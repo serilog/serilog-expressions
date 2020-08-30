@@ -10,5 +10,10 @@ namespace Serilog.Expressions.Ast
             Receiver = receiver;
             Index = index;
         }
+
+        public override string ToString()
+        {
+            return $"{Receiver}[{Index}]";
+        }
     }
 }

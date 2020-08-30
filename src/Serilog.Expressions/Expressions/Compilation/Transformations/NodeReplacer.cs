@@ -74,5 +74,21 @@ namespace Serilog.Expressions.Compilation.Transformations
 
             return base.Transform(wx);
         }
+
+        protected override Expression Transform(IndexerExpression ix)
+        {
+            if (ix == _source)
+                return _dest;
+            
+            return base.Transform(ix);
+        }
+        
+        protected override Expression Transform(ArrayExpression ax)
+        {
+            if (ax == _source)
+                return _dest;
+            
+            return base.Transform(ax);
+        }
     }
 }
