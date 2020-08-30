@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Expression evaluation over Serilog events.</Description>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Authors>Serilog Contributors</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Serilog.Expressions</AssemblyName>
+    <RootNamespace>Serilog</RootNamespace>
+    <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageTags>serilog</PackageTags>
+    <PackageIconUrl>https://serilog.net/images/serilog-extension-nuget.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/serilog/serilog-expressions</PackageProjectUrl>
+    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/serilog/serilog-expressions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Superpower" Version="2.3.0" />
+  </ItemGroup>
+
+</Project>

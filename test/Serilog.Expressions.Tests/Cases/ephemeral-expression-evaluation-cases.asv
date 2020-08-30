@@ -1,0 +1,170 @@
+// Primitives
+null                                 ⇶ null
+true                                 ⇶ true
+false                                ⇶ false
+1.3                                  ⇶ 1.3
+'foo'                                ⇶ 'foo'
+[5, 6]                               ⇶ [5, 6]
+
+// Collections
+[5, undefined]                       ⇶ undefined
+
+// Strings
+''                                   ⇶ ''
+''''                                 ⇶ ''''
+'a'                                  ⇶ 'a'
+'''b'                                ⇶ '''b'
+'b'''                                ⇶ 'b'''
+'a''b'                               ⇶ 'a''b'
+'😂'                                 ⇶ '😂'
+
+// Numbers
+0                                    ⇶ 0
+0.0                                  ⇶ 0
+1                                    ⇶ 1
+1.0                                  ⇶ 1
+123                                  ⇶ 123
+1.23                                 ⇶ 1.23
+-1                                   ⇶ -1
+-1.23                                ⇶ -1.23
+
+// Math
+1 + 1                                ⇶ 2
+1 + 2 + 3                            ⇶ 6
+'foo' + 1                            ⇶ undefined
+1 - 2                                ⇶ -1
+-1 - -1                              ⇶ 0
+3 - 2                                ⇶ 1
+'foo' - - 1                          ⇶ undefined
+1.0 + 2.0                            ⇶ 3
+1 * 0                                ⇶ 0
+12 * 12                              ⇶ 144
+3 / 1                                ⇶ 3
+3 / 0                                ⇶ undefined
+3 ^ 2                                ⇶ 9
+0 ^ 1                                ⇶ 0
+0 ^ 0                                ⇶ 1
+0 % 0                                ⇶ undefined
+0 % 1                                ⇶ 0
+1 % 0                                ⇶ undefined
+1 % 1                                ⇶ 0
+5 % 2                                ⇶ 1
+79228162514264337593543950334 + 1    ⇶ 79228162514264337593543950335
+round(1.4343434343, 2)               ⇶ 1.43
+round(1.435, 2)                      ⇶ 1.44
+round(0.00000000, 5)                 ⇶ 0
+round(0.99999999, 5)                 ⇶ 1
+52 ^ -3                              ⇶ 0.00000711197086936732
+2 ^ 3.14                             ⇶ 8.81524092701289
+
+// Boolean logic
+true or false and false              ⇶ true
+(true or false) and false            ⇶ false
+not false and false                  ⇶ false
+not (false and false)                ⇶ true
+false and true                       ⇶ false
+false and false                      ⇶ false
+true and true                        ⇶ true
+true and null                        ⇶ false
+false and null                       ⇶ false
+null and null                        ⇶ false
+undefined and undefined              ⇶ false
+undefined and true                   ⇶ false
+true and undefined                   ⇶ false
+false or false                       ⇶ false
+true or false                        ⇶ true
+true or true                         ⇶ true
+false or true                        ⇶ true
+true or null                         ⇶ true
+null or true                         ⇶ true
+true or undefined                    ⇶ true
+undefined or true                    ⇶ true
+undefined or undefined               ⇶ false
+not true                             ⇶ false
+not false                            ⇶ true
+not undefined                        ⇶ true
+not(true)                            ⇶ false
+not false and false                  ⇶ false
+not(false and false)                 ⇶ true
+not(undefined)                       ⇶ true
+'not a bool' or true                 ⇶ true
+
+// Coalesce
+coalesce(null, 1)                    ⇶ 1
+coalesce(undefined, 1)               ⇶ 1
+coalesce(1, null)                    ⇶ 1
+coalesce(undefined, undefined)       ⇶ undefined
+coalesce(null, null)                 ⇶ null
+
+// Accessors
+1.0.a                                ⇶ undefined
+
+// Identifiers
+A                                    ⇶ undefined
+_a                                   ⇶ undefined
+a1                                   ⇶ undefined
+
+// Comparators - Equal
+1 = 1                                ⇶ true
+1 = 0                                ⇶ false
+null = 0                             ⇶ false
+null = null                          ⇶ true
+null = undefined                     ⇶ undefined
+undefined = undefined                ⇶ undefined
+
+// Comparators Not Equal
+1 <> 1                               ⇶ false
+1 <> 0                               ⇶ true
+null <> 0                            ⇶ true
+null <> null                         ⇶ false
+undefined <> null                    ⇶ undefined
+undefined <> undefined               ⇶ undefined
+
+// Comparators - Less Than
+1 < 2                                ⇶ true
+1 < 1                                ⇶ false
+1 < 0                                ⇶ false
+null < 0                             ⇶ undefined
+null < null                          ⇶ undefined
+undefined < null                     ⇶ undefined
+undefined < undefined                ⇶ undefined
+
+// Comparators - Less Than or Equal To
+1 <= 2                               ⇶ true
+1 <= 1                               ⇶ true
+1 <= 0                               ⇶ false
+null <= 0                            ⇶ undefined
+null <= null                         ⇶ undefined
+undefined <= null                    ⇶ undefined
+undefined <= undefined               ⇶ undefined
+
+// Comparators - Greater Than
+3 > 1                                ⇶ true
+1 > 1                                ⇶ false
+1 > 0                                ⇶ true
+null > 0                             ⇶ undefined
+null > null                          ⇶ undefined
+undefined > null                     ⇶ undefined
+undefined > undefined                ⇶ undefined
+
+// Comparators - Greater Than or Equal To
+2 >= 1                               ⇶ true
+1 >= 1                               ⇶ true
+1 >= 0                               ⇶ true
+-1 >= 0                              ⇶ false
+null >= 0                            ⇶ undefined
+null >= null                         ⇶ undefined
+undefined >= null                    ⇶ undefined
+undefined >= undefined               ⇶ undefined
+
+// Property names and accessors
+[5, 6, 7][1]                         ⇶ 6
+
+// Wildcards
+[1,2,3][?] > 2                       ⇶ true
+[1,2,3][*] > 2                       ⇶ false
+
+// Structural
+[]                                   ⇶ []
+[1]                                  ⇶ [1]
+[[1]]                                ⇶ [[1]]
