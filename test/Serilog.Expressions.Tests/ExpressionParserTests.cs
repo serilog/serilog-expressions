@@ -39,6 +39,7 @@ namespace Serilog.Expressions.Tests
         [InlineData("@Level in ['Error', 'Warning']", "_Internal_In(@Level,[@\"Error\",@\"Warning\"])")]
         [InlineData("5 not in [1, 2]", "_Internal_NotIn(5,[1,2])")]
         [InlineData("1+1", "Add(1,1)")]
+        [InlineData("'te\nst'", null)]
         public void ValidSyntaxIsAccepted(string input, string expected = null)
         {
             var roundTrip = ExpressionParser.Parse(input).ToString();
