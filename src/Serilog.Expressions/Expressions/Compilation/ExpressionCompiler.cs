@@ -1,8 +1,5 @@
-﻿using System;
-using Serilog.Events;
-using Serilog.Expressions.Ast;
+﻿using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Arrays;
-using Serilog.Expressions.Compilation.Costing;
 using Serilog.Expressions.Compilation.In;
 using Serilog.Expressions.Compilation.Is;
 using Serilog.Expressions.Compilation.Linq;
@@ -21,7 +18,6 @@ namespace Serilog.Expressions.Compilation
             actual = NotInRewriter.Rewrite(actual);
             actual = WildcardComprehensionTransformer.Expand(actual);
             actual = IsOperatorTransformer.Rewrite(actual);
-            actual = EvaluationCostReordering.Reorder(actual);
 
             return LinqExpressionCompiler.Compile(actual);
         }
