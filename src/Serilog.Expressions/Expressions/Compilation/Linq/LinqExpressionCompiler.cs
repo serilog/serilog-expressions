@@ -24,6 +24,15 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly ConstructorInfo SequenceValueCtor =
             typeof(SequenceValue).GetConstructor(new[] {typeof(IEnumerable<LogEventPropertyValue>)});
 
+        static readonly MethodInfo CoerceTrue = typeof(LinqExpressionCompiler).GetMethod(nameof(CoerceToScalarBoolean), BindingFlags.Static | BindingFlags.Public);
+        
+        public static LogEventPropertyValue CoerceToScalarBoolean(LogEventPropertyValue value)
+        {
+            if (value is ScalarValue sv && sv.Value is bool b)
+                return RuntimeOperators.ScalarBoolean(b);
+            return RuntimeOperators.ScalarBoolean(false);
+        }
+        
         public static CompiledExpression Compile(Expression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
@@ -55,7 +64,7 @@ namespace Serilog.Expressions.Compilation.Linq
             {
                 if (shortCircuit)
                 {
-                    shortCircuitElse = op;
+                    shortCircuitElse = System.Linq.Expressions.Expression.Call(CoerceTrue, op);
                     break;
                 }
                     

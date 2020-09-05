@@ -1,4 +1,5 @@
-﻿using Serilog.Expressions.Ast;
+﻿using Serilog.Events;
+using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
 
 namespace Serilog.Expressions.Compilation.Is
@@ -12,7 +13,7 @@ namespace Serilog.Expressions.Compilation.Is
 
         protected override Expression Transform(CallExpression lx)
         {
-            if (!Operators.SameOperator(lx.OperatorName.ToLowerInvariant(), Operators.IntermediateOpSqlIs) || lx.Operands.Length != 2)
+            if (!Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpSqlIs) || lx.Operands.Length != 2)
                 return base.Transform(lx);
 
             if (lx.Operands[1] is ConstantExpression nul)
@@ -23,8 +24,9 @@ namespace Serilog.Expressions.Compilation.Is
             if (!(lx.Operands[1] is CallExpression not) || not.Operands.Length != 1)
                 return base.Transform(lx);
 
-            nul = not.Operands[0] as ConstantExpression;
-            if (nul == null || nul.Constant != null)
+            if (!(not.Operands[0] is ConstantExpression cx) ||
+                !(cx.Constant is ScalarValue sv) ||
+                sv.Value != null)
                 return base.Transform(lx);
 
             return new CallExpression(Operators.RuntimeOpIsNotNull, lx.Operands[0]);

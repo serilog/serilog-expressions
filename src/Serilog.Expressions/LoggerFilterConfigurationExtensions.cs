@@ -3,6 +3,8 @@ using Serilog.Configuration;
 using Serilog.Expressions;
 using Serilog.Expressions.Runtime;
 
+// ReSharper disable UnusedMember.Global
+
 namespace Serilog
 {
     /// <summary>

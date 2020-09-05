@@ -151,15 +151,5 @@ namespace Serilog.Expressions.Tests
             Assert.Single(sink.Events);
             Assert.Same(match, sink.Events.Single());
         }
-
-        [Fact]
-        public void StructuresAreExposedAsDictionaries()
-        {
-            var evt = Some.InformationEvent("{@Person}", new { Name = "nblumhardt" });
-            var expr = SerilogExpression.Compile("Person");
-            var val = expr(evt);
-            var dict = Assert.IsType<Dictionary<string, object>>(val);
-            Assert.Equal("nblumhardt", dict["Name"]);
-        }
     }
 }

@@ -13,7 +13,7 @@ namespace Serilog.Expressions.Runtime
         static readonly LogEventPropertyValue ConstantTrue = new ScalarValue(true),
                                               ConstantFalse = new ScalarValue(false);
 
-        static LogEventPropertyValue ScalarBoolean(bool value)
+        internal static LogEventPropertyValue ScalarBoolean(bool value)
         {
             return value ? ConstantTrue : ConstantFalse;
         }
@@ -122,18 +122,21 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue Equal(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            if (Coerce.Numeric(left, out var l) &&
-                Coerce.Numeric(right, out var r))
-                return ScalarBoolean(l == r);
+            // Undefined values propagate through comparisons
+            if (left == null || right == null)
+                return null;
             
             return ScalarBoolean(UnboxedEqualHelper(left, right));
         }
 
         static bool UnboxedEqualHelper(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            // "undefined"
             if (left == null || right == null)
-                return false;
+                throw new ArgumentException("Undefined values should short-circuit.");
+            
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return l == r;
             
             if (left is ScalarValue sl &&
                 right is ScalarValue sr)
@@ -144,11 +147,17 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue _Internal_In(LogEventPropertyValue item, LogEventPropertyValue collection)
         {
+            if (item == null)
+                return null;
+            
             if (collection is SequenceValue arr)
             {
                 for (var i = 0; i < arr.Elements.Count; ++i)
-                    if (UnboxedEqualHelper(arr.Elements[i], item))
+                {
+                    var element = arr.Elements[i];
+                    if (element != null && UnboxedEqualHelper(element, item))
                         return ConstantTrue;
+                }
 
                 return ConstantFalse;
             }
@@ -167,6 +176,9 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue NotEqual(LogEventPropertyValue left, LogEventPropertyValue right)
         {
+            if (left == null || right == null)
+                return null;
+            
             return ScalarBoolean(!UnboxedEqualHelper(left, right));
         }
 
@@ -182,6 +194,19 @@ namespace Serilog.Expressions.Runtime
             if (Coerce.Numeric(operand, out var numeric))
                 return new ScalarValue(-numeric);
             return null;
+        }
+
+        public static LogEventPropertyValue Round(LogEventPropertyValue value, LogEventPropertyValue places)
+        {
+            if (!Coerce.Numeric(value, out var v) ||
+                !Coerce.Numeric(places, out var p) ||
+                p < 0 ||
+                p > 32) // Check my memory, here :D
+            {
+                return null;
+            }
+
+            return new ScalarValue(Math.Round(v, (int)p));
         }
 
         public static LogEventPropertyValue Not(LogEventPropertyValue operand)
@@ -293,8 +318,7 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue ElementAt(LogEventPropertyValue items, LogEventPropertyValue index)
         {
-            if (items is SequenceValue arr &&
-                Coerce.Numeric(index, out var ix))
+            if (items is SequenceValue arr && Coerce.Numeric(index, out var ix))
             {
                 if (ix != Math.Floor(ix))
                     return null;
@@ -306,8 +330,7 @@ namespace Serilog.Expressions.Runtime
                 return arr.Elements.ElementAt(idx);
             }
             
-            if (items is StructureValue st &&
-                Coerce.String(index, out var s))
+            if (items is StructureValue st && Coerce.String(index, out var s))
             {
                 if (!LinqExpressionCompiler.TryGetStructurePropertyValue(st, s, out var value))
                     return null;
@@ -315,13 +338,12 @@ namespace Serilog.Expressions.Runtime
                 return value;
             }
             
-            if (items is DictionaryValue dict &&
-                index is ScalarValue sv)
+            if (items is DictionaryValue dict && index is ScalarValue sv)
             {
-                if (!dict.Elements.TryGetValue(sv, out var value))
-                    return null;
-
-                return value;
+                // The lack of eager numeric type coercion means that here, `sv` may logically equal one
+                // of the keys, but not be equal according to the dictionary's `IEqualityComparer`.
+                var entry = dict.Elements.FirstOrDefault(kv => kv.Key != null && UnboxedEqualHelper(kv.Key, sv));
+                return entry.Value; // KVP is a struct; default is a pair of nulls.
             }
 
             return null;
