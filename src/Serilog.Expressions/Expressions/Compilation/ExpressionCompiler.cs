@@ -8,13 +8,12 @@ using Serilog.Expressions.Compilation.Is;
 using Serilog.Expressions.Compilation.Linq;
 using Serilog.Expressions.Compilation.Properties;
 using Serilog.Expressions.Compilation.Wildcards;
-using Serilog.Expressions.Runtime;
 
 namespace Serilog.Expressions.Compilation
 {
     static class ExpressionCompiler
     {
-        public static Func<LogEvent, object> CompileAndExpose(Expression expression)
+        public static CompiledExpression Compile(Expression expression)
         {
             var actual = expression;
             actual = PropertiesObjectAccessorTransformer.Rewrite(actual);
@@ -24,12 +23,7 @@ namespace Serilog.Expressions.Compilation
             actual = IsOperatorTransformer.Rewrite(actual);
             actual = EvaluationCostReordering.Reorder(actual);
 
-            var compiled = LinqExpressionCompiler.Compile(actual);
-            return ctx =>
-            {
-                var result = compiled(ctx);
-                return Representation.Expose(result);
-            };
+            return LinqExpressionCompiler.Compile(actual);
         }
     }
 }

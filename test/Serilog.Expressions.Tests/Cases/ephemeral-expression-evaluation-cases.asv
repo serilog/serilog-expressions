@@ -96,9 +96,6 @@ coalesce(1, null)                    ⇶ 1
 coalesce(undefined, undefined)       ⇶ undefined
 coalesce(null, null)                 ⇶ null
 
-// Accessors
-1.0.a                                ⇶ undefined
-
 // Identifiers
 A                                    ⇶ undefined
 _a                                   ⇶ undefined

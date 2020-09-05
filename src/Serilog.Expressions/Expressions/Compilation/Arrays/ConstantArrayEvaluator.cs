@@ -23,7 +23,7 @@ namespace Serilog.Expressions.Compilation.Arrays
                 return new ConstantExpression(
                     new SequenceValue(ax.Elements
                         .Cast<ConstantExpression>()
-                        .Select(ce => Representation.Recapture(ce.ConstantValue))));
+                        .Select(ce => ce.Constant)));
             }
 
             return base.Transform(ax);

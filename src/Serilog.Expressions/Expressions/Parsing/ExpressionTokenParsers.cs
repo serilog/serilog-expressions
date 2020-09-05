@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Superpower;
 using Superpower.Model;
@@ -79,27 +80,27 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, Expression> String =
             Token.EqualTo(ExpressionToken.String)
                 .Apply(ExpressionTextParsers.String)
-                .Select(s => (Expression)new ConstantExpression(s));
+                .Select(s => (Expression)new ConstantExpression(new ScalarValue(s)));
 
         static readonly TokenListParser<ExpressionToken, Expression> HexNumber =
             Token.EqualTo(ExpressionToken.HexNumber)
                 .Apply(ExpressionTextParsers.HexInteger)
                 .SelectCatch(n => ulong.Parse(n, NumberStyles.HexNumber, CultureInfo.InvariantCulture), "the numeric literal is too large")
-                .Select(u => (Expression)new ConstantExpression((decimal)u));
+                .Select(u => (Expression)new ConstantExpression(new ScalarValue((decimal)u)));
 
         static readonly TokenListParser<ExpressionToken, Expression> Number =
             Token.EqualTo(ExpressionToken.Number)
                 .Apply(ExpressionTextParsers.Real)
                 .SelectCatch(n => decimal.Parse(n.ToStringValue(), CultureInfo.InvariantCulture), "the numeric literal is too large")
-                .Select(d => (Expression)new ConstantExpression(d));
+                .Select(d => (Expression)new ConstantExpression(new ScalarValue(d)));
 
         static readonly TokenListParser<ExpressionToken, Expression> Literal =
             String
                 .Or(Number)
                 .Or(HexNumber)
-                .Or(Token.EqualTo(ExpressionToken.True).Value((Expression)new ConstantExpression(true)))
-                .Or(Token.EqualTo(ExpressionToken.False).Value((Expression)new ConstantExpression(false)))
-                .Or(Token.EqualTo(ExpressionToken.Null).Value((Expression)new ConstantExpression(null)))
+                .Or(Token.EqualTo(ExpressionToken.True).Value((Expression)new ConstantExpression(new ScalarValue(true))))
+                .Or(Token.EqualTo(ExpressionToken.False).Value((Expression)new ConstantExpression(new ScalarValue(false))))
+                .Or(Token.EqualTo(ExpressionToken.Null).Value((Expression)new ConstantExpression(new ScalarValue(null))))
                 .Named("literal");
 
         static readonly TokenListParser<ExpressionToken, Expression> Item = Literal.Or(PropertyPath).Or(Function).Or(ArrayLiteral);

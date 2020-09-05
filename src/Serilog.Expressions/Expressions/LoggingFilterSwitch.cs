@@ -1,4 +1,4 @@
-﻿// Copyright 2013-2015 Serilog Contributors
+﻿// Copyright Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace Serilog.Expressions
         // no attempt to synchronize Expression, ToString(), and IsIncluded(),
         // for any observer, this at least ensures they won't be permanently out-of-sync for
         // all observers.
-        volatile Tuple<string, Func<LogEvent, object>> _filter;
+        volatile Tuple<string, CompiledExpression> _filter;
 
         /// <summary>
         /// Construct a <see cref="LoggingFilterSwitch"/>, optionally initialized
@@ -50,6 +50,7 @@ namespace Serilog.Expressions
         /// </summary>
         public string Expression
         {
+            // ReSharper disable once UnusedMember.Global
             get
             {
                 var filter = _filter;
@@ -63,7 +64,7 @@ namespace Serilog.Expressions
                 }
                 else
                 {
-                    _filter = new Tuple<string, Func<LogEvent, object>>(
+                    _filter = new Tuple<string, CompiledExpression>(
                         value,
                         SerilogExpression.Compile(value));
                 }
@@ -80,7 +81,7 @@ namespace Serilog.Expressions
             if (filter == null)
                 return true;
 
-            return true.Equals(filter.Item2(logEvent));
+            return true.Equals((filter.Item2(logEvent) as ScalarValue)?.Value);
         }
 
         /// <inheritdoc/>

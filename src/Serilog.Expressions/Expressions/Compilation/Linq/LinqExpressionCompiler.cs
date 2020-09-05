@@ -21,6 +21,9 @@ namespace Serilog.Expressions.Compilation.Linq
             .GetMethods(BindingFlags.Static | BindingFlags.Public)
             .ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
 
+        static readonly ConstructorInfo SequenceValueCtor =
+            typeof(SequenceValue).GetConstructor(new[] {typeof(IEnumerable<LogEventPropertyValue>)});
+
         public static CompiledExpression Compile(Expression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
@@ -36,70 +39,50 @@ namespace Serilog.Expressions.Compilation.Linq
             if (m.GetParameters().Length != lx.Operands.Length)
                 throw new ArgumentException($"The function `{lx.OperatorName}` requires {m.GetParameters().Length} arguments; to search for text instead, enclose the filter in \"double quotes\".");
 
-            var acceptUndefined = m.GetCustomAttribute<AcceptUndefinedAttribute>() != null;
-            var acceptNull = m.GetCustomAttribute<AcceptNullAttribute>() != null;
-            var numericOnly = m.GetCustomAttribute<NumericAttribute>() != null;
-            var numericComparable = m.GetCustomAttribute<NumericComparableAttribute>() != null;
-            var booleanOnly = m.GetCustomAttribute<BooleanAttribute>() != null;
             var operands = lx.Operands.Select(Transform).ToArray();
-
-            var returnUndefined = new List<Expression<Func<object, bool>>>();
-            if (!acceptUndefined) returnUndefined.Add(v => v is Undefined);
-            if (!acceptNull) returnUndefined.Add(v => v == null);
-            if (numericOnly) returnUndefined.Add(v => !(v is decimal || v == null || v is Undefined));
-            if (numericComparable) returnUndefined.Add(v => !(v is decimal || v == null || v is Undefined));
-            if (booleanOnly) returnUndefined.Add(v => !(v is bool || v == null || v is Undefined));
 
             var context = System.Linq.Expressions.Expression.Parameter(typeof(LogEvent));
 
             var operandValues = operands.Select(o => Splice(o, context));
             var operandVars = new List<ParameterExpression>();
-            var rtn = System.Linq.Expressions.Expression.Label(typeof(object));
+            var rtn = System.Linq.Expressions.Expression.Label(typeof(LogEventPropertyValue));
 
             var statements = new List<System.Linq.Expressions.Expression>();
             var first = true;
             foreach (var op in operandValues)
             {
-                var opam = System.Linq.Expressions.Expression.Variable(typeof(object));
+                var opam = System.Linq.Expressions.Expression.Variable(typeof(LogEventPropertyValue));
                 operandVars.Add(opam);
                 statements.Add(System.Linq.Expressions.Expression.Assign(opam, op));
 
                 if (first && Operators.SameOperator(lx.OperatorName, Operators.OpAnd))
                 {
-                    Expression<Func<object, bool>> shortCircuitIf = v => !true.Equals(v);
+                    Expression<Func<LogEventPropertyValue, bool>> shortCircuitIf = v => !(v is ScalarValue) || !true.Equals(((ScalarValue)v).Value);
                     var scc = Splice(shortCircuitIf, opam);
-                    statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(false, typeof(object)))));
+                    statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(new ScalarValue(false), typeof(LogEventPropertyValue)))));
                 }
 
                 if (first && Operators.SameOperator(lx.OperatorName, Operators.OpOr))
                 {
-                    Expression<Func<object, bool>> shortCircuitIf = v => true.Equals(v);
+                    Expression<Func<LogEventPropertyValue, bool>> shortCircuitIf = v => v is ScalarValue && true.Equals(((ScalarValue)v).Value);
                     var scc = Splice(shortCircuitIf, opam);
-                    statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(true, typeof(object)))));
-                }
-
-                var checks = returnUndefined.Select(fv => Splice(fv, opam)).ToArray();
-                foreach (var check in checks)
-                {
-                    statements.Add(System.Linq.Expressions.Expression.IfThen(check, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(Undefined.Value, typeof(object)))));
+                    statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(new ScalarValue(true), typeof(LogEventPropertyValue)))));
                 }
 
                 first = false;
             }
 
             statements.Add(System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Call(m, operandVars)));
-            statements.Add(System.Linq.Expressions.Expression.Label(rtn, System.Linq.Expressions.Expression.Constant(Undefined.Value, typeof(object))));
+            statements.Add(System.Linq.Expressions.Expression.Label(rtn, System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue))));
 
             return System.Linq.Expressions.Expression.Lambda<CompiledExpression>(
-                System.Linq.Expressions.Expression.Block(typeof(object), operandVars, statements),
+                System.Linq.Expressions.Expression.Block(typeof(LogEventPropertyValue), operandVars, statements),
                 context);
         }
 
         protected override Expression<CompiledExpression> Transform(AccessorExpression spx)
         {
             var tgv = typeof(LinqExpressionCompiler).GetTypeInfo().GetMethod(nameof(TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public);
-            var norm = typeof(Representation).GetTypeInfo().GetMethod(nameof(Representation.Represent), BindingFlags.Static | BindingFlags.Public);
-
             var recv = Transform(spx.Receiver);
 
             var context = System.Linq.Expressions.Expression.Parameter(typeof(LogEvent));
@@ -111,40 +94,23 @@ namespace Serilog.Expressions.Compilation.Linq
             var sx3 = System.Linq.Expressions.Expression.Call(tgv, str, System.Linq.Expressions.Expression.Constant(spx.MemberName, typeof(string)), result);
 
             var sx1 = System.Linq.Expressions.Expression.Condition(sx3,
-                            System.Linq.Expressions.Expression.Call(norm, result),
-                            System.Linq.Expressions.Expression.Constant(Undefined.Value, typeof(object)));
+                            result,
+                            System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue)));
 
-            var sx2 = System.Linq.Expressions.Expression.Block(typeof(object),
+            var sx2 = System.Linq.Expressions.Expression.Block(typeof(LogEventPropertyValue),
                     System.Linq.Expressions.Expression.Assign(str, System.Linq.Expressions.Expression.TypeAs(r, typeof(StructureValue))),
                     System.Linq.Expressions.Expression.Condition(System.Linq.Expressions.Expression.Equal(str, System.Linq.Expressions.Expression.Constant(null, typeof(StructureValue))),
-                        System.Linq.Expressions.Expression.Constant(Undefined.Value, typeof(object)),
+                        System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue)),
                         sx1));
 
             var assignR = System.Linq.Expressions.Expression.Assign(r, Splice(recv, context));
-            var getValue = System.Linq.Expressions.Expression.Condition(System.Linq.Expressions.Expression.TypeIs(r, typeof(Undefined)),
-                System.Linq.Expressions.Expression.Constant(Undefined.Value, typeof(object)),
+            var getValue = System.Linq.Expressions.Expression.Condition(System.Linq.Expressions.Expression.Equal(r, System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue))),
+                System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue)),
                 sx2);
 
             return System.Linq.Expressions.Expression.Lambda<CompiledExpression>(
-                System.Linq.Expressions.Expression.Block(typeof(object), new[] { r, str, result }, assignR, getValue),
+                System.Linq.Expressions.Expression.Block(typeof(LogEventPropertyValue), new[] { r, str, result }, assignR, getValue),
                 context);
-
-            //return context =>
-            //{
-            //    var r = recv(context);
-            //    if (r is Undefined)
-            //        return Undefined.Value;
-
-            //    var str = r as StructureValue;
-            //    if (str == null)
-            //        return Undefined.Value;
-
-            //    LogEventPropertyValue result;
-            //    if (!str.Properties.TryGetValue(spx.PropertyName, out result))
-            //        return Undefined.Value;
-
-            //    return Represent(result);
-            //};
         }
 
         static System.Linq.Expressions.Expression Splice(LambdaExpression lambda, params ParameterExpression[] newParameters)
@@ -155,7 +121,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override Expression<CompiledExpression> Transform(ConstantExpression cx)
         {
-            return context => cx.ConstantValue;
+            return context => cx.Constant;
         }
 
         protected override Expression<CompiledExpression> Transform(AmbientPropertyExpression px)
@@ -163,24 +129,24 @@ namespace Serilog.Expressions.Compilation.Linq
             if (px.IsBuiltIn)
             {
                 if (px.PropertyName == BuiltInProperty.Level)
-                    return context => context.Level.ToString();
+                    return context => new ScalarValue(context.Level.ToString());
 
                 if (px.PropertyName == BuiltInProperty.Message)
-                    return context => NormalizeBaseDocumentProperty(context.RenderMessage(null));
+                    return context => NormalizeBuiltInProperty(context.RenderMessage(null));
 
                 if (px.PropertyName == BuiltInProperty.Exception)
-                    return context => NormalizeBaseDocumentProperty(context.Exception == null ? null : context.Exception.ToString());
+                    return context => NormalizeBuiltInProperty(context.Exception == null ? null : context.Exception.ToString());
 
                 if (px.PropertyName == BuiltInProperty.Timestamp)
-                    return context => context.Timestamp.ToString("o");
+                    return context => new ScalarValue(context.Timestamp.ToString("o"));
 
                 if (px.PropertyName == BuiltInProperty.MessageTemplate)
-                    return context => NormalizeBaseDocumentProperty(context.MessageTemplate.Text);
+                    return context => NormalizeBuiltInProperty(context.MessageTemplate.Text);
 
                 if (px.PropertyName == BuiltInProperty.Properties)
                     return context => new StructureValue(context.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)), null);
 
-                return context => Undefined.Value;
+                return context => null;
             }
 
             var propertyName = px.PropertyName;
@@ -188,12 +154,12 @@ namespace Serilog.Expressions.Compilation.Linq
             return context => GetPropertyValue(context, propertyName);
         }
 
-        static object GetPropertyValue(LogEvent context, string propertyName)
+        static LogEventPropertyValue GetPropertyValue(LogEvent context, string propertyName)
         {
             if (!context.Properties.TryGetValue(propertyName, out var value))
-                return Undefined.Value;
+                return null;
 
-            return Representation.Represent(value);
+            return value;
         }
 
         public static bool TryGetStructurePropertyValue(StructureValue sv, string name, out LogEventPropertyValue value)
@@ -211,30 +177,30 @@ namespace Serilog.Expressions.Compilation.Linq
             return false;
         }
 
-        static object NormalizeBaseDocumentProperty(string rawValue)
+        static LogEventPropertyValue NormalizeBuiltInProperty(string rawValue)
         {
             // If a property like @Exception is null, it's not present at all, thus Undefined
             if (rawValue == null)
-                return Undefined.Value;
+                return null;
 
-            return rawValue;
+            return new ScalarValue(rawValue);
         }
 
         protected override Expression<CompiledExpression> Transform(Ast.LambdaExpression lmx)
         {
             var context = System.Linq.Expressions.Expression.Parameter(typeof(LogEvent));
-            var parms = lmx.Parameters.Select(px => Tuple.Create(px, System.Linq.Expressions.Expression.Parameter(typeof(object), px.ParameterName))).ToList();
+            var parms = lmx.Parameters.Select(px => Tuple.Create(px, System.Linq.Expressions.Expression.Parameter(typeof(LogEventPropertyValue), px.ParameterName))).ToList();
             var body = Splice(Transform(lmx.Body), context);
             var paramSwitcher = new ExpressionConstantMapper(parms.ToDictionary(px => (object)px.Item1, px => (System.Linq.Expressions.Expression)px.Item2));
             var rewritten = paramSwitcher.Visit(body);
 
             Type delegateType;
             if (lmx.Parameters.Length == 1)
-                delegateType = typeof(Func<object, object>);
+                delegateType = typeof(Func<LogEventPropertyValue, LogEventPropertyValue>);
             else if (lmx.Parameters.Length == 2)
-                delegateType = typeof(Func<object, object, object>);
+                delegateType = typeof(Func<LogEventPropertyValue, LogEventPropertyValue, LogEventPropertyValue>);
             else
-                throw new NotSupportedException("Unsupported lambda signature");
+                throw new NotSupportedException("Unsupported lambda signature.");
 
             var lambda = System.Linq.Expressions.Expression.Lambda(delegateType, rewritten, parms.Select(px => px.Item2).ToArray());
 
@@ -251,16 +217,16 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override Expression<CompiledExpression> Transform(IndexerWildcardExpression wx)
         {
-            return context => Undefined.Value;
+            return context => null;
         }
 
         protected override Expression<CompiledExpression> Transform(ArrayExpression ax)
         {
             var context = System.Linq.Expressions.Expression.Parameter(typeof(LogEvent));
             var elements = ax.Elements.Select(Transform).Select(ex => Splice(ex, context)).ToArray();
-            var arr = System.Linq.Expressions.Expression.NewArrayInit(typeof(object), elements);
-            var sv = System.Linq.Expressions.Expression.Call(OperatorMethods[Operators.RuntimeOpNewSequence], arr);
-            return System.Linq.Expressions.Expression.Lambda<CompiledExpression>(System.Linq.Expressions.Expression.Convert(sv, typeof(object)), context);
+            var arr = System.Linq.Expressions.Expression.NewArrayInit(typeof(LogEventPropertyValue), elements);
+            var sv = System.Linq.Expressions.Expression.New(SequenceValueCtor, System.Linq.Expressions.Expression.Convert(arr, typeof(IEnumerable<LogEventPropertyValue>)));
+            return System.Linq.Expressions.Expression.Lambda<CompiledExpression>(System.Linq.Expressions.Expression.Convert(sv, typeof(LogEventPropertyValue)), context);
         }
 
         protected override Expression<CompiledExpression> Transform(IndexerExpression ix)

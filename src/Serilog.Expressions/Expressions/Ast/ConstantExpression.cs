@@ -1,32 +1,38 @@
 ﻿using System;
 using System.Globalization;
+using Serilog.Events;
 
 namespace Serilog.Expressions.Ast
 { 
     class ConstantExpression : Expression
     {
-        public ConstantExpression(object constantValue)
+        public ConstantExpression(LogEventPropertyValue constant)
         {
-            ConstantValue = constantValue;
+            Constant = constant ?? throw new ArgumentNullException(nameof(constant));
         }
 
-        public object ConstantValue { get; }
+        public LogEventPropertyValue Constant { get; }
         
         public override string ToString()
         {
-            switch (ConstantValue)
+            if (Constant is ScalarValue sv)
             {
-                case string s:
-                    return "'" + s.Replace("'", "''") + "'";
-                case true:
-                    return "true";
-                case false:
-                    return "false";
-                case IFormattable formattable:
-                    return formattable.ToString(null, CultureInfo.InvariantCulture);
-                default:
-                    return (ConstantValue ?? "null").ToString();
+                switch (sv.Value)
+                {
+                    case string s:
+                        return "'" + s.Replace("'", "''") + "'";
+                    case true:
+                        return "true";
+                    case false:
+                        return "false";
+                    case IFormattable formattable:
+                        return formattable.ToString(null, CultureInfo.InvariantCulture);
+                    default:
+                        return (sv.Value ?? "null").ToString();
+                }
             }
+
+            return Constant.ToString();
         }
     }
 }

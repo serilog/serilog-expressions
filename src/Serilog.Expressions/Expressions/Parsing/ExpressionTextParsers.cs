@@ -20,7 +20,7 @@ namespace Serilog.Expressions.Parsing
                 .Select(chars => new string(chars));
 
         static readonly TextParser<char> StringContentChar =
-            Span.EqualTo("''").Value('\'').Try().Or(Character.AnyChar);
+            Span.EqualTo("''").Value('\'').Try().Or(Character.Except('\''));
 
         public static readonly TextParser<string> String =
             Character.EqualTo('\'')

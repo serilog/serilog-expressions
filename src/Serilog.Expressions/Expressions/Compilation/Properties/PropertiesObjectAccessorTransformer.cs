@@ -10,18 +10,20 @@ namespace Serilog.Expressions.Compilation.Properties
             return new PropertiesObjectAccessorTransformer().Transform(actual);
         }
 
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(AccessorExpression ax)
         {
-            if (!Operators.SameOperator(lx.OperatorName, Operators.OpElementAt) || lx.Operands.Length != 2)
-                return base.Transform(lx);
+            if (!Pattern.IsAmbientProperty(ax.Receiver, "Properties", true))
+                return base.Transform(ax);
+            
+            return new AmbientPropertyExpression(ax.MemberName, false);
+        }
 
-            if (!(lx.Operands[0] is AmbientPropertyExpression p)
-                    || !(lx.Operands[1] is ConstantExpression n)
-                    || !p.IsBuiltIn 
-                    || p.PropertyName != "Properties"
-                    || !(n.ConstantValue is string name))
-                return base.Transform(lx);
-
+        protected override Expression Transform(IndexerExpression ix)
+        {
+            if (!Pattern.IsAmbientProperty(ix.Receiver, "Properties", true) ||
+                !Pattern.IsStringConstant(ix.Index, out var name))
+                return base.Transform(ix);
+            
             return new AmbientPropertyExpression(name, false);
         }
     }

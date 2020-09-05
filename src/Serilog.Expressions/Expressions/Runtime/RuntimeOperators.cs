@@ -1,523 +1,428 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
 
-// ReSharper disable UnusedMember.Global
+// ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global
 
 namespace Serilog.Expressions.Runtime
 {
     static class RuntimeOperators
     {
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Add(object left, object right)
+        static readonly LogEventPropertyValue ConstantTrue = new ScalarValue(true),
+                                              ConstantFalse = new ScalarValue(false);
+
+        static LogEventPropertyValue ScalarBoolean(bool value)
         {
-            return (decimal)left + (decimal)right;
+            return value ? ConstantTrue : ConstantFalse;
+        }
+        
+        public static LogEventPropertyValue Add(LogEventPropertyValue left, LogEventPropertyValue right)
+        {
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return new ScalarValue(l + r);
+
+            return default;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Subtract(object left, object right)
+        public static LogEventPropertyValue Subtract(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return (decimal)left - (decimal)right;
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return new ScalarValue(l - r);
+
+            return default;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Multiply(object left, object right)
+        public static LogEventPropertyValue Multiply(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return (decimal)left * (decimal)right;
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return new ScalarValue(l * r);
+
+            return default;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Divide(object left, object right)
+        public static LogEventPropertyValue Divide(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            if ((decimal)right == 0) return Undefined.Value;
-            return (decimal)left / (decimal)right;
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r) &&
+                r != 0)
+                return new ScalarValue(l / r);
+
+            return default;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Modulo(object left, object right)
+        public static LogEventPropertyValue Modulo(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            if ((decimal)right == 0) return Undefined.Value;
-            return (decimal)left % (decimal)right;
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r) &&
+                r != 0)
+                return new ScalarValue(l % r);
+
+            return default;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Power(object left, object right)
+        public static LogEventPropertyValue Power(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return (decimal)Math.Pow((double)(decimal)left, (double)(decimal)right);
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return new ScalarValue(Math.Pow((double)l, (double)r));
+
+            return default;
         }
 
-        [Boolean]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object And(object left, object right)
+        public static LogEventPropertyValue And(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return true.Equals(left) && true.Equals(right);
+            throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
-        [Boolean, AcceptUndefined, AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Or(object left, object right)
+        public static LogEventPropertyValue Or(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return true.Equals(left) || true.Equals(right);
+            throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
-        [NumericComparable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object LessThanOrEqual(object left, object right)
+        public static LogEventPropertyValue LessThanOrEqual(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return ((decimal)left) <= ((decimal)right);
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return ScalarBoolean(l <= r);
+
+            return default;
         }
 
-        [NumericComparable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object LessThan(object left, object right)
+        public static LogEventPropertyValue LessThan(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return ((decimal)left) < ((decimal)right);
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return ScalarBoolean(l < r);
+
+            return default;
         }
 
-        [NumericComparable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object GreaterThan(object left, object right)
+        public static LogEventPropertyValue GreaterThan(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return ((decimal)left) > ((decimal)right);
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return ScalarBoolean(l > r);
+
+            return default;
         }
 
-        [NumericComparable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object GreaterThanOrEqual(object left, object right)
+        public static LogEventPropertyValue GreaterThanOrEqual(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return (decimal)left >= (decimal)right;
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return ScalarBoolean(l >= r);
+
+            return default;
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Equal(object left, object right)
+        public static LogEventPropertyValue Equal(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return UnboxedEqualHelper(left, right);
+            return ScalarBoolean(UnboxedEqualHelper(left, right));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static bool UnboxedEqualHelper(object left, object right)
+        static bool UnboxedEqualHelper(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return left?.Equals(right) ?? right == null;
+            // "undefined"
+            if (left == null || right == null)
+                return false;
+            
+            if (left is ScalarValue sl &&
+                right is ScalarValue sr)
+                return sl.Value?.Equals(sr.Value) ?? sr.Value == null;
+
+            return false;
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_In(object item, object collection)
+        public static LogEventPropertyValue _Internal_In(LogEventPropertyValue item, LogEventPropertyValue collection)
         {
             if (collection is SequenceValue arr)
             {
                 for (var i = 0; i < arr.Elements.Count; ++i)
-                    if (UnboxedEqualHelper(Representation.Represent(arr.Elements[i]), item))
-                        return true;
+                    if (UnboxedEqualHelper(arr.Elements[i], item))
+                        return ConstantTrue;
 
-                return false;
+                return ConstantFalse;
             }
 
-            return Undefined.Value;
+            return null;
         }
         
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_EqualIgnoreCase(object left, object right)
+        public static LogEventPropertyValue _Internal_EqualIgnoreCase(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            if (left == null && right == null)
-                return true;
+            if (!Coerce.String(left, out var ls) ||
+                !Coerce.String(right, out var rs))
+                return null;
 
-            var ls = left as string;
-            var rs = right as string;
-            if (ls == null || rs == null)
-                return Undefined.Value;
-
-            return CompareInfo.Compare(ls, rs, CompareOptions.OrdinalIgnoreCase) == 0;
+            return ScalarBoolean(CompareInfo.Compare(ls, rs, CompareOptions.OrdinalIgnoreCase) == 0);
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_EqualPattern(object left, object right)
+        public static LogEventPropertyValue NotEqual(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            if (left == null && right == null)
-                return true;
-
-            var ls = left as string;
-            var rs = right as Regex;
-            if (ls == null || rs == null)
-                return Undefined.Value;
-
-            return rs.IsMatch(ls);
+            return ScalarBoolean(!UnboxedEqualHelper(left, right));
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object NotEqual(object left, object right)
+        public static LogEventPropertyValue _Internal_NotEqualIgnoreCase(LogEventPropertyValue left, LogEventPropertyValue right)
         {
-            return !UnboxedEqualHelper(left, right);
+            if (Coerce.Boolean(_Internal_EqualIgnoreCase(left, right), out var b))
+                return ScalarBoolean(!b);
+            return null;
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_NotEqualIgnoreCase(object left, object right)
+        public static LogEventPropertyValue Negate(LogEventPropertyValue operand)
         {
-            var r = _Internal_EqualIgnoreCase(left, right);
-            if (ReferenceEquals(r, Undefined.Value)) return r;
-            return !(bool)r;
+            if (Coerce.Numeric(operand, out var numeric))
+                return new ScalarValue(-numeric);
+            return null;
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_NotEqualPattern(object left, object right)
+        public static LogEventPropertyValue Not(LogEventPropertyValue operand)
         {
-            var r = _Internal_EqualPattern(left, right);
-            if (ReferenceEquals(r, Undefined.Value)) return r;
-            return !(bool)r;
+            if (operand is null)
+                return ConstantTrue;
+
+            return Coerce.Boolean(operand, out var b) ?
+                ScalarBoolean(!b) :
+                null;
         }
 
-        [Numeric]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Negate(object operand)
+        public static LogEventPropertyValue _Internal_StrictNot(LogEventPropertyValue operand)
         {
-            return -((decimal)operand);
+            return Coerce.Boolean(operand, out var b) ?
+                ScalarBoolean(!b) :
+                null;
         }
 
-        [Boolean, AcceptUndefined]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Not(object operand)
+        public static LogEventPropertyValue Contains(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            if (operand is Undefined)
-                return true;
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
 
-            return !((bool)operand);
-        }
-
-        [Boolean]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_StrictNot(object operand)
-        {
-            return !((bool)operand);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Contains(object corpus, object pattern)
-        {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return ctx.Contains(ptx);
+            return ScalarBoolean(ctx.Contains(ptx));
         }
 
         static readonly CompareInfo CompareInfo = CultureInfo.InvariantCulture.CompareInfo;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_ContainsIgnoreCase(object corpus, object pattern)
+        public static LogEventPropertyValue _Internal_ContainsIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return CompareInfo.IndexOf(ctx, ptx, CompareOptions.OrdinalIgnoreCase) >= 0;
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return ScalarBoolean(CompareInfo.IndexOf(ctx, ptx, CompareOptions.OrdinalIgnoreCase) >= 0);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_ContainsPattern(object corpus, object pattern)
+        public static LogEventPropertyValue IndexOf(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as Regex;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return ptx.IsMatch(ctx);
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return new ScalarValue(ctx.IndexOf(ptx, StringComparison.Ordinal));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object IndexOf(object corpus, object pattern)
+        public static LogEventPropertyValue _Internal_IndexOfIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return (decimal)ctx.IndexOf(ptx, StringComparison.Ordinal);
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return new ScalarValue(ctx.IndexOf(ptx, StringComparison.OrdinalIgnoreCase));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_IndexOfIgnoreCase(object corpus, object pattern)
+        public static LogEventPropertyValue Length(LogEventPropertyValue arg)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return (decimal)ctx.IndexOf(ptx, StringComparison.OrdinalIgnoreCase);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_IndexOfPattern(object corpus, object pattern)
-        {
-            var ctx = corpus as string;
-            var ptx = pattern as Regex;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-
-            var m = ptx.Match(ctx);
-            if (!m.Success)
-                return -1m;
-
-            return (decimal)m.Index;
-
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Length(object arg)
-        {
-            if (arg is string str)
-                return (decimal)str.Length;
+            if (Coerce.String(arg, out var s))
+                return new ScalarValue(s.Length);
 
             if (arg is SequenceValue seq)
-                return (decimal) seq.Elements.Count;
+                return new ScalarValue(seq.Elements.Count);
 
-            return Undefined.Value;
+            return null;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object StartsWith(object corpus, object pattern)
+        public static LogEventPropertyValue StartsWith(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return ctx.StartsWith(ptx, StringComparison.Ordinal);
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return ScalarBoolean(ctx.StartsWith(ptx, StringComparison.Ordinal));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_StartsWithIgnoreCase(object corpus, object pattern)
+        public static LogEventPropertyValue _Internal_StartsWithIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return ctx.StartsWith(ptx, StringComparison.OrdinalIgnoreCase);
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return ScalarBoolean(ctx.StartsWith(ptx, StringComparison.OrdinalIgnoreCase));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_StartsWithPattern(object corpus, object pattern)
+        public static LogEventPropertyValue EndsWith(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as Regex;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            var m = ptx.Match(ctx);
-            return m.Success && m.Index == 0;
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.Ordinal));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object EndsWith(object corpus, object pattern)
+        public static LogEventPropertyValue _Internal_EndsWithIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as string;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            return ctx.EndsWith(ptx, StringComparison.Ordinal);
+            if (!Coerce.String(corpus, out var ctx) ||
+                !Coerce.String(pattern, out var ptx))
+                return null;
+
+            return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.OrdinalIgnoreCase));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_EndsWithIgnoreCase(object corpus, object pattern)
+        public static LogEventPropertyValue Has(LogEventPropertyValue value)
         {
-            if (!(corpus is string ctx) || !(pattern is string ptx))
-                return Undefined.Value;
-            return ctx.EndsWith(ptx, StringComparison.OrdinalIgnoreCase);
+            return ScalarBoolean(value != null);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_EndsWithPattern(object corpus, object pattern)
+        public static LogEventPropertyValue ElementAt(LogEventPropertyValue items, LogEventPropertyValue index)
         {
-            var ctx = corpus as string;
-            var ptx = pattern as Regex;
-            if (ctx == null || ptx == null)
-                return Undefined.Value;
-            var matches = ptx.Matches(ctx);
-            if (matches.Count == 0)
-                return false;
-            var m = matches[matches.Count - 1];
-            return m.Index + m.Length == ctx.Length;
-        }
-
-        [AcceptUndefined, AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Has(object value)
-        {
-            return !(value is Undefined);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object ElementAt(object items, object index)
-        {
-            if (items is SequenceValue arr)
+            if (items is SequenceValue arr &&
+                Coerce.Numeric(index, out var ix))
             {
-                if (!(index is decimal))
-                    return Undefined.Value;
+                if (ix != Math.Floor(ix))
+                    return null;
 
-                var dec = (decimal)index;
-                if (dec != Math.Floor(dec))
-                    return Undefined.Value;
-
-                var idx = (int)dec;
+                var idx = (int)ix;
                 if (idx >= arr.Elements.Count)
-                    return Undefined.Value;
+                    return null;
 
-                return Representation.Represent(arr.Elements.ElementAt(idx));
+                return arr.Elements.ElementAt(idx);
             }
             
-            if (items is StructureValue dict)
+            if (items is StructureValue st &&
+                Coerce.String(index, out var s))
             {
-                var s = index as string;
-                if (s == null)
-                    return Undefined.Value;
+                if (!LinqExpressionCompiler.TryGetStructurePropertyValue(st, s, out var value))
+                    return null;
 
-                if (!LinqExpressionCompiler.TryGetStructurePropertyValue(dict, s, out var value))
-                    return Undefined.Value;
+                return value;
+            }
+            
+            if (items is DictionaryValue dict &&
+                index is ScalarValue sv)
+            {
+                if (!dict.Elements.TryGetValue(sv, out var value))
+                    return null;
 
-                return Representation.Represent(value);
+                return value;
             }
 
-            // Case for DictionaryValue is missing, here.
-
-            return Undefined.Value;
+            return null;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_Any(object items, object predicate)
+        public static LogEventPropertyValue _Internal_Any(LogEventPropertyValue items, LogEventPropertyValue predicate)
         {
-            if (!(predicate is Func<object, object> pred))
-                return Undefined.Value;
+            if (!Coerce.Predicate(predicate, out var pred))
+                return null;
 
             if (items is SequenceValue arr)
             {
-                return arr.Elements.Any(e => true.Equals(pred(Representation.Represent(e))));
+                return ScalarBoolean(arr.Elements.Any(e => Coerce.True(pred(e))));
             }
 
             if (items is StructureValue structure)
             {
-                return structure.Properties.Any(e => true.Equals(pred(Representation.Represent(e.Value))));
+                return ScalarBoolean(structure.Properties.Any(e => Coerce.True(pred(e.Value))));
             }
 
-            return Undefined.Value;
+            return null;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_All(object items, object predicate)
+        public static LogEventPropertyValue _Internal_All(LogEventPropertyValue items, LogEventPropertyValue predicate)
         {
-            if (!(predicate is Func<object, object> pred))
-                return Undefined.Value;
+            if (!Coerce.Predicate(predicate, out var pred))
+                return null;
 
             if (items is SequenceValue arr)
             {
-                return arr.Elements.All(e => true.Equals(pred(Representation.Represent(e))));
+                return ScalarBoolean(arr.Elements.All(e => Coerce.True(pred(e))));
             }
 
             if (items is StructureValue structure)
             {
-                return structure.Properties.All(e => true.Equals(pred(Representation.Represent(e.Value))));
+                return ScalarBoolean(structure.Properties.All(e => Coerce.True(pred(e.Value))));
             }
 
-            return Undefined.Value;
+            return null;
         }
 
-        [AcceptNull, AcceptUndefined]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object TypeOf(object value)
+        public static LogEventPropertyValue TagOf(LogEventPropertyValue value)
+        {
+            if (value is StructureValue structure)
+                return new ScalarValue(structure.TypeTag); // I.e. may be null
+
+            return null;
+        }
+
+        public static LogEventPropertyValue TypeOf(LogEventPropertyValue value)
         {
             if (value is DictionaryValue)
-                return "object"; // Follow the JSON system here
+                return new ScalarValue("dictionary");
 
-            if (value is StructureValue structure)
-                return structure.TypeTag ?? "object";
+            if (value is StructureValue)
+                return new ScalarValue("structure");
 
             if (value is SequenceValue)
-                return "array";
+                return new ScalarValue("sequence");
 
-            if (value is string)
-                return "string";
+            if (value is ScalarValue scalar)
+            {
+                return new ScalarValue(scalar.Value?.GetType().ToString() ?? "null");
+            }
 
-            if (value is decimal)
-                return "number";
-
-            if (value is bool)
-                return "boolean";
-
-            if (value is Undefined)
-                return "undefined";
-
-            if (value == null)
-                return "null";
-
-            return Undefined.Value;
+            return new ScalarValue("undefined");
         }
 
-        [AcceptUndefined, AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_IsNull(object value)
+        public static LogEventPropertyValue _Internal_IsNull(LogEventPropertyValue value)
         {
-            return value is Undefined || value == null;
+            return ScalarBoolean(value is null || value is ScalarValue sv && sv.Value == null);
         }
 
-        [AcceptUndefined, AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object _Internal_IsNotNull(object value)
+        public static LogEventPropertyValue _Internal_IsNotNull(LogEventPropertyValue value)
         {
-            return value != null && !(value is Undefined);
+            return ScalarBoolean(!(value is null || value is ScalarValue sv && sv.Value == null));
         }
 
-        [AcceptUndefined, AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Coalesce(object v1, object v2)
+        public static LogEventPropertyValue Coalesce(LogEventPropertyValue v1, LogEventPropertyValue v2)
         {
-            if (v1 != null && !(v1 is Undefined))
-                return v1;
+            if (v1 is null || v1 is ScalarValue sv && sv.Value == null)
+                return v2;
 
-            return v2;
+            return v1;
         }
 
-        [AcceptNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Substring(object sval, object startIndex, object length)
+        public static LogEventPropertyValue Substring(LogEventPropertyValue sval, LogEventPropertyValue startIndex, LogEventPropertyValue length)
         {
-            var str = sval as string;
-            if (str == null || !(startIndex is decimal) || length != null && !(length is decimal))
-                return Undefined.Value;
-
-            var si = (decimal)startIndex;
-
+            if (!Coerce.String(sval, out var str) ||
+                !Coerce.Numeric(startIndex, out var si))
+                return null;
+            
             if (si < 0 || si >= str.Length || (int)si != si)
-                return Undefined.Value;
+                return null;
 
             if (length == null)
-                return str.Substring((int)si);
+                return new ScalarValue(str.Substring((int)si));
 
-            var len = (decimal)length;
-            if ((int)len != len)
-                return Undefined.Value;
+            if (!Coerce.Numeric(length, out var len) || (int)len != len)
+                return null;
 
             if (len + si > str.Length)
-                return str.Substring((int)si);
+                return new ScalarValue(str.Substring((int)si));
 
-            return str.Substring((int)si, (int)len);
-        }
-
-        // This helper method is not called as an operator; rather, we use it
-        // to avoid uglier LINQ expression code to create array literals in
-        // `LinqExpressionCompiler`.
-        public static SequenceValue _Internal_NewSequence(object[] arr)
-        {
-            if (arr == null) throw new ArgumentNullException(nameof(arr));
-            return new SequenceValue(arr.Select(Representation.Recapture));
+            return new ScalarValue(str.Substring((int)si, (int)len));
         }
     }
 }

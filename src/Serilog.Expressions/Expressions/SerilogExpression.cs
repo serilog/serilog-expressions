@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Serilog.Events;
 using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Parsing;
+
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Serilog.Expressions
 {
@@ -15,8 +16,8 @@ namespace Serilog.Expressions
         /// Create an evaluation function based on the provided expression.
         /// </summary>
         /// <param name="expression">An expression.</param>
-        /// <returns>A function that evaluates the expression in the context of the log event.</returns>
-        public static Func<LogEvent, object> Compile(string expression)
+        /// <returns>A function that evaluates the expression in the context of a log event.</returns>
+        public static CompiledExpression Compile(string expression)
         {
             if (!TryCompile(expression, out var filter, out var error))
                 throw new ArgumentException(error);
@@ -31,7 +32,7 @@ namespace Serilog.Expressions
         /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
         /// <param name="error">The reported error, if compilation was unsuccessful.</param>
         /// <returns>True if the function could be created; otherwise, false.</returns>
-        public static bool TryCompile(string expression, out Func<LogEvent, object> result, out string error)
+        public static bool TryCompile(string expression, out CompiledExpression result, out string error)
         {
             if (!ExpressionParser.TryParse(expression, out var root, out error))
             {
@@ -39,7 +40,7 @@ namespace Serilog.Expressions
                 return false;
             }
 
-            result = ExpressionCompiler.CompileAndExpose(root);
+            result = ExpressionCompiler.Compile(root);
             error = null;
             return true;
         }

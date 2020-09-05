@@ -17,14 +17,14 @@ namespace Serilog.Expressions.Compilation.Is
 
             if (lx.Operands[1] is ConstantExpression nul)
             {
-                return nul.ConstantValue != null ? base.Transform(lx) : new CallExpression(Operators.RuntimeOpIsNull, lx.Operands[0]);
+                return nul.Constant != null ? base.Transform(lx) : new CallExpression(Operators.RuntimeOpIsNull, lx.Operands[0]);
             }
 
             if (!(lx.Operands[1] is CallExpression not) || not.Operands.Length != 1)
                 return base.Transform(lx);
 
             nul = not.Operands[0] as ConstantExpression;
-            if (nul == null || nul.ConstantValue != null)
+            if (nul == null || nul.Constant != null)
                 return base.Transform(lx);
 
             return new CallExpression(Operators.RuntimeOpIsNotNull, lx.Operands[0]);

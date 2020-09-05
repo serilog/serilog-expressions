@@ -32,9 +32,9 @@ namespace Serilog.Expressions.Tests
             var actual = SerilogExpression.Compile(expr)(Some.InformationEvent());
             var expected = SerilogExpression.Compile(result)(Some.InformationEvent());
 
-            if (expected is Undefined)
+            if (expected is null)
             {
-                Assert.True(actual is Undefined, $"Expected: {expected}{Environment.NewLine}Actual: {actual}");
+                Assert.True(actual is null, $"Expected: undefined{Environment.NewLine}Actual: {actual}");
             }
             else
             {
