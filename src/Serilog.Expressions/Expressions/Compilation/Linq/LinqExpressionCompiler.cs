@@ -49,8 +49,16 @@ namespace Serilog.Expressions.Compilation.Linq
 
             var statements = new List<System.Linq.Expressions.Expression>();
             var first = true;
+            var shortCircuit = false;
+            System.Linq.Expressions.Expression shortCircuitElse = null;
             foreach (var op in operandValues)
             {
+                if (shortCircuit)
+                {
+                    shortCircuitElse = op;
+                    break;
+                }
+                    
                 var opam = System.Linq.Expressions.Expression.Variable(typeof(LogEventPropertyValue));
                 operandVars.Add(opam);
                 statements.Add(System.Linq.Expressions.Expression.Assign(opam, op));
@@ -60,6 +68,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     Expression<Func<LogEventPropertyValue, bool>> shortCircuitIf = v => !(v is ScalarValue) || !true.Equals(((ScalarValue)v).Value);
                     var scc = Splice(shortCircuitIf, opam);
                     statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(new ScalarValue(false), typeof(LogEventPropertyValue)))));
+                    shortCircuit = true;
                 }
 
                 if (first && Operators.SameOperator(lx.OperatorName, Operators.OpOr))
@@ -67,12 +76,13 @@ namespace Serilog.Expressions.Compilation.Linq
                     Expression<Func<LogEventPropertyValue, bool>> shortCircuitIf = v => v is ScalarValue && true.Equals(((ScalarValue)v).Value);
                     var scc = Splice(shortCircuitIf, opam);
                     statements.Add(System.Linq.Expressions.Expression.IfThen(scc, System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Constant(new ScalarValue(true), typeof(LogEventPropertyValue)))));
+                    shortCircuit = true;
                 }
 
                 first = false;
             }
 
-            statements.Add(System.Linq.Expressions.Expression.Return(rtn, System.Linq.Expressions.Expression.Call(m, operandVars)));
+            statements.Add(System.Linq.Expressions.Expression.Return(rtn, shortCircuitElse ?? System.Linq.Expressions.Expression.Call(m, operandVars)));
             statements.Add(System.Linq.Expressions.Expression.Label(rtn, System.Linq.Expressions.Expression.Constant(null, typeof(LogEventPropertyValue))));
 
             return System.Linq.Expressions.Expression.Lambda<CompiledExpression>(

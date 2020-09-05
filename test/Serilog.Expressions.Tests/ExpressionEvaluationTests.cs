@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Serilog.Events;
 using Serilog.Expressions.Runtime;
 using Serilog.Expressions.Tests.Support;
 using Xunit;
@@ -29,17 +30,26 @@ namespace Serilog.Expressions.Tests
         [MemberData(nameof(EphemeralExpressionEvaluationCases))]
         public void EphemeralExpressionsAreCorrectlyEvaluated(string expr, string result)
         {
-            var actual = SerilogExpression.Compile(expr)(Some.InformationEvent());
-            var expected = SerilogExpression.Compile(result)(Some.InformationEvent());
+            var evt = Some.InformationEvent();
+            var actual = SerilogExpression.Compile(expr)(evt);
+            var expected = SerilogExpression.Compile(result)(evt);
 
             if (expected is null)
             {
-                Assert.True(actual is null, $"Expected: undefined{Environment.NewLine}Actual: {actual}");
+                Assert.True(actual is null, $"Expected value: undefined{Environment.NewLine}Actual value: {Display(actual)}");
             }
             else
             {
-                Assert.True(RuntimeOperators.Equal(actual, expected)?.Equals(true), $"Expected: {expected}{Environment.NewLine}Actual: {actual}");
+                Assert.True(Coerce.True(RuntimeOperators.Equal(actual, expected)), $"Expected value: {Display(expected)}{Environment.NewLine}Actual value: {Display(actual)}");
             }
+        }
+
+        static string Display(LogEventPropertyValue value)
+        {
+            if (value == null)
+                return "undefined";
+
+            return value.ToString();
         }
     }
 }

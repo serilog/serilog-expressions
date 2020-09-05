@@ -129,8 +129,8 @@ namespace Serilog.Expressions.Tests
         public void InExaminesSequenceValues()
         {
             AssertEvaluation("5 not in Numbers",
-                Some.InformationEvent("{Numbers}", new object[] {new []{1, 2, 3}}),
-                Some.InformationEvent("{Numbers}", new object[] { new [] { 1, 5, 3 }}),
+                Some.InformationEvent("{Numbers}", new []{1, 2, 3}),
+                Some.InformationEvent("{Numbers}", new [] { 1, 5, 3 }),
                 Some.InformationEvent());
         }
 

@@ -122,6 +122,10 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue Equal(LogEventPropertyValue left, LogEventPropertyValue right)
         {
+            if (Coerce.Numeric(left, out var l) &&
+                Coerce.Numeric(right, out var r))
+                return ScalarBoolean(l == r);
+            
             return ScalarBoolean(UnboxedEqualHelper(left, right));
         }
 

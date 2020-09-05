@@ -1,6 +1,7 @@
 ﻿using System;
 using Serilog.Configuration;
 using Serilog.Expressions;
+using Serilog.Expressions.Runtime;
 
 namespace Serilog
 {
@@ -21,7 +22,7 @@ namespace Serilog
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerFilterConfiguration.ByIncludingOnly(e => true.Equals(compiled(e)));
+            return loggerFilterConfiguration.ByIncludingOnly(e => Coerce.True(compiled(e)));
         }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace Serilog
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerFilterConfiguration.ByExcluding(e => true.Equals(compiled(e)));
+            return loggerFilterConfiguration.ByExcluding(e => Coerce.True(compiled(e)));
         }
 
         /// <summary>

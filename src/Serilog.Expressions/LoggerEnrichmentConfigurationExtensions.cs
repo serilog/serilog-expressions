@@ -15,6 +15,7 @@
 using System;
 using Serilog.Configuration;
 using Serilog.Expressions;
+using Serilog.Expressions.Runtime;
 
 namespace Serilog
 {
@@ -42,7 +43,7 @@ namespace Serilog
             if (configureEnricher == null) throw new ArgumentNullException(nameof(configureEnricher));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerEnrichmentConfiguration.When(e => true.Equals(compiled(e)), configureEnricher);
+            return loggerEnrichmentConfiguration.When(e => Coerce.True(compiled(e)), configureEnricher);
         }
     }
 }

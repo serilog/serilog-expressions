@@ -6,14 +6,16 @@ namespace Serilog.Expressions.Runtime
 {
     static class Coerce
     {
-        static readonly Type[] NumericTypes = { typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
-            typeof(int), typeof(uint), typeof(long), typeof(ulong), typeof(float), typeof(double) };
+        static readonly Type[] NumericTypes = { typeof(decimal),
+            typeof(int), typeof(long), typeof(double), 
+            typeof(float), typeof(uint), typeof(sbyte), 
+            typeof(byte), typeof(short), typeof(ushort), typeof(ulong) };
 
         public static bool Numeric(LogEventPropertyValue value, out decimal numeric)
         {
             if (value is ScalarValue sv &&
                 sv.Value != null &&
-                NumericTypes.Contains(sv.GetType()))
+                NumericTypes.Contains(sv.Value.GetType()))
             {
                 numeric = (decimal)Convert.ChangeType(sv.Value, typeof(decimal));
                 return true;
