@@ -5,13 +5,14 @@ using Serilog.Templates;
 
 namespace Sample
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class Program
     {
         public static void Main()
         {
             SelfLog.Enable(Console.Error);
             
-            const string expr = "@Level = 'Information' and AppId is not null and Items[?] like 'C%'";
+            const string expr = "@l = 'Information' and AppId is not null and Items[?] like 'C%'";
 
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("AppId", 10)
@@ -21,7 +22,7 @@ namespace Sample
                 .WriteTo.Console(outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3} ({SourceContext})] {Message:lj} (first item is {FirstItem}){NewLine}{Exception}")
                 .WriteTo.Console(new OutputTemplate(
-                    "[{@Timestamp} {@Level} ({SourceContext})] {@Message} (first item is {Items[0]})\n{@Exception}"))
+                    "[{@t} {@l} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
                     .CreateLogger();
 
             log.ForContext<Program>().Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });

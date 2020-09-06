@@ -1,3 +1,5 @@
 // Temporarily using Serilog's default value formatting
-Hello, {'world'}!                        ⇶ Hello, "world"!
-{@Level}                                 ⇶ "Information"
+Hello, {'world'}!                        ⇶ Hello, world!
+{@l}                                     ⇶ Information
+Items are {[1, 2]}                       ⇶ Items are [1,2]
+{@p}                                     ⇶ {}

@@ -78,7 +78,7 @@ namespace Serilog.Expressions.Tests
         [Fact]
         public void ExpressionsEvaluateBuiltInProperties()
         {
-            AssertEvaluation("@Level = 'Information'",
+            AssertEvaluation("@l = 'Information'",
                 Some.InformationEvent(),
                 Some.WarningEvent());
         }
@@ -121,7 +121,7 @@ namespace Serilog.Expressions.Tests
         [Fact]
         public void InMatchesLiterals()
         {
-            AssertEvaluation("@Level in ['Warning', 'Error']",
+            AssertEvaluation("@l in ['Warning', 'Error']",
                 Some.LogEvent(LogEventLevel.Error, "Hello"),
                 Some.InformationEvent("Hello"));
         }
