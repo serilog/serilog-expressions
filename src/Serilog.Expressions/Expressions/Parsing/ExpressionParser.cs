@@ -5,7 +5,7 @@ namespace Serilog.Expressions.Parsing
 {
     static class ExpressionParser
     {
-        static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer(false);
+        static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
         
         public static Expression Parse(string filterExpression)
         {

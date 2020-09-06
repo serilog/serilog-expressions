@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Superpower;
 using Superpower.Model;
 
@@ -6,8 +7,6 @@ namespace Serilog.Expressions.Parsing
 {
     class ExpressionTokenizer : Tokenizer<ExpressionToken>
     {
-        readonly bool _templateSyntax;
-        
         static readonly ExpressionToken[] SimpleOps = new ExpressionToken[128];
 
         static readonly ExpressionKeyword[] Keywords =
@@ -44,78 +43,17 @@ namespace Serilog.Expressions.Parsing
             SimpleOps['?'] = ExpressionToken.QuestionMark;
         }
 
-        public ExpressionTokenizer(bool templateSyntax)
+        public TokenList<ExpressionToken> GreedyTokenize(TextSpan textSpan)
         {
-            _templateSyntax = templateSyntax;
+            // Dropping error info off for now
+            return new TokenList<ExpressionToken>(
+                Tokenize(textSpan)
+                    .TakeWhile(r => r.HasValue)
+                    .Select(r => new Token<ExpressionToken>(r.Value, r.Location.Until(r.Remainder)))
+                    .ToArray());
         }
 
         protected override IEnumerable<Result<ExpressionToken>> Tokenize(TextSpan stringSpan)
-        {
-            return _templateSyntax ? TokenizeTemplate(stringSpan) : TokenizeExpression(stringSpan);
-        }
-
-        IEnumerable<Result<ExpressionToken>> TokenizeTemplate(TextSpan stringSpan)
-        {
-            var last = stringSpan;
-            var next = SkipLiteral(stringSpan);
-            if (!next.HasValue)
-                yield break;
-
-            do
-            {
-                yield return Result.Value(ExpressionToken.TemplateLiteral, last, next.Location);
-
-                if (next.Value == '{')
-                {
-                    next = next.Remainder.ConsumeChar();
-                    if (!next.HasValue)
-                    {
-                        yield return Result.Empty<ExpressionToken>(next.Location, "Unexpected end-of-input.");
-                        yield break;
-                    }
-
-                    if (next.Value == '{')
-                    {
-                        yield return Result.Value(ExpressionToken.TemplateLiteral, next.Location, next.Remainder);
-                    }
-                    else
-                    {
-                        var until = next.Location;
-                        
-                        // Here we'll need to contextually apply the parser...
-                        foreach (var tok in TokenizeExpression(next.Location))
-                        {
-                            yield return tok;
-                            until = tok.Remainder;
-                        }
-                        
-                        next = until.ConsumeChar();
-                        if (!next.HasValue)
-                        {
-                            yield return Result.Empty<ExpressionToken>(next.Location, "Unexpected end-of-input.");
-                            yield break;
-                        }
-                    }
-                }
-                else if (next.Value == '}')
-                {
-                    
-                }
-
-                last = next.Remainder;
-                next = SkipLiteral(next.Remainder);
-            } while (next.HasValue);
-        }
-
-        static Result<char> SkipLiteral(TextSpan stringSpan)
-        {
-            Result<char> result = stringSpan.ConsumeChar();
-            while (result.HasValue && result.Value != '{' && result.Value != '}')
-                result = result.Remainder.ConsumeChar();
-            return result;
-        }
-        
-        IEnumerable<Result<ExpressionToken>> TokenizeExpression(TextSpan stringSpan)
         {
             var next = SkipWhiteSpace(stringSpan);
             if (!next.HasValue)
