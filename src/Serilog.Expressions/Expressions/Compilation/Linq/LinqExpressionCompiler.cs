@@ -178,13 +178,13 @@ namespace Serilog.Expressions.Compilation.Linq
             if (px.IsBuiltIn)
             {
                 if (px.PropertyName == BuiltInProperty.Level)
-                    return context => new ScalarValue(context.Level.ToString());
+                    return context => new ScalarValue(context.Level);
 
                 if (px.PropertyName == BuiltInProperty.Message)
                     return context => NormalizeBuiltInProperty(context.RenderMessage(null));
 
                 if (px.PropertyName == BuiltInProperty.Exception)
-                    return context => NormalizeBuiltInProperty(context.Exception == null ? null : context.Exception.ToString());
+                    return context => context.Exception == null ? null : new ScalarValue(context.Exception);
 
                 if (px.PropertyName == BuiltInProperty.Timestamp)
                     return context => new ScalarValue(context.Timestamp);

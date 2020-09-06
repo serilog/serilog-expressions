@@ -137,6 +137,10 @@ namespace Serilog.Expressions.Runtime
                 Coerce.Numeric(right, out var r))
                 return l == r;
             
+            if (Coerce.String(left, out var ls) &&
+                Coerce.String(right, out var rs))
+                return ls == rs;
+            
             if (left is ScalarValue sl &&
                 right is ScalarValue sr)
                 return sl.Value?.Equals(sr.Value) ?? sr.Value == null;

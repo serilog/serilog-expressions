@@ -45,11 +45,25 @@ namespace Serilog.Expressions.Runtime
 
         public static bool String(LogEventPropertyValue value, out string str)
         {
-            if (value is ScalarValue sv &&
-                sv.Value is string s)
+            if (value is ScalarValue sv)
             {
-                str = s;
-                return true;
+                if (sv.Value is string s)
+                {
+                    str = s;
+                    return true;
+                }
+                
+                if (sv.Value is Exception ex)
+                {
+                    str = ex.ToString();
+                    return true;
+                }
+
+                if (sv.Value?.GetType().IsEnum ?? false)
+                {
+                    str = sv.Value.ToString();
+                    return true;
+                }
             }
 
             str = default;
