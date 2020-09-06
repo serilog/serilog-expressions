@@ -32,6 +32,8 @@ namespace Serilog.Expressions
         /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
         /// <param name="error">The reported error, if compilation was unsuccessful.</param>
         /// <returns>True if the function could be created; otherwise, false.</returns>
+        /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
+        /// errors.</remarks>
         public static bool TryCompile(string expression, out CompiledExpression result, out string error)
         {
             if (!ExpressionParser.TryParse(expression, out var root, out error))
@@ -72,15 +74,15 @@ namespace Serilog.Expressions
         }
 
         /// <summary>
-        /// Determine if the specified text is a valid property name.
+        /// Determine if the specified text is a valid identifier.
         /// </summary>
-        /// <param name="propertyName">The text to check.</param>
+        /// <param name="identifier">The text to check.</param>
         /// <returns>True if the text can be used verbatim as a property name.</returns>
-        public static bool IsValidPropertyName(string propertyName)
+        public static bool IsValidIdentifier(string identifier)
         {
-            return propertyName.Length != 0 &&
-                   !char.IsDigit(propertyName[0]) &&
-                   propertyName.All(ch => char.IsLetter(ch) || char.IsDigit(ch) || ch == '_');
+            return identifier.Length != 0 &&
+                   !char.IsDigit(identifier[0]) &&
+                   identifier.All(ch => char.IsLetter(ch) || char.IsDigit(ch) || ch == '_');
         }
     }
 }

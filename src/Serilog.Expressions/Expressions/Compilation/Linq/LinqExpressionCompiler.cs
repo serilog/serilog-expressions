@@ -74,13 +74,12 @@ namespace Serilog.Expressions.Compilation.Linq
         protected override Expression<CompiledExpression> Transform(CallExpression lx)
         {
             if (!OperatorMethods.TryGetValue(lx.OperatorName, out var m))
-                throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognised; to search for text instead, enclose the filter in \"double quotes\".");
-
+                throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognised.");
+            
             if (m.GetParameters().Length != lx.Operands.Length)
-                throw new ArgumentException($"The function `{lx.OperatorName}` requires {m.GetParameters().Length} arguments; to search for text instead, enclose the filter in \"double quotes\".");
+                throw new ArgumentException($"The function `{lx.OperatorName}` requires {m.GetParameters().Length} arguments.");
 
             var operands = lx.Operands.Select(Transform).ToArray();
-
             var context = LX.Parameter(typeof(LogEvent));
 
             var operandValues = operands.Select(o => Splice(o, context));
@@ -188,7 +187,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     return context => NormalizeBuiltInProperty(context.Exception == null ? null : context.Exception.ToString());
 
                 if (px.PropertyName == BuiltInProperty.Timestamp)
-                    return context => new ScalarValue(context.Timestamp.ToString("o"));
+                    return context => new ScalarValue(context.Timestamp);
 
                 if (px.PropertyName == BuiltInProperty.MessageTemplate)
                     return context => NormalizeBuiltInProperty(context.MessageTemplate.Text);

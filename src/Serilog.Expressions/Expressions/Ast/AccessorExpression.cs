@@ -16,7 +16,7 @@ namespace Serilog.Expressions.Ast
 
         public override string ToString()
         {
-            if (SerilogExpression.IsValidPropertyName(MemberName))
+            if (SerilogExpression.IsValidIdentifier(MemberName))
                 return Receiver + "." + MemberName;
 
             return $"{Receiver}['{SerilogExpression.EscapeStringContent(MemberName)}']";

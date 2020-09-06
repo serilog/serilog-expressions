@@ -2,7 +2,7 @@
 
 namespace Sample
 {
-    public static class Program
+    public class Program
     {
         public static void Main()
         {
@@ -10,11 +10,14 @@ namespace Sample
 
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("AppId", 10)
+                .Enrich.WithComputed("FirstItem", "Items[0]")
+                .Enrich.WithComputed("SourceContext", "coalesce(substring(SourceContext, lastindexof(SourceContext, '.') + 1), SourceContext, '<no source>')")
                 .Filter.ByIncludingOnly(expr)
-                .WriteTo.Console()
+                .WriteTo.Console(outputTemplate:
+                    "[{Timestamp:HH:mm:ss} {Level:u3} ({SourceContext})] {Message:lj} (first item is {FirstItem}){NewLine}{Exception}")
                 .CreateLogger();
 
-            log.Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
+            log.ForContext<Program>().Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
             log.Warning("Cart contains {@Items}", new[] { "Tea", "Coffee" });
             log.Information("Cart contains {@Items}", new[] { "Apricots" });
             log.Information("Cart contains {@Items}", new[] { "Peanuts", "Chocolate" });

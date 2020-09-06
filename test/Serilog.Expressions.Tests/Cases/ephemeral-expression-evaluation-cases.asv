@@ -95,6 +95,9 @@ coalesce(undefined, 1)               ⇶ 1
 coalesce(1, null)                    ⇶ 1
 coalesce(undefined, undefined)       ⇶ undefined
 coalesce(null, null)                 ⇶ null
+coalesce(null, null, 3)              ⇶ 3
+coalesce()                           ⇶ undefined
+coalesce(1)                          ⇶ 1
 
 // Identifiers
 A                                    ⇶ undefined
@@ -172,3 +175,5 @@ indexofmatch('foo', 'o')             ⇶ 1
 ismatch('foo', '^f')                 ⇶ true
 ismatch('foo', '^o')                 ⇶ false
 indexofmatch('foo', 'x')             ⇶ -1
+substring('abcd', 1, 2)              ⇶ 'bc'
+substring('abcd', 1)                 ⇶ 'bcd'

@@ -31,6 +31,7 @@ namespace Serilog.Expressions
         public const string OpNot = "Not";
         public const string OpContains = "Contains";
         public const string OpIndexOf = "IndexOf";
+        public const string OpLastIndexOf = "IndexOf";
         public const string OpLength = "Length";
         public const string OpStartsWith = "StartsWith";
         public const string OpEndsWith = "EndsWith";

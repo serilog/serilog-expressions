@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
@@ -172,15 +171,6 @@ namespace Serilog.Expressions.Runtime
 
             return null;
         }
-        
-        public static LogEventPropertyValue _Internal_EqualIgnoreCase(LogEventPropertyValue left, LogEventPropertyValue right)
-        {
-            if (!Coerce.String(left, out var ls) ||
-                !Coerce.String(right, out var rs))
-                return null;
-
-            return ScalarBoolean(CompareInfo.Compare(ls, rs, CompareOptions.OrdinalIgnoreCase) == 0);
-        }
 
         public static LogEventPropertyValue NotEqual(LogEventPropertyValue left, LogEventPropertyValue right)
         {
@@ -188,13 +178,6 @@ namespace Serilog.Expressions.Runtime
                 return null;
             
             return ScalarBoolean(!UnboxedEqualHelper(left, right));
-        }
-
-        public static LogEventPropertyValue _Internal_NotEqualIgnoreCase(LogEventPropertyValue left, LogEventPropertyValue right)
-        {
-            if (Coerce.Boolean(_Internal_EqualIgnoreCase(left, right), out var b))
-                return ScalarBoolean(!b);
-            return null;
         }
 
         public static LogEventPropertyValue Negate(LogEventPropertyValue operand)
@@ -243,17 +226,6 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.Contains(ptx));
         }
 
-        static readonly CompareInfo CompareInfo = CultureInfo.InvariantCulture.CompareInfo;
-
-        public static LogEventPropertyValue _Internal_ContainsIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
-        {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
-                return null;
-
-            return ScalarBoolean(CompareInfo.IndexOf(ctx, ptx, CompareOptions.OrdinalIgnoreCase) >= 0);
-        }
-
         public static LogEventPropertyValue IndexOf(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
@@ -263,13 +235,13 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(ctx.IndexOf(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue _Internal_IndexOfIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue LastIndexOf(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
                 return null;
 
-            return new ScalarValue(ctx.IndexOf(ptx, StringComparison.OrdinalIgnoreCase));
+            return new ScalarValue(ctx.LastIndexOf(ptx, StringComparison.Ordinal));
         }
 
         public static LogEventPropertyValue Length(LogEventPropertyValue arg)
@@ -292,15 +264,6 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.StartsWith(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue _Internal_StartsWithIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
-        {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
-                return null;
-
-            return ScalarBoolean(ctx.StartsWith(ptx, StringComparison.OrdinalIgnoreCase));
-        }
-
         public static LogEventPropertyValue EndsWith(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
@@ -308,15 +271,6 @@ namespace Serilog.Expressions.Runtime
                 return null;
 
             return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.Ordinal));
-        }
-
-        public static LogEventPropertyValue _Internal_EndsWithIgnoreCase(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
-        {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
-                return null;
-
-            return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.OrdinalIgnoreCase));
         }
 
         public static LogEventPropertyValue Has(LogEventPropertyValue value)

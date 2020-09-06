@@ -10,7 +10,7 @@ namespace Serilog.Expressions.Ast
         {
             PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
             IsBuiltIn = isBuiltIn;
-            _requiresEscape = !SerilogExpression.IsValidPropertyName(propertyName);
+            _requiresEscape = !SerilogExpression.IsValidIdentifier(propertyName);
         }
 
         public string PropertyName { get; }
