@@ -15,9 +15,10 @@ namespace Serilog.Expressions.Compilation
         {
             var actual = expression;
             actual = TextMatchingTransformer.Rewrite(actual);
+            actual = LikeSyntaxTransformer.Rewrite(actual);
             actual = PropertiesObjectAccessorTransformer.Rewrite(actual);
             actual = ConstantArrayEvaluator.Evaluate(actual);
-            actual = NotInRewriter.Rewrite(actual);
+            actual = NotInRewriter.Rewrite(actual); 
             actual = WildcardComprehensionTransformer.Expand(actual);
             actual = IsOperatorTransformer.Rewrite(actual);
 

@@ -68,14 +68,10 @@ namespace Serilog.Expressions.Parsing
             select (Expression)new ArrayExpression(expr)).Named("array");
 
         static readonly TokenListParser<ExpressionToken, Expression> RootProperty =
-            Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression)new AmbientPropertyExpression(b.ToStringValue().Substring(1), true))
-                .Or(Token.EqualTo(ExpressionToken.Identifier).Select(t => (Expression)new AmbientPropertyExpression(t.ToStringValue(), false)));
-
-        static readonly TokenListParser<ExpressionToken, Expression> PropertyPath =
             (from notFunction in Parse.Not(Token.EqualTo(ExpressionToken.Identifier).IgnoreThen(Token.EqualTo(ExpressionToken.LParen)))
-             from root in RootProperty
-             from path in PropertyPathStep.Or(PropertyPathIndexerStep).Many()
-             select path.Aggregate(root, (o, f) => f(o))).Named("property");
+                from p in Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression) new AmbientPropertyExpression(b.ToStringValue().Substring(1), true))
+                    .Or(Token.EqualTo(ExpressionToken.Identifier).Select(t => (Expression) new AmbientPropertyExpression(t.ToStringValue(), false)))
+                select p).Named("property");
 
         static readonly TokenListParser<ExpressionToken, Expression> String =
             Token.EqualTo(ExpressionToken.String)
@@ -103,7 +99,7 @@ namespace Serilog.Expressions.Parsing
                 .Or(Token.EqualTo(ExpressionToken.Null).Value((Expression)new ConstantExpression(new ScalarValue(null))))
                 .Named("literal");
 
-        static readonly TokenListParser<ExpressionToken, Expression> Item = Literal.Or(PropertyPath).Or(Function).Or(ArrayLiteral);
+        static readonly TokenListParser<ExpressionToken, Expression> Item = Literal.Or(RootProperty).Or(Function).Or(ArrayLiteral);
 
         static readonly TokenListParser<ExpressionToken, Expression> Factor =
             (from lparen in Token.EqualTo(ExpressionToken.LParen)
@@ -112,10 +108,15 @@ namespace Serilog.Expressions.Parsing
              select expr)
                 .Or(Item);
 
+        static readonly TokenListParser<ExpressionToken, Expression> Path =
+            from root in Factor
+            from path in PropertyPathStep.Or(PropertyPathIndexerStep).Many()
+            select path.Aggregate(root, (o, f) => f(o));
+
         static readonly TokenListParser<ExpressionToken, Expression> Operand =
             (from op in Negate.Or(Not)
-             from factor in Factor
-             select MakeUnary(op, factor)).Or(Factor).Named("expression");
+                from path in Path
+                select MakeUnary(op, path)).Or(Path).Named("expression");
 
         static readonly TokenListParser<ExpressionToken, Expression> InnerTerm = Parse.Chain(Power, Operand, MakeBinary);
 

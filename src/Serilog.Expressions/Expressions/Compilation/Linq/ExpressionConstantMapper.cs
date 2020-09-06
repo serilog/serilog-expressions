@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
+using Serilog.Events;
 
 namespace Serilog.Expressions.Compilation.Linq
 {
@@ -14,7 +15,9 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value != null && _mapping.TryGetValue(node.Value, out var substitute))
+            if (node.Value != null && 
+                node.Value is ScalarValue sv &&
+                _mapping.TryGetValue(sv.Value, out var substitute))
                 return substitute;
 
             return base.VisitConstant(node);

@@ -254,15 +254,19 @@ namespace Serilog.Expressions.Compilation.Linq
                 throw new NotSupportedException("Unsupported lambda signature.");
 
             var lambda = LX.Lambda(delegateType, rewritten!, parms.Select(px => px.Item2).ToArray());
+            
+            // Unfortunately, right now, functions need to be threaded through in constant scalar values :-D
+            var constant = LX.New(typeof(ScalarValue).GetConstructor(new[] {typeof(object)})!,
+                LX.Convert(lambda, typeof(object)));
 
-            return LX.Lambda<CompiledExpression>(lambda, context);
+            return LX.Lambda<CompiledExpression>(constant, context);
         }
 
         protected override Expression<CompiledExpression> Transform(Ast.ParameterExpression prx)
         {
             // Will be within a lambda, which will subsequently sub-in the actual value
             var context = LX.Parameter(typeof(LogEvent));
-            var constant = LX.Constant(prx, typeof(object));
+            var constant = LX.Constant(new ScalarValue(prx), typeof(LogEventPropertyValue));
             return LX.Lambda<CompiledExpression>(constant, context);
         }
 

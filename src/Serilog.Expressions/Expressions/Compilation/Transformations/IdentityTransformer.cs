@@ -8,7 +8,7 @@ namespace Serilog.Expressions.Compilation.Transformations
         bool TryTransform(Expression expr, out Expression result)
         {
             result = Transform(expr);
-            return ReferenceEquals(expr, result);
+            return !ReferenceEquals(expr, result);
         }
         
         protected override Expression Transform(CallExpression lx)

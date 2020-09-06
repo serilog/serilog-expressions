@@ -52,9 +52,10 @@ namespace Serilog.Expressions.Tests
         }
 
         [Fact]
-        public void LikeIsCaseInsensitive()
+        public void LikeIsCaseSensitive()
         {
             AssertEvaluation("Fruit like 'apple'",
+                Some.InformationEvent("Snacking on {Fruit}", "apple"),
                 Some.InformationEvent("Snacking on {Fruit}", "Apple"));
         }
 

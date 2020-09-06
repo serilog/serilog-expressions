@@ -90,5 +90,13 @@ namespace Serilog.Expressions.Compilation.Transformations
             
             return base.Transform(ax);
         }
+
+        protected override Expression Transform(IndexOfMatchExpression mx)
+        {
+            if (mx == _source)
+                return _dest;
+            
+            return base.Transform(mx);
+        }
     }
 }
