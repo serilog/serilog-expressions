@@ -12,7 +12,7 @@ namespace Serilog.Expressions.Compilation.Properties
 
         protected override Expression Transform(AccessorExpression ax)
         {
-            if (!Pattern.IsAmbientProperty(ax.Receiver, "Properties", true))
+            if (!Pattern.IsAmbientProperty(ax.Receiver, BuiltInProperty.Properties, true))
                 return base.Transform(ax);
             
             return new AmbientPropertyExpression(ax.MemberName, false);
@@ -20,7 +20,7 @@ namespace Serilog.Expressions.Compilation.Properties
 
         protected override Expression Transform(IndexerExpression ix)
         {
-            if (!Pattern.IsAmbientProperty(ix.Receiver, "Properties", true) ||
+            if (!Pattern.IsAmbientProperty(ix.Receiver, BuiltInProperty.Properties, true) ||
                 !Pattern.IsStringConstant(ix.Index, out var name))
                 return base.Transform(ix);
             

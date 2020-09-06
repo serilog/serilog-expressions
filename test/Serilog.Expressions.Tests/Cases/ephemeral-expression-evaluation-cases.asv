@@ -165,3 +165,10 @@ undefined >= undefined               ⇶ undefined
 []                                   ⇶ []
 [1]                                  ⇶ [1]
 [[1]]                                ⇶ [[1]]
+
+// Text and regex
+ismatch('foo', 'f')                  ⇶ true
+indexofmatch('foo', 'o')             ⇶ 1
+ismatch('foo', '^f')                 ⇶ true
+ismatch('foo', '^o')                 ⇶ false
+indexofmatch('foo', 'x')             ⇶ -1

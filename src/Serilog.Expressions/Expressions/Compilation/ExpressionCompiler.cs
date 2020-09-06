@@ -4,6 +4,7 @@ using Serilog.Expressions.Compilation.In;
 using Serilog.Expressions.Compilation.Is;
 using Serilog.Expressions.Compilation.Linq;
 using Serilog.Expressions.Compilation.Properties;
+using Serilog.Expressions.Compilation.Text;
 using Serilog.Expressions.Compilation.Wildcards;
 
 namespace Serilog.Expressions.Compilation
@@ -13,6 +14,7 @@ namespace Serilog.Expressions.Compilation
         public static CompiledExpression Compile(Expression expression)
         {
             var actual = expression;
+            actual = TextMatchingTransformer.Rewrite(actual);
             actual = PropertiesObjectAccessorTransformer.Rewrite(actual);
             actual = ConstantArrayEvaluator.Evaluate(actual);
             actual = NotInRewriter.Rewrite(actual);

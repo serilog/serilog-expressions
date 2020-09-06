@@ -8,5 +8,6 @@ namespace Serilog.Expressions
         public const string Message = "Message";
         public const string MessageTemplate = "MessageTemplate";
         public const string Properties = "Properties";
+        public const string Undefined = "Undefined";
     }
 }

@@ -8,10 +8,11 @@ namespace Serilog.Expressions.Compilation.Arrays
 {
     class ConstantArrayEvaluator : IdentityTransformer
     {
+        static readonly ConstantArrayEvaluator Instance = new ConstantArrayEvaluator();
+        
         public static Expression Evaluate(Expression expression)
         {
-            var evaluator = new ConstantArrayEvaluator();
-            return evaluator.Transform(expression);
+            return Instance.Transform(expression);
         }
 
         protected override Expression Transform(ArrayExpression ax)

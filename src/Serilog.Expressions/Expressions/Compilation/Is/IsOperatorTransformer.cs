@@ -6,9 +6,11 @@ namespace Serilog.Expressions.Compilation.Is
 {
     class IsOperatorTransformer : IdentityTransformer
     {
+        static readonly IsOperatorTransformer Instance = new IsOperatorTransformer();
+        
         public static Expression Rewrite(Expression expression)
         {
-            return new IsOperatorTransformer().Transform(expression);
+            return Instance.Transform(expression);
         }
 
         protected override Expression Transform(CallExpression lx)

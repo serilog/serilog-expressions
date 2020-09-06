@@ -6,10 +6,11 @@ namespace Serilog.Expressions.Compilation.Wildcards
 {
     class WildcardSearch : SerilogExpressionTransformer<IndexerExpression>
     {
+        static readonly WildcardSearch Instance = new WildcardSearch();
+        
         public static IndexerExpression FindElementAtWildcard(Expression fx)
         {
-            var search = new WildcardSearch();
-            return search.Transform(fx);
+            return Instance.Transform(fx);
         }
 
         protected override IndexerExpression Transform(IndexerExpression ix)
@@ -59,6 +60,11 @@ namespace Serilog.Expressions.Compilation.Wildcards
         protected override IndexerExpression Transform(CallExpression lx)
         {
             return lx.Operands.Select(Transform).FirstOrDefault(e => e != null);
+        }
+
+        protected override IndexerExpression Transform(IndexOfMatchExpression mx)
+        {
+            return Transform(mx.Corpus);
         }
     }
 }

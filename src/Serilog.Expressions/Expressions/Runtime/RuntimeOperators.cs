@@ -142,6 +142,14 @@ namespace Serilog.Expressions.Runtime
                 right is ScalarValue sr)
                 return sl.Value?.Equals(sr.Value) ?? sr.Value == null;
 
+            if (left is SequenceValue ql &&
+                right is SequenceValue qr)
+            {
+                // Not in any way optimized :-)
+                return ql.Elements.Count == qr.Elements.Count &&
+                       ql.Elements.Zip(qr.Elements, UnboxedEqualHelper).All(eq => eq);
+            }
+
             return false;
         }
 
@@ -449,6 +457,16 @@ namespace Serilog.Expressions.Runtime
                 return new ScalarValue(str.Substring((int)si));
 
             return new ScalarValue(str.Substring((int)si, (int)len));
+        }
+
+        public static LogEventPropertyValue IndexOfMatch(LogEventPropertyValue corpus, LogEventPropertyValue regex)
+        {
+            throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
+        }
+
+        public static LogEventPropertyValue IsMatch(LogEventPropertyValue corpus, LogEventPropertyValue regex)
+        {
+            throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
         }
     }
 }

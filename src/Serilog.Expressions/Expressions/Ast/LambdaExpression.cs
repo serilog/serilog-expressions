@@ -16,7 +16,7 @@ namespace Serilog.Expressions.Ast
 
         public override string ToString()
         {
-            return "\\(" + string.Join(",", Parameters.Select(p => p.ToString())) + "){" + Body + "}";
+            return "|" + string.Join(", ", Parameters.Select(p => p.ToString())) + "| {" + Body + "}";
         }
     }
 }

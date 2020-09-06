@@ -5,10 +5,11 @@ namespace Serilog.Expressions.Compilation.In
 {
     class NotInRewriter : IdentityTransformer
     {
+        static readonly NotInRewriter Instance = new NotInRewriter();
+        
         public static Expression Rewrite(Expression expression)
         {
-            var rewriter = new NotInRewriter();
-            return rewriter.Transform(expression);
+            return Instance.Transform(expression);
         }
 
         protected override Expression Transform(CallExpression lx)
