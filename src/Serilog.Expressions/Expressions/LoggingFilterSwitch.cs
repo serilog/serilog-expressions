@@ -15,6 +15,7 @@
 using System;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Expressions.Runtime;
 
 namespace Serilog.Expressions
 {
@@ -81,7 +82,7 @@ namespace Serilog.Expressions
             if (filter == null)
                 return true;
 
-            return true.Equals((filter.Item2(logEvent) as ScalarValue)?.Value);
+            return Coerce.True(filter.Item2(logEvent));
         }
 
         /// <inheritdoc/>
