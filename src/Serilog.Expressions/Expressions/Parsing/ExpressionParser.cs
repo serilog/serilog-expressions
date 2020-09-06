@@ -5,6 +5,8 @@ namespace Serilog.Expressions.Parsing
 {
     static class ExpressionParser
     {
+        static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer(false);
+        
         public static Expression Parse(string filterExpression)
         {
             if (!TryParse(filterExpression, out var root, out var error))
@@ -17,7 +19,7 @@ namespace Serilog.Expressions.Parsing
         {
             if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
 
-            var tokenList = ExpressionTokenizer.Instance.TryTokenize(filterExpression);       
+            var tokenList = Tokenizer.TryTokenize(filterExpression);       
             if (!tokenList.HasValue)
             {
                 error = tokenList.ToString();

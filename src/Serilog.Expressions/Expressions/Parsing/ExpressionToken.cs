@@ -5,6 +5,9 @@ namespace Serilog.Expressions.Parsing
     enum ExpressionToken
     {
         None,
+        
+        [Token(Description = "literal text")]
+        TemplateLiteral,
 
         Identifier,
 

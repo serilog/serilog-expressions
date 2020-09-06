@@ -1,0 +1,3 @@
+// Temporarily using Serilog's default value formatting
+Hello, {'world'}!                        ⇶ Hello, "world"!
+{@Level}                                 ⇶ "Information"

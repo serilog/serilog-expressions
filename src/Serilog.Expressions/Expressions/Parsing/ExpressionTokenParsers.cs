@@ -17,6 +17,12 @@ namespace Serilog.Expressions.Parsing
             return Expr.AtEnd().TryParse(input);
         }
 
+        public static TokenListParserResult<ExpressionToken, Expression> TryPartialParse(
+            TokenList<ExpressionToken> input)
+        {
+            return Expr.TryParse(input);
+        }
+
         static readonly TokenListParser<ExpressionToken, string> Add = Token.EqualTo(ExpressionToken.Plus).Value(Operators.OpAdd);
         static readonly TokenListParser<ExpressionToken, string> Subtract = Token.EqualTo(ExpressionToken.Minus).Value(Operators.OpSubtract);
         static readonly TokenListParser<ExpressionToken, string> Multiply = Token.EqualTo(ExpressionToken.Asterisk).Value(Operators.OpMultiply);
