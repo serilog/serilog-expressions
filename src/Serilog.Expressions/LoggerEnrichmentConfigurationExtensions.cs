@@ -43,7 +43,7 @@ namespace Serilog
             if (configureEnricher == null) throw new ArgumentNullException(nameof(configureEnricher));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerEnrichmentConfiguration.When(e => Coerce.True(compiled(e)), configureEnricher);
+            return loggerEnrichmentConfiguration.When(e => Coerce.IsTrue(compiled(e)), configureEnricher);
         }
 
         /// <summary>

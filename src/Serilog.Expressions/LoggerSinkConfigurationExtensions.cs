@@ -44,7 +44,7 @@ namespace Serilog
             if (configureSink == null) throw new ArgumentNullException(nameof(configureSink));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerSinkConfiguration.Conditional(e => Coerce.True(compiled(e)), configureSink);
+            return loggerSinkConfiguration.Conditional(e => Coerce.IsTrue(compiled(e)), configureSink);
         }
     }
 }

@@ -322,12 +322,12 @@ namespace Serilog.Expressions.Runtime
 
             if (items is SequenceValue arr)
             {
-                return ScalarBoolean(arr.Elements.Any(e => Coerce.True(pred(e))));
+                return ScalarBoolean(arr.Elements.Any(e => Coerce.IsTrue(pred(e))));
             }
 
             if (items is StructureValue structure)
             {
-                return ScalarBoolean(structure.Properties.Any(e => Coerce.True(pred(e.Value))));
+                return ScalarBoolean(structure.Properties.Any(e => Coerce.IsTrue(pred(e.Value))));
             }
 
             return null;
@@ -340,12 +340,12 @@ namespace Serilog.Expressions.Runtime
 
             if (items is SequenceValue arr)
             {
-                return ScalarBoolean(arr.Elements.All(e => Coerce.True(pred(e))));
+                return ScalarBoolean(arr.Elements.All(e => Coerce.IsTrue(pred(e))));
             }
 
             if (items is StructureValue structure)
             {
-                return ScalarBoolean(structure.Properties.All(e => Coerce.True(pred(e.Value))));
+                return ScalarBoolean(structure.Properties.All(e => Coerce.IsTrue(pred(e.Value))));
             }
 
             return null;

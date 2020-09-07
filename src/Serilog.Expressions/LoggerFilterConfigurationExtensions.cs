@@ -24,7 +24,7 @@ namespace Serilog
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerFilterConfiguration.ByIncludingOnly(e => Coerce.True(compiled(e)));
+            return loggerFilterConfiguration.ByIncludingOnly(e => Coerce.IsTrue(compiled(e)));
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Serilog
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
             var compiled = SerilogExpression.Compile(expression);
-            return loggerFilterConfiguration.ByExcluding(e => Coerce.True(compiled(e)));
+            return loggerFilterConfiguration.ByExcluding(e => Coerce.IsTrue(compiled(e)));
         }
 
         /// <summary>

@@ -82,7 +82,7 @@ namespace Serilog.Expressions
             if (filter == null)
                 return true;
 
-            return Coerce.True(filter.Item2(logEvent));
+            return Coerce.IsTrue(filter.Item2(logEvent));
         }
 
         /// <inheritdoc/>

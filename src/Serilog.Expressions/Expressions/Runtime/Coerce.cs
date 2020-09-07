@@ -38,7 +38,7 @@ namespace Serilog.Expressions.Runtime
             return false;
         }
 
-        public static bool True(LogEventPropertyValue value)
+        public static bool IsTrue(LogEventPropertyValue value)
         {
             return Boolean(value, out var b) && b;
         }
