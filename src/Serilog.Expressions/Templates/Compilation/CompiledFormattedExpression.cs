@@ -3,6 +3,7 @@ using System.IO;
 using Serilog.Events;
 using Serilog.Expressions;
 using Serilog.Formatting.Json;
+using Serilog.Templates.Rendering;
 
 namespace Serilog.Templates.Compilation
 {
@@ -30,7 +31,10 @@ namespace Serilog.Templates.Compilation
                 if (scalar.Value is null)
                     return; // Null is empty
 
-                if (scalar.Value is IFormattable fmt)
+                if (scalar.Value is LogEventLevel level)
+                    // This would be better implemented using CompiledLevelToken : CompiledTemplate.
+                    output.Write(LevelRenderer.GetLevelMoniker(level, _format));
+                else if (scalar.Value is IFormattable fmt)
                     output.Write(fmt.ToString(_format, formatProvider));
                 else
                     output.Write(scalar.Value.ToString());

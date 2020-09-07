@@ -17,12 +17,12 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("AppId", 10)
                 .Enrich.WithComputed("FirstItem", "Items[0]")
-                .Enrich.WithComputed("SourceContext", "coalesce(substring(SourceContext, lastindexof(SourceContext, '.') + 1), SourceContext, '<no source>')")
+                .Enrich.WithComputed("SourceContext", "coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), SourceContext, '<no source>')")
                 .Filter.ByIncludingOnly(expr)
                 .WriteTo.Console(outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3} ({SourceContext})] {Message:lj} (first item is {FirstItem}){NewLine}{Exception}")
                 .WriteTo.Console(new OutputTemplate(
-                    "[{@t} {@l} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
+                    "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
                     .CreateLogger();
 
             log.ForContext<Program>().Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
