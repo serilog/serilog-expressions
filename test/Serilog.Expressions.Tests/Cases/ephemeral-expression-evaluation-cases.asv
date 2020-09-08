@@ -159,6 +159,7 @@ undefined >= undefined               ⇶ undefined
 
 // Property names and accessors
 [5, 6, 7][1]                         ⇶ 6
+User.Name                            ⇶ 'nblumhardt'
 
 // Wildcards
 [1,2,3][?] > 2                       ⇶ true
@@ -177,3 +178,4 @@ ismatch('foo', '^o')                 ⇶ false
 indexofmatch('foo', 'x')             ⇶ -1
 substring('abcd', 1, 2)              ⇶ 'bc'
 substring('abcd', 1)                 ⇶ 'bcd'
+

@@ -298,10 +298,7 @@ namespace Serilog.Expressions.Runtime
             
             if (items is StructureValue st && Coerce.String(index, out var s))
             {
-                if (!LinqExpressionCompiler.TryGetStructurePropertyValue(st, s, out var value))
-                    return null;
-
-                return value;
+                return Intrinsics.TryGetStructurePropertyValue(st, s);
             }
             
             if (items is DictionaryValue dict && index is ScalarValue sv)

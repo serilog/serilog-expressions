@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Serilog.Expressions.Compilation.Linq
@@ -7,7 +8,13 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         readonly ParameterExpression[] _from, _to;
 
-        public ParameterReplacementVisitor(ParameterExpression[] from, ParameterExpression[] to)
+        public static Expression ReplaceParameters(LambdaExpression lambda, params ParameterExpression[] newParameters)
+        {
+            var v = new ParameterReplacementVisitor(lambda.Parameters.ToArray(), newParameters);
+            return v.Visit(lambda.Body);
+        }
+
+        ParameterReplacementVisitor(ParameterExpression[] from, ParameterExpression[] to)
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
             if (to == null) throw new ArgumentNullException(nameof(to));
