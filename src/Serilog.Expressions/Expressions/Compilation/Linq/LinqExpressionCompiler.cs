@@ -61,30 +61,23 @@ namespace Serilog.Expressions.Compilation.Linq
 
             // `and` and `or` short-circuit to save execution time; unlike the earlier Serilog.Filters.Expressions, nothing else does.
             if (Operators.SameOperator(lx.OperatorName, Operators.OpAnd))
-            {
-                return
-                    LX.Convert(
-                        LX.New(
-                            typeof(ScalarValue).GetConstructor(new[]{typeof(object)})!,
-                            LX.Convert(LX.AndAlso(
-                                LX.Call(CoerceToScalarBooleanMethod, operands[0]),
-                                LX.Call(CoerceToScalarBooleanMethod, operands[1])), typeof(object))),
-                        typeof(LogEventPropertyValue));
-            }
+                return CompileLogical(LX.AndAlso, operands[0], operands[1]);
 
             if (Operators.SameOperator(lx.OperatorName, Operators.OpOr))
-            {
-                return
-                    LX.Convert(
-                        LX.New(
-                            typeof(ScalarValue).GetConstructor(new[]{typeof(object)})!,
-                            LX.Convert(LX.OrElse(
-                                LX.Call(CoerceToScalarBooleanMethod, operands[0]),
-                                LX.Call(CoerceToScalarBooleanMethod, operands[1])), typeof(object))),
-                        typeof(LogEventPropertyValue));
-            }
+                return CompileLogical(LX.OrElse, operands[0], operands[1]);
 
             return LX.Call(m, operands);
+        }
+
+        static ExpressionBody CompileLogical(Func<ExpressionBody, ExpressionBody, ExpressionBody> apply, ExpressionBody lhs, ExpressionBody rhs)
+        {
+            return LX.Convert(
+                LX.New(
+                    typeof(ScalarValue).GetConstructor(new[]{typeof(object)})!,
+                    LX.Convert(apply(
+                        LX.Call(CoerceToScalarBooleanMethod, lhs),
+                        LX.Call(CoerceToScalarBooleanMethod, rhs)), typeof(object))),
+                typeof(LogEventPropertyValue));
         }
 
         protected override ExpressionBody Transform(AccessorExpression spx)

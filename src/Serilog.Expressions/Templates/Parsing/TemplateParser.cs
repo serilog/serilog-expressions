@@ -12,10 +12,11 @@ namespace Serilog.Templates.Parsing
     {
         static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
         
-        public static Template Parse(string template)
+        public static bool TryParse(string template, out Template parsed, out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            
+
+            parsed = null;
             var elements = new List<Template>();
 
             var i = 0;
@@ -27,32 +28,38 @@ namespace Serilog.Templates.Parsing
                 {
                     i++;
                     if (i == template.Length)
-                        throw new ArgumentException("Character `{` must be escaped by doubling in literal text.");
+                    {
+                        error = "Character `{` must be escaped by doubling in literal text.";
+                        return false;
+                    }
 
                     if (template[i] == '{')
                     {
-                        elements.Add(new LiteralText("}"));
+                        elements.Add(new LiteralText("{"));
                         i++;
                     }
                     else
                     {
-                        // A lot of TODOs, here; exceptions thrown instead of error returns; positions of errors not 
-                        // reported
-                        
-                        // Not reporting line/column
+                        // No line/column tracking
                         var tokens = Tokenizer.GreedyTokenize(new TextSpan(template, new Position(i, 0, 0), template.Length - i));
-                        // Dropping error info; may return a zero-length parse
                         var expr = ExpressionTokenParsers.TryPartialParse(tokens);
                         if (!expr.HasValue)
-                            throw new ArgumentException($"Invalid expression, {expr.FormatErrorMessageFragment()}.");
-                        
+                        {
+                            // Error message accuracy is not great here
+                            error = $"Invalid expression, {expr.FormatErrorMessageFragment()}.";
+                            return false;
+                        }
+
                         if (expr.Remainder.Position == tokens.Count())
                             i = tokens.Last().Position.Absolute + tokens.Last().Span.Length;
                         else
                             i = tokens.ElementAt(i).Position.Absolute;
 
                         if (i == template.Length)
-                            throw new ArgumentException("Un-closed hole, `}` expected.");
+                        {
+                            error = "Un-closed hole, `}` expected.";
+                            return false;
+                        }
 
                         string format = null;
                         if (template[i] == ':')
@@ -68,9 +75,19 @@ namespace Serilog.Templates.Parsing
 
                             format = formatBuilder.ToString();
                         }
-                        
-                        if (i == template.Length || template[i] != '}')
-                            throw new ArgumentException("Un-closed hole, `}` expected.");
+
+                        if (i == template.Length)
+                        {
+                            error = "Un-closed hole, `}` expected.";
+                            return false;
+                        }
+
+                        if (template[i] != '}')
+                        {
+                            error = $"Invalid expression, unexpected `{template[i]}`.";
+                            return false;
+                        }
+
                         i++;
                         
                         elements.Add(new FormattedExpression(expr.Value, format));
@@ -80,7 +97,11 @@ namespace Serilog.Templates.Parsing
                 {
                     i++;
                     if (i == template.Length || template[i] != '}')
-                        throw new ArgumentException("Character `}` must be escaped by doubling in literal text.");
+                    {
+                        error = "Character `}` must be escaped by doubling in literal text.";
+                        return false;
+                    }
+
                     elements.Add(new LiteralText("}"));
                     i++;
                 }
@@ -97,9 +118,12 @@ namespace Serilog.Templates.Parsing
             }
             
             if (elements.Count == 1)
-                return elements.Single();
-            
-            return new TemplateBlock(elements.ToArray());
+                parsed = elements.Single();
+            else
+                parsed = new TemplateBlock(elements.ToArray());
+
+            error = null;
+            return true;
         }
     }
 }
