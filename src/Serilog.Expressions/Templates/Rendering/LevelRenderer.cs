@@ -54,7 +54,7 @@ namespace Serilog.Templates.Rendering
             new[] { "F", "FA", "FTL", "FATL" },
         };
 
-        public static string GetLevelMoniker(LogEventLevel value, string format)
+        public static string GetLevelMoniker(LogEventLevel value, string? format)
         {
             if (format == null)
                 return value.ToString();

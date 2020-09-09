@@ -7,17 +7,17 @@ namespace Serilog.Expressions.Tests.Support
 {
     static class Some
     {
-        public static LogEvent InformationEvent(string messageTemplate = "Hello, world!", params object[] propertyValues)
+        public static LogEvent InformationEvent(string messageTemplate = "Hello, world!", params object?[] propertyValues)
         {
             return LogEvent(LogEventLevel.Information, messageTemplate, propertyValues);
         }
 
-        public static LogEvent WarningEvent(string messageTemplate = "Hello, world!", params object[] propertyValues)
+        public static LogEvent WarningEvent(string messageTemplate = "Hello, world!", params object?[] propertyValues)
         {
             return LogEvent(LogEventLevel.Warning, messageTemplate, propertyValues);
         }
 
-        public static LogEvent LogEvent(LogEventLevel level, string messageTemplate = "Hello, world!", params object[] propertyValues)
+        public static LogEvent LogEvent(LogEventLevel level, string messageTemplate = "Hello, world!", params object?[] propertyValues)
         {
             var log = new LoggerConfiguration().CreateLogger();
             MessageTemplate template;

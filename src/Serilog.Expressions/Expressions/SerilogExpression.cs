@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Parsing;
@@ -48,7 +49,10 @@ namespace Serilog.Expressions
         /// <returns>True if the function could be created; otherwise, false.</returns>
         /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
         /// errors.</remarks>
-        public static bool TryCompile(string expression, out CompiledExpression result, out string error)
+        public static bool TryCompile(
+            string expression,
+            [MaybeNullWhen(false)] out CompiledExpression result,
+            [MaybeNullWhen(true)] out string error)
         {
             if (!ExpressionParser.TryParse(expression, out var root, out error))
             {

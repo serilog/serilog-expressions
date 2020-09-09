@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Expressions.Ast;
 
 namespace Serilog.Expressions.Parsing
@@ -15,7 +16,8 @@ namespace Serilog.Expressions.Parsing
             return root;
         }
 
-        public static bool TryParse(string filterExpression, out Expression root, out string error)
+        public static bool TryParse(string filterExpression,
+            [MaybeNullWhen(false)] out Expression root, [MaybeNullWhen(true)] out string error)
         {
             if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using Serilog.Expressions.Parsing;
@@ -12,7 +13,10 @@ namespace Serilog.Templates.Parsing
     {
         static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
         
-        public static bool TryParse(string template, out Template parsed, out string error)
+        public static bool TryParse(
+            string template,
+            [MaybeNullWhen(false)] out Template parsed, 
+            [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
@@ -61,7 +65,7 @@ namespace Serilog.Templates.Parsing
                             return false;
                         }
 
-                        string format = null;
+                        string? format = null;
                         if (template[i] == ':')
                         {
                             i++;

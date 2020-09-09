@@ -52,7 +52,7 @@ namespace Serilog.Expressions.Tests
             }
         }
 
-        static string Display(LogEventPropertyValue value)
+        static string Display(LogEventPropertyValue? value)
         {
             if (value == null)
                 return "undefined";

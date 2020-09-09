@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Serilog.Events;
+﻿using Serilog.Events;
 using System.Linq;
 using Serilog.Expressions.Tests.Support;
 using Xunit;
@@ -88,7 +87,7 @@ namespace Serilog.Expressions.Tests
         {
             AssertEvaluation("AppId is not null",
                 Some.InformationEvent("{AppId}", 10),
-                Some.InformationEvent("{AppId}", null),
+                Some.InformationEvent("{AppId}", new object?[] {null}),
                 Some.InformationEvent());
         }
 

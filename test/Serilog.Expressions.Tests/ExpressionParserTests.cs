@@ -38,7 +38,7 @@ namespace Serilog.Expressions.Tests
         [InlineData("5 not in [1, 2]", "_Internal_NotIn(5,[1,2])")]
         [InlineData("1+1", "Add(1,1)")]
         [InlineData("'te\nst'", null)]
-        public void ValidSyntaxIsAccepted(string input, string expected = null)
+        public void ValidSyntaxIsAccepted(string input, string? expected = null)
         {
             var roundTrip = ExpressionParser.Parse(input).ToString();
             Assert.Equal(expected ?? input, roundTrip);

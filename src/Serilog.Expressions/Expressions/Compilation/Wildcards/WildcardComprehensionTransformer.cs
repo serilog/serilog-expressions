@@ -27,7 +27,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
 
             var wildcardPath = lhsIs != null ? target.Operands[0] : target.Operands[1];
             var comparand = lhsIs != null ? target.Operands[1] : target.Operands[0];
-            var indexer = lhsIs ?? rhsIs;
+            var indexer = lhsIs ?? rhsIs!;
 
             var px = new ParameterExpression("p" + _nextParameter++);
             var nestedComparand = NodeReplacer.Replace(wildcardPath, indexer, px);

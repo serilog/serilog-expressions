@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Serilog.Events;
 
@@ -11,7 +12,7 @@ namespace Serilog.Expressions.Runtime
             typeof(float), typeof(uint), typeof(sbyte), 
             typeof(byte), typeof(short), typeof(ushort), typeof(ulong) };
 
-        public static bool Numeric(LogEventPropertyValue value, out decimal numeric)
+        public static bool Numeric(LogEventPropertyValue? value, out decimal numeric)
         {
             if (value is ScalarValue sv &&
                 sv.Value != null &&
@@ -25,7 +26,7 @@ namespace Serilog.Expressions.Runtime
             return false;
         }
 
-        public static bool Boolean(LogEventPropertyValue value, out bool boolean)
+        public static bool Boolean(LogEventPropertyValue? value, out bool boolean)
         {
             if (value is ScalarValue sv &&
                 sv.Value is bool b)
@@ -38,12 +39,12 @@ namespace Serilog.Expressions.Runtime
             return false;
         }
 
-        public static bool IsTrue(LogEventPropertyValue value)
+        public static bool IsTrue(LogEventPropertyValue? value)
         {
             return Boolean(value, out var b) && b;
         }
 
-        public static bool String(LogEventPropertyValue value, out string str)
+        public static bool String(LogEventPropertyValue? value, [MaybeNullWhen(false)] out string str)
         {
             if (value is ScalarValue sv)
             {
@@ -70,8 +71,8 @@ namespace Serilog.Expressions.Runtime
             return false;
         }
 
-        public static bool Predicate(LogEventPropertyValue value,
-            out Func<LogEventPropertyValue, LogEventPropertyValue> predicate)
+        public static bool Predicate(LogEventPropertyValue? value,
+            [MaybeNullWhen(false)] out Func<LogEventPropertyValue, LogEventPropertyValue> predicate)
         {
             if (value is ScalarValue sv &&
                 sv.Value is Func<LogEventPropertyValue, LogEventPropertyValue> pred)

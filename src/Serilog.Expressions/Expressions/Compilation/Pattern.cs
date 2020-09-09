@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 
@@ -12,7 +13,7 @@ namespace Serilog.Expressions.Compilation
                    px.IsBuiltIn == isBuiltIn;
         }
 
-        public static bool IsStringConstant(Expression expression, out string value)
+        public static bool IsStringConstant(Expression expression, [MaybeNullWhen(false)] out string value)
         {
             if (expression is ConstantExpression cx &&
                 cx.Constant is ScalarValue sv &&

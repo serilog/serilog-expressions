@@ -17,7 +17,7 @@ namespace Serilog.Expressions.Runtime
             return value ? ConstantTrue : ConstantFalse;
         }
         
-        public static LogEventPropertyValue Add(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Add(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -26,7 +26,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Subtract(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Subtract(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -35,7 +35,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Multiply(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Multiply(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -44,7 +44,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Divide(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Divide(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r) &&
@@ -54,7 +54,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Modulo(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Modulo(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r) &&
@@ -64,7 +64,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Power(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Power(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -73,17 +73,19 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue And(LogEventPropertyValue left, LogEventPropertyValue right)
+        // ReSharper disable once ReturnTypeCanBeNotNullable
+        public static LogEventPropertyValue? And(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
-        public static LogEventPropertyValue Or(LogEventPropertyValue left, LogEventPropertyValue right)
+        // ReSharper disable once ReturnTypeCanBeNotNullable
+        public static LogEventPropertyValue? Or(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
-        public static LogEventPropertyValue LessThanOrEqual(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? LessThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -92,7 +94,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue LessThan(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? LessThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -101,7 +103,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue GreaterThan(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? GreaterThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -110,7 +112,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue GreaterThanOrEqual(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? GreaterThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -119,7 +121,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue Equal(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? Equal(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             // Undefined values propagate through comparisons
             if (left == null || right == null)
@@ -128,7 +130,7 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(UnboxedEqualHelper(left, right));
         }
 
-        static bool UnboxedEqualHelper(LogEventPropertyValue left, LogEventPropertyValue right)
+        static bool UnboxedEqualHelper(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (left == null || right == null)
                 throw new ArgumentException("Undefined values should short-circuit.");
@@ -156,7 +158,7 @@ namespace Serilog.Expressions.Runtime
             return false;
         }
 
-        public static LogEventPropertyValue _Internal_In(LogEventPropertyValue item, LogEventPropertyValue collection)
+        public static LogEventPropertyValue? _Internal_In(LogEventPropertyValue? item, LogEventPropertyValue? collection)
         {
             if (item == null)
                 return null;
@@ -176,7 +178,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue NotEqual(LogEventPropertyValue left, LogEventPropertyValue right)
+        public static LogEventPropertyValue? NotEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (left == null || right == null)
                 return null;
@@ -184,14 +186,14 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(!UnboxedEqualHelper(left, right));
         }
 
-        public static LogEventPropertyValue Negate(LogEventPropertyValue operand)
+        public static LogEventPropertyValue? Negate(LogEventPropertyValue? operand)
         {
             if (Coerce.Numeric(operand, out var numeric))
                 return new ScalarValue(-numeric);
             return null;
         }
 
-        public static LogEventPropertyValue Round(LogEventPropertyValue value, LogEventPropertyValue places)
+        public static LogEventPropertyValue? Round(LogEventPropertyValue? value, LogEventPropertyValue? places)
         {
             if (!Coerce.Numeric(value, out var v) ||
                 !Coerce.Numeric(places, out var p) ||
@@ -204,7 +206,7 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(Math.Round(v, (int)p));
         }
 
-        public static LogEventPropertyValue Not(LogEventPropertyValue operand)
+        public static LogEventPropertyValue? Not(LogEventPropertyValue? operand)
         {
             if (operand is null)
                 return ConstantTrue;
@@ -214,14 +216,14 @@ namespace Serilog.Expressions.Runtime
                 null;
         }
 
-        public static LogEventPropertyValue _Internal_StrictNot(LogEventPropertyValue operand)
+        public static LogEventPropertyValue? _Internal_StrictNot(LogEventPropertyValue? operand)
         {
             return Coerce.Boolean(operand, out var b) ?
                 ScalarBoolean(!b) :
                 null;
         }
 
-        public static LogEventPropertyValue Contains(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue? Contains(LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
@@ -230,7 +232,7 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.Contains(ptx));
         }
 
-        public static LogEventPropertyValue IndexOf(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue? IndexOf(LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
@@ -239,7 +241,7 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(ctx.IndexOf(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue LastIndexOf(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue? LastIndexOf(LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
@@ -248,7 +250,7 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(ctx.LastIndexOf(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue Length(LogEventPropertyValue arg)
+        public static LogEventPropertyValue? Length(LogEventPropertyValue? arg)
         {
             if (Coerce.String(arg, out var s))
                 return new ScalarValue(s.Length);
@@ -259,7 +261,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue StartsWith(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue? StartsWith(LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
@@ -268,7 +270,7 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.StartsWith(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue EndsWith(LogEventPropertyValue corpus, LogEventPropertyValue pattern)
+        public static LogEventPropertyValue? EndsWith(LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
         {
             if (!Coerce.String(corpus, out var ctx) ||
                 !Coerce.String(pattern, out var ptx))
@@ -277,13 +279,14 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue Has(LogEventPropertyValue value)
+        public static LogEventPropertyValue Has(LogEventPropertyValue? value)
         {
             return ScalarBoolean(value != null);
         }
 
-        public static LogEventPropertyValue ElementAt(LogEventPropertyValue items, LogEventPropertyValue index)
+        public static LogEventPropertyValue? ElementAt(LogEventPropertyValue? items, LogEventPropertyValue? index)
         {
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (items is SequenceValue arr && Coerce.Numeric(index, out var ix))
             {
                 if (ix != Math.Floor(ix))
@@ -312,7 +315,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue _Internal_Any(LogEventPropertyValue items, LogEventPropertyValue predicate)
+        public static LogEventPropertyValue? _Internal_Any(LogEventPropertyValue? items, LogEventPropertyValue? predicate)
         {
             if (!Coerce.Predicate(predicate, out var pred))
                 return null;
@@ -330,7 +333,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue _Internal_All(LogEventPropertyValue items, LogEventPropertyValue predicate)
+        public static LogEventPropertyValue? _Internal_All(LogEventPropertyValue? items, LogEventPropertyValue? predicate)
         {
             if (!Coerce.Predicate(predicate, out var pred))
                 return null;
@@ -348,7 +351,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue TagOf(LogEventPropertyValue value)
+        public static LogEventPropertyValue? TagOf(LogEventPropertyValue? value)
         {
             if (value is StructureValue structure)
                 return new ScalarValue(structure.TypeTag); // I.e. may be null
@@ -356,7 +359,7 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue TypeOf(LogEventPropertyValue value)
+        public static LogEventPropertyValue TypeOf(LogEventPropertyValue? value)
         {
             if (value is DictionaryValue)
                 return new ScalarValue("dictionary");
@@ -375,17 +378,17 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue("undefined");
         }
 
-        public static LogEventPropertyValue _Internal_IsNull(LogEventPropertyValue value)
+        public static LogEventPropertyValue _Internal_IsNull(LogEventPropertyValue? value)
         {
             return ScalarBoolean(value is null || value is ScalarValue sv && sv.Value == null);
         }
 
-        public static LogEventPropertyValue _Internal_IsNotNull(LogEventPropertyValue value)
+        public static LogEventPropertyValue _Internal_IsNotNull(LogEventPropertyValue? value)
         {
             return ScalarBoolean(!(value is null || value is ScalarValue sv && sv.Value == null));
         }
 
-        public static LogEventPropertyValue Coalesce(LogEventPropertyValue v1, LogEventPropertyValue v2)
+        public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? v1, LogEventPropertyValue? v2)
         {
             if (v1 is null || v1 is ScalarValue sv && sv.Value == null)
                 return v2;
@@ -393,7 +396,7 @@ namespace Serilog.Expressions.Runtime
             return v1;
         }
 
-        public static LogEventPropertyValue Substring(LogEventPropertyValue sval, LogEventPropertyValue startIndex, LogEventPropertyValue length)
+        public static LogEventPropertyValue? Substring(LogEventPropertyValue? sval, LogEventPropertyValue? startIndex, LogEventPropertyValue? length)
         {
             if (!Coerce.String(sval, out var str) ||
                 !Coerce.Numeric(startIndex, out var si))
@@ -414,12 +417,14 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(str.Substring((int)si, (int)len));
         }
 
-        public static LogEventPropertyValue IndexOfMatch(LogEventPropertyValue corpus, LogEventPropertyValue regex)
+        // ReSharper disable once ReturnTypeCanBeNotNullable
+        public static LogEventPropertyValue? IndexOfMatch(LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
         {
             throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
         }
 
-        public static LogEventPropertyValue IsMatch(LogEventPropertyValue corpus, LogEventPropertyValue regex)
+        // ReSharper disable once ReturnTypeCanBeNotNullable
+        public static LogEventPropertyValue? IsMatch(LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
         {
             throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
         }

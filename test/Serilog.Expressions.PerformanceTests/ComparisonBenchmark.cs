@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 using Serilog.Events;
 using System;
 using Serilog.Expressions.PerformanceTests.Support;
@@ -12,7 +11,7 @@ namespace Serilog.Expressions.PerformanceTests
     /// </summary>
     public class ComparisonBenchmark
     {
-        Func<LogEvent, bool> _trivialFilter, _handwrittenFilter, _expressionFilter;
+        readonly Func<LogEvent, bool> _trivialFilter, _handwrittenFilter, _expressionFilter;
         readonly LogEvent _event = Some.InformationEvent("{A}", 3);
 
         public ComparisonBenchmark()
@@ -23,10 +22,7 @@ namespace Serilog.Expressions.PerformanceTests
             // `A == 3`, the old way
             _handwrittenFilter = evt =>
             {
-                LogEventPropertyValue a;
-                if (evt.Properties.TryGetValue("A", out a) &&
-                        a is ScalarValue &&
-                        ((ScalarValue)a).Value is int)
+                if (evt.Properties.TryGetValue("A", out var a) && (a as ScalarValue)?.Value is int)
                 {
                     return (int)((ScalarValue)a).Value == 3;
                 }
@@ -37,7 +33,7 @@ namespace Serilog.Expressions.PerformanceTests
             // The code we're interested in; the `true.Equals()` overhead is normally added when
             // this is used with Serilog
             var compiled = SerilogExpression.Compile("A = 3");
-            _expressionFilter = evt => true.Equals(compiled(evt));
+            _expressionFilter = evt => ExpressionResult.IsTrue(compiled(evt));
 
             Assert.True(_trivialFilter(_event) && _handwrittenFilter(_event) && _expressionFilter(_event));
         }

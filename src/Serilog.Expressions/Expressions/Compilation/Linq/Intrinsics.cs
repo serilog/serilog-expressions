@@ -9,7 +9,7 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         
-        public static LogEventPropertyValue ConstructSequenceValue(LogEventPropertyValue[] elements)
+        public static LogEventPropertyValue? ConstructSequenceValue(LogEventPropertyValue[] elements)
         {
             // Avoid upsetting Serilog's (currently) fragile `SequenceValue.Render()`.
             if (elements.Any(el => el == null))
@@ -24,7 +24,7 @@ namespace Serilog.Expressions.Compilation.Linq
             return false;
         }
         
-        public static LogEventPropertyValue IndexOfMatch(LogEventPropertyValue value, Regex regex)
+        public static LogEventPropertyValue? IndexOfMatch(LogEventPropertyValue value, Regex regex)
         {
             if (value is ScalarValue scalar &&
                 scalar.Value is string s)
@@ -38,7 +38,7 @@ namespace Serilog.Expressions.Compilation.Linq
             return null;
         }
 
-        public static LogEventPropertyValue GetPropertyValue(LogEvent context, string propertyName)
+        public static LogEventPropertyValue? GetPropertyValue(LogEvent context, string propertyName)
         {
             if (!context.Properties.TryGetValue(propertyName, out var value))
                 return null;
@@ -46,7 +46,7 @@ namespace Serilog.Expressions.Compilation.Linq
             return value;
         }
 
-        public static LogEventPropertyValue TryGetStructurePropertyValue(LogEventPropertyValue maybeStructure, string name)
+        public static LogEventPropertyValue? TryGetStructurePropertyValue(LogEventPropertyValue maybeStructure, string name)
         {
             if (maybeStructure is StructureValue sv)
             {

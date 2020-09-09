@@ -28,7 +28,7 @@ namespace Serilog.Expressions
         // no attempt to synchronize Expression, ToString(), and IsIncluded(),
         // for any observer, this at least ensures they won't be permanently out-of-sync for
         // all observers.
-        volatile Tuple<string, CompiledExpression> _filter;
+        volatile Tuple<string, CompiledExpression>? _filter;
 
         /// <summary>
         /// Construct a <see cref="LoggingFilterSwitch"/>, optionally initialized
@@ -38,7 +38,7 @@ namespace Serilog.Expressions
         /// Only expressions that evaluate to <c>true</c> are included
         /// by the filter. A <c>null</c> expression will accept all
         /// events.</param>
-        public LoggingFilterSwitch(string expression = null)
+        public LoggingFilterSwitch(string? expression = null)
         {
             Expression = expression;
         }
@@ -49,7 +49,7 @@ namespace Serilog.Expressions
         /// by the filter. A <c>null</c> expression will accept all
         /// events.
         /// </summary>
-        public string Expression
+        public string? Expression
         {
             // ReSharper disable once UnusedMember.Global
             get

@@ -30,7 +30,7 @@ namespace Serilog.Expressions
         /// <returns>Returns <c langword="true">true</c> if and only if the
         /// <paramref name="value"/> is a scalar Boolean with the
         /// value <c langword="true">true</c>. Returns <c langword="false">false</c>, otherwise.</returns>
-        public static bool IsTrue(LogEventPropertyValue value)
+        public static bool IsTrue(LogEventPropertyValue? value)
         {
             return Coerce.IsTrue(value);
         }

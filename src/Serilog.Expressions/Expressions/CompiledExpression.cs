@@ -14,8 +14,6 @@
 
 using Serilog.Events;
 
-#nullable enable
-
 namespace Serilog.Expressions
 {
     /// <summary>

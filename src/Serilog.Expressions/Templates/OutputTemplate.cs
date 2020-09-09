@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -23,9 +24,9 @@ namespace Serilog.Templates
         /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
         public static bool TryParse(
             string template,
-            IFormatProvider formatProvider,
-            out OutputTemplate result,
-            out string error)
+            IFormatProvider? formatProvider,
+            [MaybeNullWhen(false)] out OutputTemplate result,
+            [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
             
@@ -39,10 +40,10 @@ namespace Serilog.Templates
             return true;
         }
         
-        readonly IFormatProvider _formatProvider;
+        readonly IFormatProvider? _formatProvider;
         readonly CompiledTemplate _compiled;
 
-        OutputTemplate(CompiledTemplate compiled, IFormatProvider formatProvider)
+        OutputTemplate(CompiledTemplate compiled, IFormatProvider? formatProvider)
         {
             _compiled = compiled;
             _formatProvider = formatProvider;
@@ -54,7 +55,7 @@ namespace Serilog.Templates
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
         /// embedded values.</param>
-        public OutputTemplate(string template, IFormatProvider formatProvider = null)
+        public OutputTemplate(string template, IFormatProvider? formatProvider = null)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 

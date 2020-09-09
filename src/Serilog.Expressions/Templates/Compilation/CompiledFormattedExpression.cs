@@ -12,15 +12,15 @@ namespace Serilog.Templates.Compilation
         static readonly JsonValueFormatter JsonFormatter = new JsonValueFormatter("$type");
         
         readonly CompiledExpression _expression;
-        readonly string _format;
+        readonly string? _format;
 
-        public CompiledFormattedExpression(CompiledExpression expression, string format)
+        public CompiledFormattedExpression(CompiledExpression expression, string? format)
         {
             _expression = expression ?? throw new ArgumentNullException(nameof(expression));
             _format = format;
         }
 
-        public override void Evaluate(LogEvent logEvent, TextWriter output, IFormatProvider formatProvider)
+        public override void Evaluate(LogEvent logEvent, TextWriter output, IFormatProvider? formatProvider)
         {
             var value = _expression(logEvent);
             if (value == null)

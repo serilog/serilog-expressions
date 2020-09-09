@@ -23,16 +23,16 @@ namespace Serilog.Expressions.Compilation.Linq
             .ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
 
         static readonly MethodInfo ConstructSequenceValueMethod = typeof(Intrinsics)
-            .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public);
+            .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public)!;
 
         static readonly MethodInfo CoerceToScalarBooleanMethod = typeof(Intrinsics)
-            .GetMethod(nameof(Intrinsics.CoerceToScalarBoolean), BindingFlags.Static | BindingFlags.Public);
+            .GetMethod(nameof(Intrinsics.CoerceToScalarBoolean), BindingFlags.Static | BindingFlags.Public)!;
 
         static readonly MethodInfo IndexOfMatchMethod = typeof(Intrinsics)
-            .GetMethod(nameof(Intrinsics.IndexOfMatch), BindingFlags.Static | BindingFlags.Public);
+            .GetMethod(nameof(Intrinsics.IndexOfMatch), BindingFlags.Static | BindingFlags.Public)!;
         
         static readonly MethodInfo TryGetStructurePropertyValueMethod = typeof(Intrinsics)
-            .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public);
+            .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public)!;
 
         ParameterExpression Context { get; } = LX.Variable(typeof(LogEvent), "evt");
         
