@@ -42,6 +42,15 @@ namespace Serilog.Expressions.Parsing
         [Token(Example = ")")]
         RParen,
 
+        [Token(Example = "{")]
+        LBrace,
+
+        [Token(Example = "}")]
+        RBrace,
+
+        [Token(Example = ":")]
+        Colon,
+
         [Token(Example = "?")]
         QuestionMark,
 
@@ -106,6 +115,15 @@ namespace Serilog.Expressions.Parsing
         False,
 
         [Token(Category = "keyword", Example = "null")]
-        Null
+        Null,
+
+        [Token(Category = "keyword", Example = "if")]
+        If,
+
+        [Token(Category = "keyword", Example = "then")]
+        Then,
+
+        [Token(Category = "keyword", Example = "else")]
+        Else
     }
 }

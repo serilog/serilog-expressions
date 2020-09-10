@@ -7,7 +7,7 @@ namespace Serilog.Expressions.Parsing
 {
     class ExpressionTokenizer : Tokenizer<ExpressionToken>
     {
-        static readonly ExpressionToken[] SimpleOps = new ExpressionToken[128];
+        static readonly ExpressionToken[] SingleCharOps = new ExpressionToken[128];
 
         static readonly ExpressionKeyword[] Keywords =
         {
@@ -19,28 +19,34 @@ namespace Serilog.Expressions.Parsing
             new ExpressionKeyword("or", ExpressionToken.Or),
             new ExpressionKeyword("true", ExpressionToken.True),
             new ExpressionKeyword("false", ExpressionToken.False),
-            new ExpressionKeyword("null", ExpressionToken.Null)
+            new ExpressionKeyword("null", ExpressionToken.Null),
+            new ExpressionKeyword("if", ExpressionToken.If),
+            new ExpressionKeyword("then", ExpressionToken.Then),
+            new ExpressionKeyword("else", ExpressionToken.Else)
         };
 
         static ExpressionTokenizer()
         {
-            SimpleOps['+'] = ExpressionToken.Plus;
-            SimpleOps['-'] = ExpressionToken.Minus;
-            SimpleOps['*'] = ExpressionToken.Asterisk;
-            SimpleOps['/'] = ExpressionToken.ForwardSlash;
-            SimpleOps['%'] = ExpressionToken.Percent;
-            SimpleOps['^'] = ExpressionToken.Caret;
-            SimpleOps['<'] = ExpressionToken.LessThan;
-            SimpleOps['>'] = ExpressionToken.GreaterThan;
-            SimpleOps['='] = ExpressionToken.Equal;
-            SimpleOps[','] = ExpressionToken.Comma;
-            SimpleOps['.'] = ExpressionToken.Period;
-            SimpleOps['('] = ExpressionToken.LParen;
-            SimpleOps[')'] = ExpressionToken.RParen;
-            SimpleOps['['] = ExpressionToken.LBracket;
-            SimpleOps[']'] = ExpressionToken.RBracket;
-            SimpleOps['*'] = ExpressionToken.Asterisk;
-            SimpleOps['?'] = ExpressionToken.QuestionMark;
+            SingleCharOps['+'] = ExpressionToken.Plus;
+            SingleCharOps['-'] = ExpressionToken.Minus;
+            SingleCharOps['*'] = ExpressionToken.Asterisk;
+            SingleCharOps['/'] = ExpressionToken.ForwardSlash;
+            SingleCharOps['%'] = ExpressionToken.Percent;
+            SingleCharOps['^'] = ExpressionToken.Caret;
+            SingleCharOps['<'] = ExpressionToken.LessThan;
+            SingleCharOps['>'] = ExpressionToken.GreaterThan;
+            SingleCharOps['='] = ExpressionToken.Equal;
+            SingleCharOps[','] = ExpressionToken.Comma;
+            SingleCharOps['.'] = ExpressionToken.Period;
+            SingleCharOps['('] = ExpressionToken.LParen;
+            SingleCharOps[')'] = ExpressionToken.RParen;
+            SingleCharOps['{'] = ExpressionToken.LBrace;
+            SingleCharOps['}'] = ExpressionToken.RBrace;
+            SingleCharOps[':'] = ExpressionToken.Colon;
+            SingleCharOps['['] = ExpressionToken.LBracket;
+            SingleCharOps[']'] = ExpressionToken.RBracket;
+            SingleCharOps['*'] = ExpressionToken.Asterisk;
+            SingleCharOps['?'] = ExpressionToken.QuestionMark;
         }
 
         public TokenList<ExpressionToken> GreedyTokenize(TextSpan textSpan)
@@ -140,9 +146,9 @@ namespace Serilog.Expressions.Parsing
                         yield return Result.Value(compoundOp.Value, compoundOp.Location, compoundOp.Remainder);
                         next = compoundOp.Remainder.ConsumeChar();
                     }
-                    else if (next.Value < SimpleOps.Length && SimpleOps[next.Value] != ExpressionToken.None)
+                    else if (next.Value < SingleCharOps.Length && SingleCharOps[next.Value] != ExpressionToken.None)
                     {
-                        yield return Result.Value(SimpleOps[next.Value], next.Location, next.Remainder);
+                        yield return Result.Value(SingleCharOps[next.Value], next.Location, next.Remainder);
                         next = next.Remainder.ConsumeChar();
                     }
                     else
@@ -160,7 +166,7 @@ namespace Serilog.Expressions.Parsing
         {
             return !next.HasValue ||
                    char.IsWhiteSpace(next.Value) ||
-                   next.Value < SimpleOps.Length && SimpleOps[next.Value] != ExpressionToken.None;
+                   next.Value < SingleCharOps.Length && SingleCharOps[next.Value] != ExpressionToken.None;
         }
 
         static bool TryGetKeyword(TextSpan span, out ExpressionToken keyword)

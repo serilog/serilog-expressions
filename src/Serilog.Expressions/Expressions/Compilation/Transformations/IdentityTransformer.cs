@@ -83,6 +83,23 @@ namespace Serilog.Expressions.Compilation.Transformations
             return new ArrayExpression(elements.ToArray());
         }
 
+        protected override Expression Transform(ObjectExpression ox)
+        {
+            var any = false;
+            var members = new List<KeyValuePair<string, Expression>>();
+            foreach (var m in ox.Members)
+            {
+                if (TryTransform(m.Value, out var result))
+                    any = true;
+                members.Add(KeyValuePair.Create(m.Key, result));
+            }
+
+            if (!any)
+                return ox;
+
+            return new ObjectExpression(members.ToArray());
+        }
+
         protected override Expression Transform(IndexerExpression ix)
         {
             var transformedRecv = TryTransform(ix.Receiver, out var recv);

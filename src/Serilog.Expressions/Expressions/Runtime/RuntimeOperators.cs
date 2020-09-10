@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
@@ -153,6 +154,23 @@ namespace Serilog.Expressions.Runtime
                 // Not in any way optimized :-)
                 return ql.Elements.Count == qr.Elements.Count &&
                        ql.Elements.Zip(qr.Elements, UnboxedEqualHelper).All(eq => eq);
+            }
+
+            if (left is StructureValue tl &&
+                right is StructureValue tr)
+            {
+                // .... even less optimized; lots of work to de-dup keys with last-in-wins precedence.
+                var lhs = new Dictionary<string, LogEventPropertyValue?>();
+                foreach (var property in tl.Properties)
+                    lhs[property.Name] = property.Value;
+                
+                var rhs = new Dictionary<string, LogEventPropertyValue?>();
+                foreach (var property in tr.Properties)
+                    rhs[property.Name] = property.Value;
+
+                return lhs.Keys.Count == rhs.Keys.Count &&
+                       lhs.All(kv => rhs.TryGetValue(kv.Key, out var value) &&
+                                     UnboxedEqualHelper(kv.Value, value));
             }
 
             return false;
@@ -388,6 +406,7 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(!(value is null || value is ScalarValue sv && sv.Value == null));
         }
 
+        // Ideally this will be compiled as a short-circuiting intrinsic
         public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? v1, LogEventPropertyValue? v2)
         {
             if (v1 is null || v1 is ScalarValue sv && sv.Value == null)
@@ -427,6 +446,15 @@ namespace Serilog.Expressions.Runtime
         public static LogEventPropertyValue? IsMatch(LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
         {
             throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
+        }
+
+        // Ideally this will be compiled as a short-circuiting intrinsic
+        public static LogEventPropertyValue? _Internal_IfThenElse(
+            LogEventPropertyValue? condition,
+            LogEventPropertyValue? consequent,
+            LogEventPropertyValue? alternative)
+        {
+            return Coerce.IsTrue(condition) ? consequent : alternative;
         }
     }
 }

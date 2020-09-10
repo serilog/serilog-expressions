@@ -22,7 +22,7 @@ namespace Serilog.Expressions.Ast
                 return Operands[0] + "[" + Operands[1] + "]";
             }
 
-            return OperatorName + "(" + string.Join(",", Operands.Select(o => o.ToString())) + ")";
+            return OperatorName + "(" + string.Join(", ", Operands.Select(o => o.ToString())) + ")";
         }
     }
 }

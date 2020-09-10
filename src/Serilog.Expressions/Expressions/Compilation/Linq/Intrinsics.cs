@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Expressions.Runtime;
@@ -9,12 +10,27 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         
-        public static LogEventPropertyValue? ConstructSequenceValue(LogEventPropertyValue[] elements)
+        public static LogEventPropertyValue? ConstructSequenceValue(LogEventPropertyValue?[] elements)
         {
             // Avoid upsetting Serilog's (currently) fragile `SequenceValue.Render()`.
             if (elements.Any(el => el == null))
                 return null;
             return new SequenceValue(elements);
+        }
+        
+        public static LogEventPropertyValue? ConstructStructureValue(string[] names, LogEventPropertyValue?[] values)
+        {
+            var properties = new List<LogEventProperty>();
+            for (var i = 0; i < names.Length; ++i)
+            {
+                var value = values[i];
+                
+                // Avoid upsetting Serilog's `Structure.Render()`.
+                if (value == null) return null;
+                
+                properties.Add(new LogEventProperty(names[i], value));
+            }
+            return new StructureValue(properties);
         }
         
         public static bool CoerceToScalarBoolean(LogEventPropertyValue value)

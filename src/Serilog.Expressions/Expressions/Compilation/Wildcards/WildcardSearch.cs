@@ -66,5 +66,10 @@ namespace Serilog.Expressions.Compilation.Wildcards
         {
             return Transform(mx.Corpus);
         }
+
+        protected override IndexerExpression? Transform(ObjectExpression ox)
+        {
+            return null;
+        }
     }
 }

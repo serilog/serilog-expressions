@@ -19,84 +19,12 @@ namespace Serilog.Expressions.Compilation.Transformations
             _dest = dest;
         }
 
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(Expression x)
         {
-            if (lx == _source)
+            if (x == _source)
                 return _dest;
 
-            return base.Transform(lx);
-        }
-
-        protected override Expression Transform(ConstantExpression cx)
-        {
-            if (cx == _source)
-                return _dest;
-
-            return base.Transform(cx);
-        }
-
-        protected override Expression Transform(AmbientPropertyExpression px)
-        {
-            if (px == _source)
-                return _dest;
-
-            return base.Transform(px);
-        }
-
-        protected override Expression Transform(AccessorExpression spx)
-        {
-            if (spx == _source)
-                return _dest;
-
-            return base.Transform(spx);
-        }
-
-        protected override Expression Transform(LambdaExpression lmx)
-        {
-            if (lmx == _source)
-                return _dest;
-
-            return base.Transform(lmx);
-        }
-
-        protected override Expression Transform(ParameterExpression prx)
-        {
-            if (prx == _source)
-                return _dest;
-
-            return base.Transform(prx);
-        }
-
-        protected override Expression Transform(IndexerWildcardExpression wx)
-        {
-            if (wx == _source)
-                return _dest;
-
-            return base.Transform(wx);
-        }
-
-        protected override Expression Transform(IndexerExpression ix)
-        {
-            if (ix == _source)
-                return _dest;
-            
-            return base.Transform(ix);
-        }
-        
-        protected override Expression Transform(ArrayExpression ax)
-        {
-            if (ax == _source)
-                return _dest;
-            
-            return base.Transform(ax);
-        }
-
-        protected override Expression Transform(IndexOfMatchExpression mx)
-        {
-            if (mx == _source)
-                return _dest;
-            
-            return base.Transform(mx);
+            return base.Transform(x);
         }
     }
 }

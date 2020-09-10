@@ -2,6 +2,7 @@
 Hello, {'world'}!                        ⇶ Hello, world!
 {@l}                                     ⇶ Information
 Items are {[1, 2]}                       ⇶ Items are [1,2]
+Members are { {a: 1, 'b c': 2} }         ⇶ Members are {"a":1,"b c":2}
 {@p}                                     ⇶ {}
 Hello, {'my } brackety { {}} friends'}!  ⇶ Hello, my } brackety { {}} friends!
 Text only                                ⇶ Text only

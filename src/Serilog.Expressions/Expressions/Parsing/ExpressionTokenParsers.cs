@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Serilog.Events;
@@ -72,7 +73,21 @@ namespace Serilog.Expressions.Parsing
             from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
             from rbracket in Token.EqualTo(ExpressionToken.RBracket)
             select (Expression)new ArrayExpression(expr)).Named("array");
+        
+        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> ObjectMember =
+            (from key in Token.EqualTo(ExpressionToken.Identifier)
+                    .Select(t => t.ToStringValue())
+                    .Or(Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String))
+                from colon in Token.EqualTo(ExpressionToken.Colon)
+                from value in Parse.Ref(() => Expr)
+                select KeyValuePair.Create(key, value)).Named("object member");
 
+        static readonly TokenListParser<ExpressionToken, Expression> ObjectLiteral =
+            (from lbrace in Token.EqualTo(ExpressionToken.LBrace)
+                from members in ObjectMember.ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
+                from rbrace in Token.EqualTo(ExpressionToken.RBrace)
+                select (Expression)new ObjectExpression(members)).Named("object");
+        
         static readonly TokenListParser<ExpressionToken, Expression> RootProperty =
             (from notFunction in Parse.Not(Token.EqualTo(ExpressionToken.Identifier).IgnoreThen(Token.EqualTo(ExpressionToken.LParen)))
                 from p in Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression) new AmbientPropertyExpression(b.ToStringValue().Substring(1), true))
@@ -96,6 +111,15 @@ namespace Serilog.Expressions.Parsing
                 .SelectCatch(n => decimal.Parse(n.ToStringValue(), CultureInfo.InvariantCulture), "the numeric literal is too large")
                 .Select(d => (Expression)new ConstantExpression(new ScalarValue(d)));
 
+        static readonly TokenListParser<ExpressionToken, Expression> Conditional =
+            from _ in Token.EqualTo(ExpressionToken.If)
+            from condition in Parse.Ref(() => Expr)
+            from __ in Token.EqualTo(ExpressionToken.Then)
+            from consequent in Parse.Ref(() => Expr)
+            from ___ in Token.EqualTo(ExpressionToken.Else)
+            from alternative in Parse.Ref(() => Expr)
+            select (Expression)new CallExpression(Operators.RuntimeOpIfThenElse, condition, consequent, alternative);
+        
         static readonly TokenListParser<ExpressionToken, Expression> Literal =
             String
                 .Or(Number)
@@ -105,7 +129,13 @@ namespace Serilog.Expressions.Parsing
                 .Or(Token.EqualTo(ExpressionToken.Null).Value((Expression)new ConstantExpression(new ScalarValue(null))))
                 .Named("literal");
 
-        static readonly TokenListParser<ExpressionToken, Expression> Item = Literal.Or(RootProperty).Or(Function).Or(ArrayLiteral);
+        static readonly TokenListParser<ExpressionToken, Expression> Item =
+            Literal
+                .Or(RootProperty)
+                .Or(Function)
+                .Or(ArrayLiteral)
+                .Or(ObjectLiteral)
+                .Or(Conditional);
 
         static readonly TokenListParser<ExpressionToken, Expression> Factor =
             (from lparen in Token.EqualTo(ExpressionToken.LParen)

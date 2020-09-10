@@ -25,6 +25,9 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly MethodInfo ConstructSequenceValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public)!;
 
+        static readonly MethodInfo ConstructStructureValueMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.ConstructStructureValue), BindingFlags.Static | BindingFlags.Public)!;
+
         static readonly MethodInfo CoerceToScalarBooleanMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.CoerceToScalarBoolean), BindingFlags.Static | BindingFlags.Public)!;
 
@@ -160,6 +163,28 @@ namespace Serilog.Expressions.Compilation.Linq
             var elements = ax.Elements.Select(Transform).ToArray();
             var arr = LX.NewArrayInit(typeof(LogEventPropertyValue), elements);
             return LX.Call(ConstructSequenceValueMethod, arr);
+        }
+        
+        protected override ExpressionBody Transform(ObjectExpression ox)
+        {
+            var names = new List<string>();
+            var values = new List<ExpressionBody>();
+            foreach (var member in ox.Members)
+            {
+                if (names.Contains(member.Key))
+                {
+                    var oldPos = names.IndexOf(member.Key);
+                    values[oldPos] = Transform(member.Value);
+                }
+                else
+                {
+                    names.Add(member.Key);
+                    values.Add(Transform(member.Value));
+                }
+            }
+            var namesConstant = LX.Constant(names.ToArray(), typeof(string[]));
+            var valuesArr = LX.NewArrayInit(typeof(LogEventPropertyValue), values.ToArray());
+            return LX.Call(ConstructStructureValueMethod, namesConstant, valuesArr);
         }
 
         protected override ExpressionBody Transform(IndexerExpression ix)

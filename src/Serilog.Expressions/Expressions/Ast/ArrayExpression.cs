@@ -14,7 +14,7 @@ namespace Serilog.Expressions.Ast
 
         public override string ToString()
         {
-            return "[" + string.Join(",", Elements.Select(o => o.ToString())) + "]";
+            return "[" + string.Join(", ", Elements.Select(o => o.ToString())) + "]";
         }
     }
 }

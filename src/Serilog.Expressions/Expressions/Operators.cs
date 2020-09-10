@@ -57,6 +57,7 @@ namespace Serilog.Expressions
         public const string OpSubstring = "Substring";
         public const string OpIndexOfMatch = "IndexOfMatch";
         public const string OpIsMatch = "IsMatch";
+        public const string RuntimeOpIfThenElse = "_Internal_IfThenElse";
 
         public static readonly HashSet<string> WildcardComparators = new HashSet<string>(OperatorComparer)
         {

@@ -4,7 +4,10 @@ true                                 ⇶ true
 false                                ⇶ false
 1.3                                  ⇶ 1.3
 'foo'                                ⇶ 'foo'
+[]                                   ⇶ []
 [5, 6]                               ⇶ [5, 6]
+{}                                   ⇶ {}
+{a: 1, 'b c': 2}                     ⇶ {a: 1, 'b c': 2}
 
 // Collections
 [5, undefined]                       ⇶ undefined
@@ -179,3 +182,10 @@ indexofmatch('foo', 'x')             ⇶ -1
 substring('abcd', 1, 2)              ⇶ 'bc'
 substring('abcd', 1)                 ⇶ 'bcd'
 
+// Conditional
+if true then 1 else 2                ⇶ 1
+if 1 + 2 = 3 then 1 else 2           ⇶ 1
+if false then 1 else 2               ⇶ 2
+if undefined then 1 else 2           ⇶ 2
+if 'string' then 1 else 2            ⇶ 2
+if true then if false then 1 else 2 else 3 ⇶ 2

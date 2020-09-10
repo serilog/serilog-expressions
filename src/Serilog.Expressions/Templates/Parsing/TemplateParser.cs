@@ -57,7 +57,7 @@ namespace Serilog.Templates.Parsing
                         if (expr.Remainder.Position == tokens.Count())
                             i = tokens.Last().Position.Absolute + tokens.Last().Span.Length;
                         else
-                            i = tokens.ElementAt(i).Position.Absolute;
+                            i = tokens.ElementAt(expr.Remainder.Position).Position.Absolute;
 
                         if (i == template.Length)
                         {
