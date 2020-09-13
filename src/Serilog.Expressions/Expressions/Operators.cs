@@ -48,11 +48,10 @@ namespace Serilog.Expressions
         public const string RuntimeOpIsNull = "_Internal_IsNull";
         public const string RuntimeOpIsNotNull = "_Internal_IsNotNull";
         public const string OpCoalesce = "Coalesce";
-        public const string IntermediateOpSqlLike = "_Internal_Like";
-        public const string IntermediateOpSqlNotLike = "_Internal_NotLike";
-        public const string IntermediateOpSqlIs = "_Internal_Is";
-        public const string RuntimeOpSqlIn = "_Internal_In";
-        public const string IntermediateOpSqlNotIn = "_Internal_NotIn";
+        public const string IntermediateOpLike = "_Internal_Like";
+        public const string IntermediateOpNotLike = "_Internal_NotLike";
+        public const string RuntimeOpIn = "_Internal_In";
+        public const string RuntimeOpNotIn = "_Internal_NotIn";
         public const string RuntimeOpStrictNot = "_Internal_StrictNot";
         public const string OpSubstring = "Substring";
         public const string OpIndexOfMatch = "IndexOfMatch";
@@ -70,11 +69,9 @@ namespace Serilog.Expressions
             OpLessThanOrEqual,
             OpGreaterThan,
             OpGreaterThanOrEqual,
-            IntermediateOpSqlLike,
-            IntermediateOpSqlNotLike,
-            RuntimeOpSqlIn,
-            IntermediateOpSqlNotIn,
-            IntermediateOpSqlIs
+            IntermediateOpLike,
+            IntermediateOpNotLike,
+            RuntimeOpIn,
         };
 
         public static bool SameOperator(string op1, string op2)

@@ -1,7 +1,7 @@
-# _Serilog.Expressions_
+# _Serilog Expressions_
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog 
-events, ideal for use in JSON or XML configuration.
+events, ideal for use with JSON or XML configuration.
 
 ## Getting started
 

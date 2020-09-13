@@ -24,7 +24,7 @@ namespace Serilog.Expressions.Tests
         }
 
         public static IEnumerable<object[]> EphemeralExpressionEvaluationCases =>
-            ReadCases("ephemeral-expression-evaluation-cases.asv");
+            ReadCases("expression-evaluation-cases.asv");
 
         [Theory]
         [MemberData(nameof(EphemeralExpressionEvaluationCases))]

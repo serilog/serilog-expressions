@@ -21,10 +21,10 @@ namespace Serilog.Expressions.Compilation.Text
             if (lx.Operands.Length != 2)
                 return base.Transform(lx);
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpSqlLike))
+            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpLike))
                 return TryCompileLikeExpression(lx.Operands[0], lx.Operands[1]);
             
-            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpSqlNotLike))
+            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpNotLike))
                 return new CallExpression(
                     Operators.RuntimeOpStrictNot,
                     TryCompileLikeExpression(lx.Operands[0], lx.Operands[1]));

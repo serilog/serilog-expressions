@@ -196,6 +196,11 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
+        public static LogEventPropertyValue? _Internal_NotIn(LogEventPropertyValue? item, LogEventPropertyValue? collection)
+        {
+            return _Internal_StrictNot(_Internal_In(item, collection));
+        }
+        
         public static LogEventPropertyValue? NotEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (left == null || right == null)

@@ -40,11 +40,31 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, string> Neq = Token.EqualTo(ExpressionToken.NotEqual).Value(Operators.OpNotEqual);
         static readonly TokenListParser<ExpressionToken, string> Negate = Token.EqualTo(ExpressionToken.Minus).Value(Operators.OpNegate);
         static readonly TokenListParser<ExpressionToken, string> Not = Token.EqualTo(ExpressionToken.Not).Value(Operators.OpNot);
-        static readonly TokenListParser<ExpressionToken, string> Like = Token.EqualTo(ExpressionToken.Like).Value(Operators.IntermediateOpSqlLike);
-        static readonly TokenListParser<ExpressionToken, string> NotLike = Not.IgnoreThen(Like).Value(Operators.IntermediateOpSqlNotLike);
-        static readonly TokenListParser<ExpressionToken, string> In = Token.EqualTo(ExpressionToken.In).Value(Operators.RuntimeOpSqlIn);
-        static readonly TokenListParser<ExpressionToken, string> NotIn = Not.IgnoreThen(In).Value(Operators.IntermediateOpSqlNotIn);
-        static readonly TokenListParser<ExpressionToken, string> Is = Token.EqualTo(ExpressionToken.Is).Value(Operators.IntermediateOpSqlIs);
+        
+        static readonly TokenListParser<ExpressionToken, string> Like = Token.EqualTo(ExpressionToken.Like).Value(Operators.IntermediateOpLike);
+
+        static readonly TokenListParser<ExpressionToken, string> NotLike =
+            Token.EqualTo(ExpressionToken.Not)
+                .IgnoreThen(Token.EqualTo(ExpressionToken.Like))
+                .Value(Operators.IntermediateOpNotLike);
+        
+        static readonly TokenListParser<ExpressionToken, string> In = Token.EqualTo(ExpressionToken.In).Value(Operators.RuntimeOpIn);
+
+        static readonly TokenListParser<ExpressionToken, string> NotIn = 
+            Token.EqualTo(ExpressionToken.Not)
+                .IgnoreThen(Token.EqualTo(ExpressionToken.In))
+                .Value(Operators.RuntimeOpNotIn);
+
+        static readonly TokenListParser<ExpressionToken, string> IsNull = 
+            Token.EqualTo(ExpressionToken.Is)
+                .IgnoreThen(Token.EqualTo(ExpressionToken.Null))
+                .Value(Operators.RuntimeOpIsNull);
+        
+        static readonly TokenListParser<ExpressionToken, string> IsNotNull = 
+            Token.EqualTo(ExpressionToken.Is)
+                .IgnoreThen(Token.EqualTo(ExpressionToken.Not))
+                .IgnoreThen(Token.EqualTo(ExpressionToken.Null))
+                .Value(Operators.RuntimeOpIsNotNull);
 
         static readonly TokenListParser<ExpressionToken, Func<Expression, Expression>> PropertyPathStep =
             Token.EqualTo(ExpressionToken.Period)
@@ -152,7 +172,15 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, Expression> Operand =
             (from op in Negate.Or(Not)
                 from path in Path
-                select MakeUnary(op, path)).Or(Path).Named("expression");
+                select MakeUnary(op, path))
+            .Or(Path)
+            .Then(operand => Token.EqualTo(ExpressionToken.Is).Try()
+                .IgnoreThen(
+                    Token.EqualTo(ExpressionToken.Null).Value(Operators.RuntimeOpIsNull)
+                        .Or(Token.EqualTo(ExpressionToken.Not).IgnoreThen(Token.EqualTo(ExpressionToken.Null)).Value(Operators.RuntimeOpIsNotNull)))
+                .Select(op => (Expression)new CallExpression(op, operand))
+                .OptionalOrDefault(operand))
+            .Named("expression");
 
         static readonly TokenListParser<ExpressionToken, Expression> InnerTerm = Parse.Chain(Power, Operand, MakeBinary);
 
@@ -160,7 +188,12 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Comparand = Parse.Chain(Add.Or(Subtract), Term, MakeBinary);
 
-        static readonly TokenListParser<ExpressionToken, Expression> Comparison = Parse.Chain(Is.Or(NotLike.Try().Or(Like)).Or(NotIn.Try().Or(In)).Or(Lte.Or(Neq).Or(Lt)).Or(Gte.Or(Gt)).Or(Eq), Comparand, MakeBinary);
+        static readonly TokenListParser<ExpressionToken, Expression> Comparison = Parse.Chain(
+            NotLike.Try().Or(Like)
+                .Or(NotIn.Try().Or(In))
+                .Or(Lte.Or(Neq).Or(Lt))
+                .Or(Gte.Or(Gt))
+                .Or(Eq), Comparand, MakeBinary);
 
         static readonly TokenListParser<ExpressionToken, Expression> Conjunction = Parse.Chain(And, Comparison, MakeBinary);
 
