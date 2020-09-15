@@ -26,7 +26,7 @@ namespace Serilog.Expressions.Compilation.Text
             
             if (Operators.SameOperator(lx.OperatorName, Operators.OpIsMatch))
                 return new CallExpression(
-                    Operators.OpNotEqual,
+                    Operators.RuntimeOpNotEqual,
                     TryCompileIndexOfMatch(lx.Operands[0], lx.Operands[1]),
                     new ConstantExpression(new ScalarValue(-1)));
 

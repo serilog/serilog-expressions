@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Serilog.Expressions.Ast;
 
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace Serilog.Expressions
 {
     static class Operators
@@ -12,50 +14,48 @@ namespace Serilog.Expressions
         // Op* means usable in expressions _and_ runtime executable.
         // RuntimeOp* means runtime only.
 
-        public const string OpAdd = "Add";
-        public const string OpSubtract = "Subtract";
-        public const string OpMultiply = "Multiply";
-        public const string OpDivide = "Divide";
-        public const string OpModulo = "Modulo";
-        public const string OpPower = "Power";
-        public const string OpRound = "Round";
-        public const string OpAnd = "And";
-        public const string OpOr = "Or";
-        public const string OpLessThanOrEqual = "LessThanOrEqual";
-        public const string OpLessThan = "LessThan";
-        public const string OpGreaterThan = "GreaterThan";
-        public const string OpGreaterThanOrEqual = "GreaterThanOrEqual";
-        public const string OpEqual = "Equal";
-        public const string OpNotEqual = "NotEqual";
-        public const string OpNegate = "Negate";
-        public const string OpNot = "Not";
-        public const string OpContains = "Contains";
-        public const string OpIndexOf = "IndexOf";
-        public const string OpLastIndexOf = "IndexOf";
-        public const string OpLength = "Length";
-        public const string OpStartsWith = "StartsWith";
-        public const string OpEndsWith = "EndsWith";
-        public const string OpHas = "Has";
-        public const string OpDateTime = "DateTime";
-        public const string OpTimeSpan = "TimeSpan";
-        public const string OpTimeOfDay = "TimeOfDay";
-        public const string OpElementAt = "ElementAt";
-        public const string RuntimeOpAny = "_Internal_Any";
-        public const string RuntimeOpAll = "_Internal_All";
-        public const string OpTypeOf = "TypeOf";
-        public const string OpTagOf = "TagOf";
-        public const string OpTotalMilliseconds = "TotalMilliseconds";
-        public const string RuntimeOpIsNull = "_Internal_IsNull";
-        public const string RuntimeOpIsNotNull = "_Internal_IsNotNull";
         public const string OpCoalesce = "Coalesce";
+        public const string OpContains = "Contains";
+        public const string OpEndsWith = "EndsWith";
+        public const string OpIndexOf = "IndexOf";
+        public const string OpIndexOfMatch = "IndexOfMatch";
+        public const string OpIsMatch = "IsMatch";
+        public const string OpIsDefined = "IsDefined";
+        public const string OpLastIndexOf = "LastIndexOf";
+        public const string OpLength = "Length";
+        public const string OpRound = "Round";
+        public const string OpStartsWith = "StartsWith";
+        public const string OpSubstring = "Substring";
+        public const string OpTagOf = "TagOf";
+        public const string OpTypeOf = "TypeOf";
+
         public const string IntermediateOpLike = "_Internal_Like";
         public const string IntermediateOpNotLike = "_Internal_NotLike";
+
+        public const string RuntimeOpAdd = "_Internal_Add";
+        public const string RuntimeOpSubtract = "_Internal_Subtract";
+        public const string RuntimeOpMultiply = "_Internal_Multiply";
+        public const string RuntimeOpDivide = "_Internal_Divide";
+        public const string RuntimeOpModulo = "_Internal_Modulo";
+        public const string RuntimeOpPower = "_Internal_Power";
+        public const string RuntimeOpAnd = "_Internal_And";
+        public const string RuntimeOpOr = "_Internal_Or";
+        public const string RuntimeOpLessThanOrEqual = "_Internal_LessThanOrEqual";
+        public const string RuntimeOpLessThan = "_Internal_LessThan";
+        public const string RuntimeOpGreaterThan = "_Internal_GreaterThan";
+        public const string RuntimeOpGreaterThanOrEqual = "_Internal_GreaterThanOrEqual";
+        public const string RuntimeOpEqual = "_Internal_Equal";
+        public const string RuntimeOpNotEqual = "_Internal_NotEqual";
+        public const string RuntimeOpNegate = "_Internal_Negate";
+        public const string RuntimeOpNot = "_Internal_Not";
+        public const string RuntimeOpElementAt = "_Internal_ElementAt";
+        public const string RuntimeOpAny = "_Internal_Any";
+        public const string RuntimeOpAll = "_Internal_All";
+        public const string RuntimeOpIsNull = "_Internal_IsNull";
+        public const string RuntimeOpIsNotNull = "_Internal_IsNotNull";
         public const string RuntimeOpIn = "_Internal_In";
         public const string RuntimeOpNotIn = "_Internal_NotIn";
         public const string RuntimeOpStrictNot = "_Internal_StrictNot";
-        public const string OpSubstring = "Substring";
-        public const string OpIndexOfMatch = "IndexOfMatch";
-        public const string OpIsMatch = "IsMatch";
         public const string RuntimeOpIfThenElse = "_Internal_IfThenElse";
 
         public static readonly HashSet<string> WildcardComparators = new HashSet<string>(OperatorComparer)
@@ -63,15 +63,20 @@ namespace Serilog.Expressions
             OpContains,
             OpStartsWith,
             OpEndsWith,
-            OpNotEqual,
-            OpEqual,
-            OpLessThan,
-            OpLessThanOrEqual,
-            OpGreaterThan,
-            OpGreaterThanOrEqual,
+            RuntimeOpNotEqual,
+            RuntimeOpEqual,
+            RuntimeOpLessThan,
+            RuntimeOpLessThanOrEqual,
+            RuntimeOpGreaterThan,
+            RuntimeOpGreaterThanOrEqual,
             IntermediateOpLike,
             IntermediateOpNotLike,
             RuntimeOpIn,
+            RuntimeOpNotIn,
+            OpIsMatch,
+            OpIsDefined,
+            RuntimeOpIsNull,
+            RuntimeOpIsNotNull
         };
 
         public static bool SameOperator(string op1, string op2)
@@ -84,7 +89,12 @@ namespace Serilog.Expressions
         
         public static string ToRuntimeWildcardOperator(IndexerWildcard wildcard)
         {
-            return "_Internal_" + wildcard; // "Any"/"All"
+            return wildcard switch
+            {
+                IndexerWildcard.All => RuntimeOpAll,
+                IndexerWildcard.Any => RuntimeOpAny,
+                _ => throw new ArgumentException("Unsupported wildcard.")
+            };
         }
     }
 }

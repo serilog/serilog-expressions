@@ -26,7 +26,7 @@ namespace Sample
             log.ForContext<Program>().Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
             log.Warning("Cart contains {@Items}", new[] { "Tea", "Coffee" });
             log.Information("Cart contains {@Items}", new[] { "Apricots" });
-            log.Information("Cart contains {@Items}", new[] { "Peanuts", "Chocolate" });
+            log.Information("Cart for {Name} contains {@Items}", Environment.UserName, new[] { "Peanuts", "Chocolate" });
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Serilog.Expressions.Compilation.Text
                 var regex = LikeToRegex(s);
                 var compiled = new Regex(regex, RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
                 var indexof = new IndexOfMatchExpression(Transform(corpus), compiled);
-                return new CallExpression(Operators.OpNotEqual, indexof, new ConstantExpression(new ScalarValue(-1)));
+                return new CallExpression(Operators.RuntimeOpNotEqual, indexof, new ConstantExpression(new ScalarValue(-1)));
             }
             
             SelfLog.WriteLine($"Serilog.Expressions: `like` requires a constant string argument; found ${like}.");

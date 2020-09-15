@@ -32,7 +32,7 @@ namespace Serilog.Expressions.Tests
         [MemberData(nameof(TemplateEvaluationCases))]
         public void TemplatesAreCorrectlyEvaluated(string template, string expected)
         {
-            var evt = Some.InformationEvent();
+            var evt = Some.InformationEvent("Hello, {Name}!", "nblumhardt");
             var compiled = new OutputTemplate(template);
             var output = new StringWriter();
             compiled.Format(evt, output);

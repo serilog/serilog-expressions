@@ -1,11 +1,12 @@
-// Temporarily using Serilog's default value formatting
 Hello, {'world'}!                        ⇶ Hello, world!
 {@l}                                     ⇶ Information
+{@l:u3}                                  ⇶ INF
 Items are {[1, 2]}                       ⇶ Items are [1,2]
 Members are { {a: 1, 'b c': 2} }         ⇶ Members are {"a":1,"b c":2}
-{@p}                                     ⇶ {}
+{@p}                                     ⇶ {"Name":"nblumhardt"}
 Hello, {'my } brackety { {}} friends'}!  ⇶ Hello, my } brackety { {}} friends!
 Text only                                ⇶ Text only
 {{ Escaped {{ left {{                    ⇶ { Escaped { left {
 }} Escaped }} right }}                   ⇶ } Escaped } right }
 Formatted {42:0000}                      ⇶ Formatted 0042
+{@m}                                     ⇶ Hello, nblumhardt!

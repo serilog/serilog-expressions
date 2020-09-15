@@ -63,10 +63,10 @@ namespace Serilog.Expressions.Compilation.Linq
             var operands = lx.Operands.Select(Transform).ToArray();
 
             // `and` and `or` short-circuit to save execution time; unlike the earlier Serilog.Filters.Expressions, nothing else does.
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpAnd))
+            if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpAnd))
                 return CompileLogical(LX.AndAlso, operands[0], operands[1]);
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpOr))
+            if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpOr))
                 return CompileLogical(LX.OrElse, operands[0], operands[1]);
 
             return LX.Call(m, operands);
@@ -102,7 +102,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     return Splice(context => new ScalarValue(context.Level));
 
                 if (px.PropertyName == BuiltInProperty.Message)
-                    return Splice(context => new ScalarValue(context.RenderMessage(null)));
+                    return Splice(context => new ScalarValue(Intrinsics.RenderMessage(context)));
 
                 if (px.PropertyName == BuiltInProperty.Exception)
                     return Splice(context => context.Exception == null ? null : new ScalarValue(context.Exception));
@@ -189,7 +189,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override ExpressionBody Transform(IndexerExpression ix)
         {
-            return Transform(new CallExpression(Operators.OpElementAt, ix.Receiver, ix.Index));
+            return Transform(new CallExpression(Operators.RuntimeOpElementAt, ix.Receiver, ix.Index));
         }
 
         protected override ExpressionBody Transform(IndexOfMatchExpression mx)

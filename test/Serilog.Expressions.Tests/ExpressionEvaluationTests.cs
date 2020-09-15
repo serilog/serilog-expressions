@@ -48,7 +48,7 @@ namespace Serilog.Expressions.Tests
             }
             else
             {
-                Assert.True(Coerce.IsTrue(RuntimeOperators.Equal(actual, expected)), $"Expected value: {Display(expected)}{Environment.NewLine}Actual value: {Display(actual)}");
+                Assert.True(Coerce.IsTrue(RuntimeOperators._Internal_Equal(actual, expected)), $"Expected value: {Display(expected)}{Environment.NewLine}Actual value: {Display(actual)}");
             }
         }
 

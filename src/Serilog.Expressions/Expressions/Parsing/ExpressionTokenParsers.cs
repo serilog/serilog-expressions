@@ -24,22 +24,22 @@ namespace Serilog.Expressions.Parsing
             return Expr.TryParse(input);
         }
 
-        static readonly TokenListParser<ExpressionToken, string> Add = Token.EqualTo(ExpressionToken.Plus).Value(Operators.OpAdd);
-        static readonly TokenListParser<ExpressionToken, string> Subtract = Token.EqualTo(ExpressionToken.Minus).Value(Operators.OpSubtract);
-        static readonly TokenListParser<ExpressionToken, string> Multiply = Token.EqualTo(ExpressionToken.Asterisk).Value(Operators.OpMultiply);
-        static readonly TokenListParser<ExpressionToken, string> Divide = Token.EqualTo(ExpressionToken.ForwardSlash).Value(Operators.OpDivide);
-        static readonly TokenListParser<ExpressionToken, string> Modulo = Token.EqualTo(ExpressionToken.Percent).Value(Operators.OpModulo);
-        static readonly TokenListParser<ExpressionToken, string> Power = Token.EqualTo(ExpressionToken.Caret).Value(Operators.OpPower);
-        static readonly TokenListParser<ExpressionToken, string> And = Token.EqualTo(ExpressionToken.And).Value(Operators.OpAnd);
-        static readonly TokenListParser<ExpressionToken, string> Or = Token.EqualTo(ExpressionToken.Or).Value(Operators.OpOr);
-        static readonly TokenListParser<ExpressionToken, string> Lte = Token.EqualTo(ExpressionToken.LessThanOrEqual).Value(Operators.OpLessThanOrEqual);
-        static readonly TokenListParser<ExpressionToken, string> Lt = Token.EqualTo(ExpressionToken.LessThan).Value(Operators.OpLessThan);
-        static readonly TokenListParser<ExpressionToken, string> Gt = Token.EqualTo(ExpressionToken.GreaterThan).Value(Operators.OpGreaterThan);
-        static readonly TokenListParser<ExpressionToken, string> Gte = Token.EqualTo(ExpressionToken.GreaterThanOrEqual).Value(Operators.OpGreaterThanOrEqual);
-        static readonly TokenListParser<ExpressionToken, string> Eq = Token.EqualTo(ExpressionToken.Equal).Value(Operators.OpEqual);
-        static readonly TokenListParser<ExpressionToken, string> Neq = Token.EqualTo(ExpressionToken.NotEqual).Value(Operators.OpNotEqual);
-        static readonly TokenListParser<ExpressionToken, string> Negate = Token.EqualTo(ExpressionToken.Minus).Value(Operators.OpNegate);
-        static readonly TokenListParser<ExpressionToken, string> Not = Token.EqualTo(ExpressionToken.Not).Value(Operators.OpNot);
+        static readonly TokenListParser<ExpressionToken, string> Add = Token.EqualTo(ExpressionToken.Plus).Value(Operators.RuntimeOpAdd);
+        static readonly TokenListParser<ExpressionToken, string> Subtract = Token.EqualTo(ExpressionToken.Minus).Value(Operators.RuntimeOpSubtract);
+        static readonly TokenListParser<ExpressionToken, string> Multiply = Token.EqualTo(ExpressionToken.Asterisk).Value(Operators.RuntimeOpMultiply);
+        static readonly TokenListParser<ExpressionToken, string> Divide = Token.EqualTo(ExpressionToken.ForwardSlash).Value(Operators.RuntimeOpDivide);
+        static readonly TokenListParser<ExpressionToken, string> Modulo = Token.EqualTo(ExpressionToken.Percent).Value(Operators.RuntimeOpModulo);
+        static readonly TokenListParser<ExpressionToken, string> Power = Token.EqualTo(ExpressionToken.Caret).Value(Operators.RuntimeOpPower);
+        static readonly TokenListParser<ExpressionToken, string> And = Token.EqualTo(ExpressionToken.And).Value(Operators.RuntimeOpAnd);
+        static readonly TokenListParser<ExpressionToken, string> Or = Token.EqualTo(ExpressionToken.Or).Value(Operators.RuntimeOpOr);
+        static readonly TokenListParser<ExpressionToken, string> Lte = Token.EqualTo(ExpressionToken.LessThanOrEqual).Value(Operators.RuntimeOpLessThanOrEqual);
+        static readonly TokenListParser<ExpressionToken, string> Lt = Token.EqualTo(ExpressionToken.LessThan).Value(Operators.RuntimeOpLessThan);
+        static readonly TokenListParser<ExpressionToken, string> Gt = Token.EqualTo(ExpressionToken.GreaterThan).Value(Operators.RuntimeOpGreaterThan);
+        static readonly TokenListParser<ExpressionToken, string> Gte = Token.EqualTo(ExpressionToken.GreaterThanOrEqual).Value(Operators.RuntimeOpGreaterThanOrEqual);
+        static readonly TokenListParser<ExpressionToken, string> Eq = Token.EqualTo(ExpressionToken.Equal).Value(Operators.RuntimeOpEqual);
+        static readonly TokenListParser<ExpressionToken, string> Neq = Token.EqualTo(ExpressionToken.NotEqual).Value(Operators.RuntimeOpNotEqual);
+        static readonly TokenListParser<ExpressionToken, string> Negate = Token.EqualTo(ExpressionToken.Minus).Value(Operators.RuntimeOpNegate);
+        static readonly TokenListParser<ExpressionToken, string> Not = Token.EqualTo(ExpressionToken.Not).Value(Operators.RuntimeOpNot);
         
         static readonly TokenListParser<ExpressionToken, string> Like = Token.EqualTo(ExpressionToken.Like).Value(Operators.IntermediateOpLike);
 

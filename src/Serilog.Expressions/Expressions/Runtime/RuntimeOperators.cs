@@ -18,7 +18,7 @@ namespace Serilog.Expressions.Runtime
             return value ? ConstantTrue : ConstantFalse;
         }
         
-        public static LogEventPropertyValue? Add(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Add(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -27,7 +27,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Subtract(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Subtract(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -36,7 +36,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Multiply(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Multiply(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -45,7 +45,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Divide(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Divide(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r) &&
@@ -55,7 +55,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Modulo(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Modulo(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r) &&
@@ -65,7 +65,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Power(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Power(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -75,18 +75,18 @@ namespace Serilog.Expressions.Runtime
         }
 
         // ReSharper disable once ReturnTypeCanBeNotNullable
-        public static LogEventPropertyValue? And(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_And(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
         // ReSharper disable once ReturnTypeCanBeNotNullable
-        public static LogEventPropertyValue? Or(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Or(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             throw new InvalidOperationException("Logical operators should be evaluated intrinsically.");
         }
 
-        public static LogEventPropertyValue? LessThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_LessThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -95,7 +95,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? LessThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_LessThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -104,7 +104,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? GreaterThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_GreaterThan(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -113,7 +113,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? GreaterThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_GreaterThanOrEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
@@ -122,7 +122,7 @@ namespace Serilog.Expressions.Runtime
             return default;
         }
 
-        public static LogEventPropertyValue? Equal(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_Equal(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             // Undefined values propagate through comparisons
             if (left == null || right == null)
@@ -201,7 +201,7 @@ namespace Serilog.Expressions.Runtime
             return _Internal_StrictNot(_Internal_In(item, collection));
         }
         
-        public static LogEventPropertyValue? NotEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
+        public static LogEventPropertyValue? _Internal_NotEqual(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (left == null || right == null)
                 return null;
@@ -209,7 +209,7 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(!UnboxedEqualHelper(left, right));
         }
 
-        public static LogEventPropertyValue? Negate(LogEventPropertyValue? operand)
+        public static LogEventPropertyValue? _Internal_Negate(LogEventPropertyValue? operand)
         {
             if (Coerce.Numeric(operand, out var numeric))
                 return new ScalarValue(-numeric);
@@ -229,7 +229,7 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(Math.Round(v, (int)p));
         }
 
-        public static LogEventPropertyValue? Not(LogEventPropertyValue? operand)
+        public static LogEventPropertyValue? _Internal_Not(LogEventPropertyValue? operand)
         {
             if (operand is null)
                 return ConstantTrue;
@@ -302,12 +302,12 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(ctx.EndsWith(ptx, StringComparison.Ordinal));
         }
 
-        public static LogEventPropertyValue Has(LogEventPropertyValue? value)
+        public static LogEventPropertyValue IsDefined(LogEventPropertyValue? value)
         {
             return ScalarBoolean(value != null);
         }
 
-        public static LogEventPropertyValue? ElementAt(LogEventPropertyValue? items, LogEventPropertyValue? index)
+        public static LogEventPropertyValue? _Internal_ElementAt(LogEventPropertyValue? items, LogEventPropertyValue? index)
         {
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (items is SequenceValue arr && Coerce.Numeric(index, out var ix))
@@ -388,10 +388,10 @@ namespace Serilog.Expressions.Runtime
                 return new ScalarValue("dictionary");
 
             if (value is StructureValue)
-                return new ScalarValue("structure");
+                return new ScalarValue("object");
 
             if (value is SequenceValue)
-                return new ScalarValue("sequence");
+                return new ScalarValue("array");
 
             if (value is ScalarValue scalar)
             {

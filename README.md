@@ -107,11 +107,58 @@ The following properties are available in expressions:
  * `@x` - the exception associated with the event, if any, as an `Exception`
  * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
 
-### Data types
+### Literals
+
+| Data type | Description | Examples |
+| :--- | :--- | :--- |
+| Null | Corresponds to .NET's `null` value | `null` |
+| Number | A number in decimal or hexadecimal notation, represented by .NET `decimal` | `0`, `100`, `-12.34`, `0xC0FFEE` |
+| String | A single-quoted Unicode string literal; to escape `'`, double it | `'pie'`, `'isn''t'`, `'😋'` |
+| Boolean | A Boolean value | `true`, `false` |
+| Array | An array of values, in square brackets | `[1, 'two', null]` |
+| Object | A mapping of string keys to values; keys that are valid identifiers do not need to be quoted | `{a: 1, 'b c': 2}` |
+
+### Operators and conditionals
+
+A typical set of operators is supported:
+
+ * Equality `=` and inequality `<>`, including for arrays and objects
+ * Boolean `and`, `or`, `not`
+ * Arithmetic `+`, `-`, `*`, `/`, `^`, `%`
+ * Numeric comparison `<`, `<=`, `>`, `>=`
+ * Existence `is null` and `is not null`
+ * SQL-style `like` and `not like`, with `%` and `_` wildcards (double wildcards to escape them)
+ * Array membership with `in` and `not in`
+ * Indexers `a[b]` and accessors `a.b`
+ * Wildcard indexing - `a[?]` any, and `a[*]` all
+ * Conditional `if a then b else c` (all branches required)
 
 ### Functions
 
-### String manipulation
+Functions are called using typical `Identifier(args)` syntax.
+
+Except for the `IsDefined()` function, the result of 
+calling a function will be undefined if:
+
+ * any argument is undefined, or
+ * any argument is of an incompatible type.
+
+| Function | Description |
+| :--- | :--- |
+| `Coalesce(p0, p1, ..pN)` | Returns the first defined, non-null argument. |
+| `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
+| `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
+| `IndexOf(s, t)` | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear. |
+| `IndexOfMatch(s, p)` | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match. |
+| `IsMatch(s, p)` | Tests whether the regular expression `p` matches within the string `s`. |
+| `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
+| `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
+| `Length(x)` | Returns the length of a string or array. |
+| `Round(n, m)` | Round the number `n` to `m` decimal places. |
+| `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
+| `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
+| `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
+| `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 
 ## Working with the raw API
 

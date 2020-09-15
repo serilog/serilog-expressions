@@ -1,15 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Expressions.Runtime;
+using Serilog.Formatting.Display;
 
 namespace Serilog.Expressions.Compilation.Linq
 {
     static class Intrinsics
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
-        
+        static readonly MessageTemplateTextFormatter MessageFormatter = new MessageTemplateTextFormatter("{Message:lj}");
+
         public static LogEventPropertyValue? ConstructSequenceValue(LogEventPropertyValue?[] elements)
         {
             // Avoid upsetting Serilog's (currently) fragile `SequenceValue.Render()`.
@@ -76,6 +79,14 @@ namespace Serilog.Expressions.Compilation.Linq
             }
 
             return null;
+        }
+
+        public static string RenderMessage(LogEvent logEvent)
+        {
+            // Use the same `:lj`-style formatting default as Serilog.Sinks.Console.
+            var sw = new StringWriter();
+            MessageFormatter.Format(logEvent, sw);
+            return sw.ToString();
         }
     }
 }
