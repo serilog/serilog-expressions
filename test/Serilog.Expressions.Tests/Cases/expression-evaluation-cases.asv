@@ -87,7 +87,6 @@ not true                             ⇶ false
 not false                            ⇶ true
 not undefined                        ⇶ true
 not(true)                            ⇶ false
-not false and false                  ⇶ false
 not(false and false)                 ⇶ true
 not(undefined)                       ⇶ true
 'not a bool' or true                 ⇶ true
