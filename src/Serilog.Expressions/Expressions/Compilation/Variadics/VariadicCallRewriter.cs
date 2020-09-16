@@ -21,7 +21,7 @@ namespace Serilog.Expressions.Compilation.Variadics
                     .Select(Transform)
                     .Concat(new[] {new AmbientPropertyExpression(BuiltInProperty.Undefined, true)})
                     .ToArray();
-                return new CallExpression(lx.OperatorName, operands);
+                return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands);
             }
 
             if (Operators.SameOperator(lx.OperatorName, Operators.OpCoalesce))
@@ -33,8 +33,8 @@ namespace Serilog.Expressions.Compilation.Variadics
                 if (lx.Operands.Length > 2)
                 {
                     var first = Transform(lx.Operands.First());
-                    return new CallExpression(lx.OperatorName, first,
-                        Transform(new CallExpression(lx.OperatorName, lx.Operands.Skip(1).ToArray())));
+                    return new CallExpression(false, lx.OperatorName, first,
+                        Transform(new CallExpression(false, lx.OperatorName, lx.Operands.Skip(1).ToArray())));
                 }
             }
 

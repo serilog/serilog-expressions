@@ -83,10 +83,11 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Function =
             (from name in Token.EqualTo(ExpressionToken.Identifier)
-            from lparen in Token.EqualTo(ExpressionToken.LParen)
-                from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
+             from lparen in Token.EqualTo(ExpressionToken.LParen)
+             from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
              from rparen in Token.EqualTo(ExpressionToken.RParen)
-            select (Expression)new CallExpression(name.ToStringValue(), expr)).Named("function");
+             from ci in Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault(false)
+             select (Expression)new CallExpression(ci, name.ToStringValue(), expr)).Named("function");
 
         static readonly TokenListParser<ExpressionToken, Expression> ArrayLiteral =
         (from lbracket in Token.EqualTo(ExpressionToken.LBracket)
@@ -138,7 +139,7 @@ namespace Serilog.Expressions.Parsing
             from consequent in Parse.Ref(() => Expr)
             from ___ in Token.EqualTo(ExpressionToken.Else)
             from alternative in Parse.Ref(() => Expr)
-            select (Expression)new CallExpression(Operators.RuntimeOpIfThenElse, condition, consequent, alternative);
+            select (Expression)new CallExpression(false, Operators.RuntimeOpIfThenElse, condition, consequent, alternative);
         
         static readonly TokenListParser<ExpressionToken, Expression> Literal =
             String
@@ -178,7 +179,7 @@ namespace Serilog.Expressions.Parsing
                 .IgnoreThen(
                     Token.EqualTo(ExpressionToken.Null).Value(Operators.RuntimeOpIsNull)
                         .Or(Token.EqualTo(ExpressionToken.Not).IgnoreThen(Token.EqualTo(ExpressionToken.Null)).Value(Operators.RuntimeOpIsNotNull)))
-                .Select(op => (Expression)new CallExpression(op, operand))
+                .Select(op => (Expression)new CallExpression(false, op, operand))
                 .OptionalOrDefault(operand))
             .Named("expression");
 
@@ -188,12 +189,15 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Comparand = Parse.Chain(Add.Or(Subtract), Term, MakeBinary);
 
-        static readonly TokenListParser<ExpressionToken, Expression> Comparison = Parse.Chain(
+        static readonly TokenListParser<ExpressionToken, Expression> Comparison = Combinators.ChainModified(
             NotLike.Try().Or(Like)
                 .Or(NotIn.Try().Or(In))
                 .Or(Lte.Or(Neq).Or(Lt))
                 .Or(Gte.Or(Gt))
-                .Or(Eq), Comparand, MakeBinary);
+                .Or(Eq),
+            Comparand,
+            Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault(),
+            (o, l, r, ci) => new CallExpression(ci, o, l, r));
 
         static readonly TokenListParser<ExpressionToken, Expression> Conjunction = Parse.Chain(And, Comparison, MakeBinary);
 
@@ -203,12 +207,12 @@ namespace Serilog.Expressions.Parsing
 
         static Expression MakeBinary(string operatorName, Expression leftOperand, Expression rightOperand)
         {
-            return new CallExpression(operatorName, leftOperand, rightOperand);
+            return new CallExpression(false, operatorName, leftOperand, rightOperand);
         }
 
         static Expression MakeUnary(string operatorName, Expression operand)
         {
-            return new CallExpression(operatorName, operand);
+            return new CallExpression(false, operatorName, operand);
         }
     }
 }

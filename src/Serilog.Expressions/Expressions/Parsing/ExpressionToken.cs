@@ -16,9 +16,6 @@ namespace Serilog.Expressions.Parsing
 
         String,
 
-        [Token(Description = "regular expression")]
-        RegularExpression,
-
         Number,
 
         [Token(Description = "hexadecimal number")]
@@ -124,6 +121,9 @@ namespace Serilog.Expressions.Parsing
         Then,
 
         [Token(Category = "keyword", Example = "else")]
-        Else
+        Else,
+
+        [Token(Category = "keyword", Example = "ci")]
+        CI
     }
 }

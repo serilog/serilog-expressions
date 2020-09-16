@@ -22,7 +22,8 @@ namespace Serilog.Expressions.Parsing
             new ExpressionKeyword("null", ExpressionToken.Null),
             new ExpressionKeyword("if", ExpressionToken.If),
             new ExpressionKeyword("then", ExpressionToken.Then),
-            new ExpressionKeyword("else", ExpressionToken.Else)
+            new ExpressionKeyword("else", ExpressionToken.Else),
+            new ExpressionKeyword("ci", ExpressionToken.CI)
         };
 
         static ExpressionTokenizer()

@@ -15,18 +15,16 @@ namespace Serilog.Expressions.Compilation.Wildcards
 
         protected override Expression Transform(CallExpression lx)
         {
-            var target = lx;
-
-            if (!Operators.WildcardComparators.Contains(target.OperatorName) || target.Operands.Length != 2)
+            if (!Operators.WildcardComparators.Contains(lx.OperatorName) || lx.Operands.Length != 2)
                 return base.Transform(lx);
 
-            var lhsIs = WildcardSearch.FindElementAtWildcard(target.Operands[0]);
-            var rhsIs = WildcardSearch.FindElementAtWildcard(target.Operands[1]);
+            var lhsIs = WildcardSearch.FindElementAtWildcard(lx.Operands[0]);
+            var rhsIs = WildcardSearch.FindElementAtWildcard(lx.Operands[1]);
             if (lhsIs != null && rhsIs != null || lhsIs == null && rhsIs == null)
                 return base.Transform(lx); // N/A, or invalid
 
-            var wildcardPath = lhsIs != null ? target.Operands[0] : target.Operands[1];
-            var comparand = lhsIs != null ? target.Operands[1] : target.Operands[0];
+            var wildcardPath = lhsIs != null ? lx.Operands[0] : lx.Operands[1];
+            var comparand = lhsIs != null ? lx.Operands[1] : lx.Operands[0];
             var indexer = lhsIs ?? rhsIs!;
 
             var px = new ParameterExpression("p" + _nextParameter++);
@@ -36,12 +34,12 @@ namespace Serilog.Expressions.Compilation.Wildcards
             var wc = ((IndexerWildcardExpression)indexer.Index).Wildcard;
 
             var comparisonArgs = lhsIs != null ? new[] { nestedComparand, comparand } : new[] { comparand, nestedComparand };
-            var body = new CallExpression(target.OperatorName, comparisonArgs);
+            var body = new CallExpression(lx.IgnoreCase, lx.OperatorName, comparisonArgs);
             
             var lambda = new LambdaExpression(new[] { px }, body);
 
             var op = Operators.ToRuntimeWildcardOperator(wc);
-            var call = new CallExpression(op, coll, lambda);
+            var call = new CallExpression(false, op, coll, lambda);
             return Transform(call);
         }
     }

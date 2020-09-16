@@ -16,6 +16,7 @@ namespace Serilog.Expressions
 
         public const string OpCoalesce = "Coalesce";
         public const string OpContains = "Contains";
+        public const string OpElementAt = "ElementAt";
         public const string OpEndsWith = "EndsWith";
         public const string OpIndexOf = "IndexOf";
         public const string OpIndexOfMatch = "IndexOfMatch";
@@ -48,7 +49,6 @@ namespace Serilog.Expressions
         public const string RuntimeOpNotEqual = "_Internal_NotEqual";
         public const string RuntimeOpNegate = "_Internal_Negate";
         public const string RuntimeOpNot = "_Internal_Not";
-        public const string RuntimeOpElementAt = "_Internal_ElementAt";
         public const string RuntimeOpAny = "_Internal_Any";
         public const string RuntimeOpAll = "_Internal_All";
         public const string RuntimeOpIsNull = "_Internal_IsNull";

@@ -147,6 +147,7 @@ calling a function will be undefined if:
 | :--- | :--- |
 | `Coalesce(p0, p1, ..pN)` | Returns the first defined, non-null argument. |
 | `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
+| `ElementAt(x, i)` | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`. |
 | `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
 | `IndexOf(s, t)` | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `IndexOfMatch(s, p)` | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match. |

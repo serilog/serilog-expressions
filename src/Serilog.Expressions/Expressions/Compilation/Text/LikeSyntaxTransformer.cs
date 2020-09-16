@@ -22,26 +22,30 @@ namespace Serilog.Expressions.Compilation.Text
                 return base.Transform(lx);
 
             if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpLike))
-                return TryCompileLikeExpression(lx.Operands[0], lx.Operands[1]);
+                return TryCompileLikeExpression(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]);
             
             if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpNotLike))
                 return new CallExpression(
+                    false,
                     Operators.RuntimeOpStrictNot,
-                    TryCompileLikeExpression(lx.Operands[0], lx.Operands[1]));
+                    TryCompileLikeExpression(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]));
 
             return base.Transform(lx);
         }
 
-        Expression TryCompileLikeExpression(Expression corpus, Expression like)
+        Expression TryCompileLikeExpression(bool ignoreCase, Expression corpus, Expression like)
         {
             if (like is ConstantExpression cx &&
                 cx.Constant is ScalarValue scalar &&
                 scalar.Value is string s)
             {
                 var regex = LikeToRegex(s);
-                var compiled = new Regex(regex, RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
+                var opts = RegexOptions.Compiled | RegexOptions.ExplicitCapture;
+                if (ignoreCase)
+                    opts |= RegexOptions.IgnoreCase;
+                var compiled = new Regex(regex, opts, TimeSpan.FromMilliseconds(100));
                 var indexof = new IndexOfMatchExpression(Transform(corpus), compiled);
-                return new CallExpression(Operators.RuntimeOpNotEqual, indexof, new ConstantExpression(new ScalarValue(-1)));
+                return new CallExpression(ignoreCase, Operators.RuntimeOpNotEqual, indexof, new ConstantExpression(new ScalarValue(-1)));
             }
             
             SelfLog.WriteLine($"Serilog.Expressions: `like` requires a constant string argument; found ${like}.");

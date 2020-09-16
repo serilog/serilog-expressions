@@ -56,11 +56,12 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             if (!OperatorMethods.TryGetValue(lx.OperatorName, out var m))
                 throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognised.");
-            
-            if (m.GetParameters().Length != lx.Operands.Length)
-                throw new ArgumentException($"The function `{lx.OperatorName}` requires {m.GetParameters().Length} arguments.");
 
-            var operands = lx.Operands.Select(Transform).ToArray();
+            var parameterCount = m.GetParameters().Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
+            if (parameterCount != lx.Operands.Length)
+                throw new ArgumentException($"The function `{lx.OperatorName}` requires {parameterCount} arguments.");
+
+            var operands = lx.Operands.Select(Transform).ToList();
 
             // `and` and `or` short-circuit to save execution time; unlike the earlier Serilog.Filters.Expressions, nothing else does.
             if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpAnd))
@@ -68,6 +69,9 @@ namespace Serilog.Expressions.Compilation.Linq
 
             if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpOr))
                 return CompileLogical(LX.OrElse, operands[0], operands[1]);
+
+            if (m.GetParameters().Any(pi => pi.ParameterType == typeof(StringComparison)))
+                operands.Insert(0, LX.Constant(lx.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
 
             return LX.Call(m, operands);
         }
@@ -86,7 +90,7 @@ namespace Serilog.Expressions.Compilation.Linq
         protected override ExpressionBody Transform(AccessorExpression spx)
         {
             var recv = Transform(spx.Receiver);
-            return LX.Call(TryGetStructurePropertyValueMethod, recv, LX.Constant(spx.MemberName, typeof(string)));
+            return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), recv, LX.Constant(spx.MemberName, typeof(string)));
         }
         
         protected override ExpressionBody Transform(ConstantExpression cx)
@@ -189,7 +193,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override ExpressionBody Transform(IndexerExpression ix)
         {
-            return Transform(new CallExpression(Operators.RuntimeOpElementAt, ix.Receiver, ix.Index));
+            return Transform(new CallExpression(false, Operators.OpElementAt, ix.Receiver, ix.Index));
         }
 
         protected override ExpressionBody Transform(IndexOfMatchExpression mx)

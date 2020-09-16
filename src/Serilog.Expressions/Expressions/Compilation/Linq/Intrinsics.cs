@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -65,13 +66,13 @@ namespace Serilog.Expressions.Compilation.Linq
             return value;
         }
 
-        public static LogEventPropertyValue? TryGetStructurePropertyValue(LogEventPropertyValue maybeStructure, string name)
+        public static LogEventPropertyValue? TryGetStructurePropertyValue(StringComparison sc, LogEventPropertyValue maybeStructure, string name)
         {
             if (maybeStructure is StructureValue sv)
             {
                 foreach (var prop in sv.Properties)
                 {
-                    if (prop.Name == name)
+                    if (prop.Name.Equals(name, sc))
                     {
                         return prop.Value;
                     }

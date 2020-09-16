@@ -22,24 +22,28 @@ namespace Serilog.Expressions.Compilation.Text
                 return base.Transform(lx);
 
             if (Operators.SameOperator(lx.OperatorName, Operators.OpIndexOfMatch))
-                return TryCompileIndexOfMatch(lx.Operands[0], lx.Operands[1]);
+                return TryCompileIndexOfMatch(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]);
             
             if (Operators.SameOperator(lx.OperatorName, Operators.OpIsMatch))
                 return new CallExpression(
+                    false,
                     Operators.RuntimeOpNotEqual,
-                    TryCompileIndexOfMatch(lx.Operands[0], lx.Operands[1]),
+                    TryCompileIndexOfMatch(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]),
                     new ConstantExpression(new ScalarValue(-1)));
 
             return base.Transform(lx);
         }
 
-        Expression TryCompileIndexOfMatch(Expression corpus, Expression regex)
+        Expression TryCompileIndexOfMatch(bool ignoreCase, Expression corpus, Expression regex)
         {
             if (regex is ConstantExpression cx &&
                 cx.Constant is ScalarValue scalar &&
                 scalar.Value is string s)
             {
-                var compiled = new Regex(s, RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
+                var opts = RegexOptions.Compiled | RegexOptions.ExplicitCapture;
+                if (ignoreCase)
+                    opts |= RegexOptions.IgnoreCase;
+                var compiled = new Regex(s, opts, TimeSpan.FromMilliseconds(100));
                 return new IndexOfMatchExpression(Transform(corpus), compiled);
             }
             

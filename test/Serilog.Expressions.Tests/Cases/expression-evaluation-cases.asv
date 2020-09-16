@@ -107,7 +107,7 @@ A                                    ⇶ undefined
 _a                                   ⇶ undefined
 a1                                   ⇶ undefined
 
-// Comparators - Equal
+// EQ
 1 = 1                                ⇶ true
 1 = 0                                ⇶ false
 null = 0                             ⇶ false
@@ -115,7 +115,7 @@ null = null                          ⇶ true
 null = undefined                     ⇶ undefined
 undefined = undefined                ⇶ undefined
 
-// Comparators Not Equal
+// NEQ
 1 <> 1                               ⇶ false
 1 <> 0                               ⇶ true
 null <> 0                            ⇶ true
@@ -123,7 +123,7 @@ null <> null                         ⇶ false
 undefined <> null                    ⇶ undefined
 undefined <> undefined               ⇶ undefined
 
-// Comparators - Less Than
+// LT
 1 < 2                                ⇶ true
 1 < 1                                ⇶ false
 1 < 0                                ⇶ false
@@ -132,7 +132,7 @@ null < null                          ⇶ undefined
 undefined < null                     ⇶ undefined
 undefined < undefined                ⇶ undefined
 
-// Comparators - Less Than or Equal To
+// LTE
 1 <= 2                               ⇶ true
 1 <= 1                               ⇶ true
 1 <= 0                               ⇶ false
@@ -141,7 +141,7 @@ null <= null                         ⇶ undefined
 undefined <= null                    ⇶ undefined
 undefined <= undefined               ⇶ undefined
 
-// Comparators - Greater Than
+// GT
 3 > 1                                ⇶ true
 1 > 1                                ⇶ false
 1 > 0                                ⇶ true
@@ -150,7 +150,7 @@ null > null                          ⇶ undefined
 undefined > null                     ⇶ undefined
 undefined > undefined                ⇶ undefined
 
-// Comparators - Greater Than or Equal To
+// GTE
 2 >= 1                               ⇶ true
 1 >= 1                               ⇶ true
 1 >= 0                               ⇶ true
@@ -160,7 +160,7 @@ null >= null                         ⇶ undefined
 undefined >= null                    ⇶ undefined
 undefined >= undefined               ⇶ undefined
 
-// Comparators - in/not in
+// in/not in
 1 in [1, 2, 3]                       ⇶ true
 5 in [1, 2, 3]                       ⇶ false
 1 not in [1, 2, 3]                   ⇶ false
@@ -170,7 +170,7 @@ undefined not in [1, 2, 3]           ⇶ undefined
 1 in undefined                       ⇶ undefined
 null in [1, null, 3]                 ⇶ true
 
-// Comparators - is null/is not null
+// is null/is not null
 null is null                         ⇶ true
 null is not null                     ⇶ false
 undefined is null                    ⇶ true
@@ -193,6 +193,8 @@ User.Name                            ⇶ 'nblumhardt'
 ismatch('foo', 'f')                  ⇶ true
 indexofmatch('foo', 'o')             ⇶ 1
 ismatch('foo', '^f')                 ⇶ true
+ismatch('foo', 'F')                  ⇶ false
+ismatch('foo', 'F') ci               ⇶ true
 ismatch('foo', '^o')                 ⇶ false
 indexofmatch('foo', 'x')             ⇶ -1
 substring('abcd', 1, 2)              ⇶ 'bc'
@@ -206,7 +208,7 @@ if undefined then 1 else 2           ⇶ 2
 if 'string' then 1 else 2            ⇶ 2
 if true then if false then 1 else 2 else 3 ⇶ 2
 
-// Types
+// Typeof
 typeof(undefined)                    ⇶ 'undefined'
 typeof('test')                       ⇶ 'System.String'
 typeof(10)                           ⇶ 'System.Decimal'
@@ -214,3 +216,36 @@ typeof(true)                         ⇶ 'System.Boolean'
 typeof(null)                         ⇶ 'null'
 typeof([])                           ⇶ 'array'
 typeof({})                           ⇶ 'object'
+
+// Case comparison
+'test' = 'TEST'                      ⇶ false
+'tschüß' = 'TSCHÜSS'                 ⇶ false
+'ὈΔΥΣΣΕΎΣ!' = 'ὀδυσσεύς!'            ⇶ false
+'ὈΔΥΣΣΕΎΣ!' = 'ὀδυσσεύσ!'            ⇶ false
+'test' = 'TEST' ci                   ⇶ true
+'tschüß' = 'TSCHÜSS' ci              ⇶ false
+'ὈΔΥΣΣΕΎΣ!' = 'ὀδυσσεύσ!' ci         ⇶ true
+null = 0 ci                          ⇶ false
+null = null ci                       ⇶ true
+null = undefined ci                  ⇶ undefined
+undefined = undefined ci             ⇶ undefined
+
+// Like
+'test' like 'test'                   ⇶ true
+'test' like 'Test'                   ⇶ false
+'test' like 'Test' ci                ⇶ true
+'test' like '%st'                    ⇶ true
+'test' like '_est'                   ⇶ true
+'test' like 't%t'                    ⇶ true
+'test' like 't_st'                   ⇶ true
+'test' like 'te%'                    ⇶ true
+'test' like 'tes_'                   ⇶ true
+'test' like '%su'                    ⇶ false
+'test' like '_esu'                   ⇶ false
+'test' like 't%u'                    ⇶ false
+'test' like 't_su'                   ⇶ false
+'test' like 'ue%'                    ⇶ false
+'test' like 'ues_'                   ⇶ false
+'test' like '%s_'                    ⇶ true
+'test' like '%'                      ⇶ true
+'test' like 't%s%'                   ⇶ true

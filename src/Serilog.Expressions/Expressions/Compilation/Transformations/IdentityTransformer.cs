@@ -25,7 +25,7 @@ namespace Serilog.Expressions.Compilation.Transformations
             if (!any)
                 return lx;
             
-            return new CallExpression(lx.OperatorName, operands.ToArray());
+            return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands.ToArray());
         }
 
         protected override Expression Transform(ConstantExpression cx)
