@@ -15,7 +15,7 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("AppId", 10)
                 .Enrich.WithComputed("FirstItem", "Items[0]")
-                .Enrich.WithComputed("SourceContext", "coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), SourceContext, '<no source>')")
+                .Enrich.WithComputed("SourceContext", "coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), '<no source>')")
                 .Filter.ByIncludingOnly("@l = 'Information' and AppId is not null and Items[?] like 'C%'")
                 .WriteTo.Console(outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3} ({SourceContext})] {Message:lj} (first item is {FirstItem}){NewLine}{Exception}")

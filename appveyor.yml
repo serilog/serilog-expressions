@@ -14,7 +14,7 @@ deploy:
     branch: /^(main|dev)$/
 - provider: GitHub
   auth_token:
-    secure: p4LpVhBKxGS5WqucHxFQ5c7C8cP74kbNB0Z8k9Oxx/PMaDQ1+ibmoexNqVU5ZlmX
+    secure: 3IDqxoOvib3PQmutXd+ebge6G7aLsZ34xZHxJtYpUsQYOVNKdTfsrs7ChEe2sbPY
   artifact: /Serilog.*\.nupkg/
   tag: v$(appveyor_build_version)
   on:

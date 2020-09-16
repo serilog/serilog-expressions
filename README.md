@@ -1,4 +1,4 @@
-# _Serilog Expressions_
+# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/2wg3tsdybwmf8tp1/branch/dev?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/serilog-expressions/branch/dev)
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog 
 events, ideal for use with JSON or XML configuration.
@@ -178,8 +178,10 @@ StartsWith(User.Name, 'n') ci
 **Trim down `SourceContext` to a type name only:**
 
 ```
-coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), SourceContext, '<no source>')
+Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)
 ```
+
+This expression takes advantage of `LastIndexOf()` returning -1 when no `.` character appears in `SourceContext`, to yield a `startIndex` of 0 in that case.
 
 **Access a property with a non-identifier name:**
 
@@ -187,11 +189,25 @@ coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), SourceCo
 @p['some name']
 ```
 
+Any structured value, including the built-in `@p`, can be indexed by string key. This means that `User.Name` and `User['Name']` are equivalent, for example.
+
 **Access a property with inconsistent casing:**
 
 ```
 ElementAt(@p, 'someName') ci
 ```
+
+`ElementAt()` is a function-call version of the `[]` indexer notation, which means it can accept the `ci` case-insensitivity modifier.
+
+**Format events as newline-delimited JSON (template, embedded in C# or JSON):**
+
+```
+{ {Timestamp: @t, Username: User.Name} }\n
+```
+
+This output template shows the use of a space between the opening `{` of a hole, and the enclosed object literal with `Timestamp` and 
+`Username` fields. The object will be formatted as JSON. The trailing `\n` is a C# or JSON newline literal (don't escape this any further, as
+it's not part of the output template syntax).
 
 ## Working with the raw API
 
