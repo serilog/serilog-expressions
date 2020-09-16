@@ -1,4 +1,4 @@
-# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/2wg3tsdybwmf8tp1/branch/dev?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/serilog-expressions/branch/dev)
+# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/2wg3tsdybwmf8tp1/branch/dev?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog 
 events, ideal for use with JSON or XML configuration.

@@ -23,12 +23,12 @@ namespace Serilog.Expressions.Tests
             }
         }
 
-        public static IEnumerable<object[]> EphemeralExpressionEvaluationCases =>
+        public static IEnumerable<object[]> ExpressionEvaluationCases =>
             ReadCases("expression-evaluation-cases.asv");
 
         [Theory]
-        [MemberData(nameof(EphemeralExpressionEvaluationCases))]
-        public void EphemeralExpressionsAreCorrectlyEvaluated(string expr, string result)
+        [MemberData(nameof(ExpressionEvaluationCases))]
+        public void ExpressionsAreCorrectlyEvaluated(string expr, string result)
         {
             var evt = Some.InformationEvent();
             
