@@ -132,6 +132,12 @@ A typical set of operators is supported:
  * Indexers `a[b]` and accessors `a.b`
  * Wildcard indexing - `a[?]` any, and `a[*]` all
  * Conditional `if a then b else c` (all branches required)
+ 
+Comparision operators that act on text all accept an optional post-fix `ci` modifier to select case-insensitive comparisons:
+
+```
+User.Name like 'n%' ci
+```
 
 ### Functions
 
@@ -160,6 +166,32 @@ calling a function will be undefined if:
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
+
+Functions that compare text accept an optional post-fix `ci` modifier to select case-insensitive comparisons:
+
+```
+StartsWith(User.Name, 'n') ci
+```
+
+## Recipes
+
+**Trim down `SourceContext` to a type name only:**
+
+```
+coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), SourceContext, '<no source>')
+```
+
+**Access a property with a non-identifier name:**
+
+```
+@p['some name']
+```
+
+**Access a property with inconsistent casing:**
+
+```
+ElementAt(@p, 'someName') ci
+```
 
 ## Working with the raw API
 
