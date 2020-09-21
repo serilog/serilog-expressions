@@ -17,6 +17,11 @@ namespace Serilog.Expressions.Runtime
         {
             return value ? ConstantTrue : ConstantFalse;
         }
+
+        public static LogEventPropertyValue? Undefined()
+        {
+            return null;
+        }
         
         public static LogEventPropertyValue? _Internal_Add(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {

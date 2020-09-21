@@ -10,7 +10,7 @@ false                                ⇶ false
 {a: 1, 'b c': 2}                     ⇶ {a: 1, 'b c': 2}
 
 // Collections
-[5, undefined]                       ⇶ undefined
+[5, undefined()]                     ⇶ undefined()
 
 // Strings
 ''                                   ⇶ ''
@@ -34,22 +34,22 @@ false                                ⇶ false
 // Math
 1 + 1                                ⇶ 2
 1 + 2 + 3                            ⇶ 6
-'foo' + 1                            ⇶ undefined
+'foo' + 1                            ⇶ undefined()
 1 - 2                                ⇶ -1
 -1 - -1                              ⇶ 0
 3 - 2                                ⇶ 1
-'foo' - - 1                          ⇶ undefined
+'foo' - - 1                          ⇶ undefined()
 1.0 + 2.0                            ⇶ 3
 1 * 0                                ⇶ 0
 12 * 12                              ⇶ 144
 3 / 1                                ⇶ 3
-3 / 0                                ⇶ undefined
+3 / 0                                ⇶ undefined()
 3 ^ 2                                ⇶ 9
 0 ^ 1                                ⇶ 0
 0 ^ 0                                ⇶ 1
-0 % 0                                ⇶ undefined
+0 % 0                                ⇶ undefined()
 0 % 1                                ⇶ 0
-1 % 0                                ⇶ undefined
+1 % 0                                ⇶ undefined()
 1 % 1                                ⇶ 0
 5 % 2                                ⇶ 1
 79228162514264337593543950334 + 1    ⇶ 79228162514264337593543950335
@@ -71,108 +71,108 @@ true and true                        ⇶ true
 true and null                        ⇶ false
 false and null                       ⇶ false
 null and null                        ⇶ false
-undefined and undefined              ⇶ false
-undefined and true                   ⇶ false
-true and undefined                   ⇶ false
+undefined() and undefined()          ⇶ false
+undefined() and true                 ⇶ false
+true and undefined()                 ⇶ false
 false or false                       ⇶ false
 true or false                        ⇶ true
 true or true                         ⇶ true
 false or true                        ⇶ true
 true or null                         ⇶ true
 null or true                         ⇶ true
-true or undefined                    ⇶ true
-undefined or true                    ⇶ true
-undefined or undefined               ⇶ false
+true or undefined()                  ⇶ true
+undefined() or true                  ⇶ true
+undefined() or undefined()           ⇶ false
 not true                             ⇶ false
 not false                            ⇶ true
-not undefined                        ⇶ true
+not undefined()                      ⇶ true
 not(true)                            ⇶ false
 not(false and false)                 ⇶ true
-not(undefined)                       ⇶ true
+not(undefined())                     ⇶ true
 'not a bool' or true                 ⇶ true
 
 // Coalesce
 coalesce(null, 1)                    ⇶ 1
-coalesce(undefined, 1)               ⇶ 1
+coalesce(undefined(), 1)             ⇶ 1
 coalesce(1, null)                    ⇶ 1
-coalesce(undefined, undefined)       ⇶ undefined
+coalesce(undefined(), undefined())   ⇶ undefined()
 coalesce(null, null)                 ⇶ null
 coalesce(null, null, 3)              ⇶ 3
-coalesce()                           ⇶ undefined
+coalesce()                           ⇶ undefined()
 coalesce(1)                          ⇶ 1
 
 // Identifiers
-A                                    ⇶ undefined
-_a                                   ⇶ undefined
-a1                                   ⇶ undefined
+A                                    ⇶ undefined()
+_a                                   ⇶ undefined()
+a1                                   ⇶ undefined()
 
 // EQ
 1 = 1                                ⇶ true
 1 = 0                                ⇶ false
 null = 0                             ⇶ false
 null = null                          ⇶ true
-null = undefined                     ⇶ undefined
-undefined = undefined                ⇶ undefined
+null = undefined()                   ⇶ undefined()
+undefined() = undefined()            ⇶ undefined()
 
 // NEQ
 1 <> 1                               ⇶ false
 1 <> 0                               ⇶ true
 null <> 0                            ⇶ true
 null <> null                         ⇶ false
-undefined <> null                    ⇶ undefined
-undefined <> undefined               ⇶ undefined
+undefined() <> null                  ⇶ undefined()
+undefined() <> undefined()           ⇶ undefined()
 
 // LT
 1 < 2                                ⇶ true
 1 < 1                                ⇶ false
 1 < 0                                ⇶ false
-null < 0                             ⇶ undefined
-null < null                          ⇶ undefined
-undefined < null                     ⇶ undefined
-undefined < undefined                ⇶ undefined
+null < 0                             ⇶ undefined()
+null < null                          ⇶ undefined()
+undefined() < null                   ⇶ undefined()
+undefined() < undefined()            ⇶ undefined()
 
 // LTE
 1 <= 2                               ⇶ true
 1 <= 1                               ⇶ true
 1 <= 0                               ⇶ false
-null <= 0                            ⇶ undefined
-null <= null                         ⇶ undefined
-undefined <= null                    ⇶ undefined
-undefined <= undefined               ⇶ undefined
+null <= 0                            ⇶ undefined()
+null <= null                         ⇶ undefined()
+undefined() <= null                  ⇶ undefined()
+undefined() <= undefined()           ⇶ undefined()
 
 // GT
 3 > 1                                ⇶ true
 1 > 1                                ⇶ false
 1 > 0                                ⇶ true
-null > 0                             ⇶ undefined
-null > null                          ⇶ undefined
-undefined > null                     ⇶ undefined
-undefined > undefined                ⇶ undefined
+null > 0                             ⇶ undefined()
+null > null                          ⇶ undefined()
+undefined() > null                   ⇶ undefined()
+undefined() > undefined()            ⇶ undefined()
 
 // GTE
 2 >= 1                               ⇶ true
 1 >= 1                               ⇶ true
 1 >= 0                               ⇶ true
 -1 >= 0                              ⇶ false
-null >= 0                            ⇶ undefined
-null >= null                         ⇶ undefined
-undefined >= null                    ⇶ undefined
-undefined >= undefined               ⇶ undefined
+null >= 0                            ⇶ undefined()
+null >= null                         ⇶ undefined()
+undefined() >= null                  ⇶ undefined()
+undefined() >= undefined()           ⇶ undefined()
 
 // in/not in
 1 in [1, 2, 3]                       ⇶ true
 5 in [1, 2, 3]                       ⇶ false
 1 not in [1, 2, 3]                   ⇶ false
 5 not in [1, 2, 3]                   ⇶ true
-undefined in [1, 2, 3]               ⇶ undefined
-undefined not in [1, 2, 3]           ⇶ undefined
-1 in undefined                       ⇶ undefined
+undefined() in [1, 2, 3]             ⇶ undefined()
+undefined() not in [1, 2, 3]         ⇶ undefined()
+1 in undefined()                     ⇶ undefined()
 null in [1, null, 3]                 ⇶ true
 
 // is null/is not null
 null is null                         ⇶ true
 null is not null                     ⇶ false
-undefined is null                    ⇶ true
+undefined() is null                  ⇶ true
 
 // Property names and accessors
 [5, 6, 7][1]                         ⇶ 6
@@ -202,12 +202,12 @@ substring('abcd', 1)                 ⇶ 'bcd'
 if true then 1 else 2                ⇶ 1
 if 1 + 2 = 3 then 1 else 2           ⇶ 1
 if false then 1 else 2               ⇶ 2
-if undefined then 1 else 2           ⇶ 2
+if undefined() then 1 else 2         ⇶ 2
 if 'string' then 1 else 2            ⇶ 2
 if true then if false then 1 else 2 else 3 ⇶ 2
 
 // Typeof
-typeof(undefined)                    ⇶ 'undefined'
+typeof(undefined())                  ⇶ 'undefined'
 typeof('test')                       ⇶ 'System.String'
 typeof(10)                           ⇶ 'System.Decimal'
 typeof(true)                         ⇶ 'System.Boolean'
@@ -225,8 +225,8 @@ typeof({})                           ⇶ 'object'
 'ὈΔΥΣΣΕΎΣ!' = 'ὀδυσσεύσ!' ci         ⇶ true
 null = 0 ci                          ⇶ false
 null = null ci                       ⇶ true
-null = undefined ci                  ⇶ undefined
-undefined = undefined ci             ⇶ undefined
+null = undefined() ci                ⇶ undefined()
+undefined() = undefined() ci         ⇶ undefined()
 
 // Like
 'test' like 'test'                   ⇶ true

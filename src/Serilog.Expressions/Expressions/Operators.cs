@@ -29,6 +29,7 @@ namespace Serilog.Expressions
         public const string OpSubstring = "Substring";
         public const string OpTagOf = "TagOf";
         public const string OpTypeOf = "TypeOf";
+        public const string OpUndefined = "Undefined";
 
         public const string IntermediateOpLike = "_Internal_Like";
         public const string IntermediateOpNotLike = "_Internal_NotLike";

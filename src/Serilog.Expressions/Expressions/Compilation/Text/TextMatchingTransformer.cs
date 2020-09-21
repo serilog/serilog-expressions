@@ -48,7 +48,7 @@ namespace Serilog.Expressions.Compilation.Text
             }
             
             SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found ${regex}.");
-            return new AmbientPropertyExpression(BuiltInProperty.Undefined, true);
+            return new CallExpression(false, Operators.OpUndefined);
         }
     }
 }

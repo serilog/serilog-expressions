@@ -8,8 +8,5 @@ namespace Serilog.Expressions
         public const string Message = "m";
         public const string MessageTemplate = "mt";
         public const string Properties = "p";
-        
-        // Undocumented, simplifies a few scenarios; an `undefined()` may be better.
-        public const string Undefined = "Undefined";
     }
 }

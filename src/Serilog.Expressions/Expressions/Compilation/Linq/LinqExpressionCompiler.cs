@@ -120,7 +120,6 @@ namespace Serilog.Expressions.Compilation.Linq
                 if (px.PropertyName == BuiltInProperty.Properties)
                     return Splice(context => new StructureValue(context.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)), null));
 
-                // Also @Undefined
                 return LX.Constant(null, typeof(LogEventPropertyValue));
             }
 

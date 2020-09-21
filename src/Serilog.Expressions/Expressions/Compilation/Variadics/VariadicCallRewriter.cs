@@ -19,7 +19,7 @@ namespace Serilog.Expressions.Compilation.Variadics
             {
                 var operands = lx.Operands
                     .Select(Transform)
-                    .Concat(new[] {new AmbientPropertyExpression(BuiltInProperty.Undefined, true)})
+                    .Concat(new[] {new CallExpression(false, Operators.OpUndefined)})
                     .ToArray();
                 return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands);
             }
@@ -27,7 +27,7 @@ namespace Serilog.Expressions.Compilation.Variadics
             if (Operators.SameOperator(lx.OperatorName, Operators.OpCoalesce))
             {
                 if (lx.Operands.Length == 0)
-                    return new AmbientPropertyExpression(BuiltInProperty.Undefined, true);
+                    return new CallExpression(false, Operators.OpUndefined);
                 if (lx.Operands.Length == 1)
                     return Transform(lx.Operands.Single());
                 if (lx.Operands.Length > 2)

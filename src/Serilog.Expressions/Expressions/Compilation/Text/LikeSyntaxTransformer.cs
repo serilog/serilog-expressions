@@ -49,7 +49,7 @@ namespace Serilog.Expressions.Compilation.Text
             }
             
             SelfLog.WriteLine($"Serilog.Expressions: `like` requires a constant string argument; found ${like}.");
-            return new AmbientPropertyExpression(BuiltInProperty.Undefined, true);
+            return new CallExpression(false, Operators.OpUndefined);
         }
         
         static string LikeToRegex(string like)
