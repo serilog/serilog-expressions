@@ -264,12 +264,12 @@ For example:
 ```csharp
 public static class MyFunctions
 {    
-    public static LogEventPropertyValue? IsFoo(
+    public static LogEventPropertyValue? IsHello(
         StringComparison comparison,
-        LogEventPropertyValue? maybeFoo)
+        LogEventPropertyValue? maybeHello)
     {
-        if (maybeFoo is ScalarValue sv && sv.Value is string s)
-            return new ScalarValue(s.Equals("Foo", comparison));
+        if (maybeHello is ScalarValue sv && sv.Value is string s)
+            return new ScalarValue(s.Equals("Hello", comparison));
 
         // Undefined - argument was not a string.
         return null;
@@ -277,13 +277,13 @@ public static class MyFunctions
 }
 ```
 
-In the example, `IsFoo('Foo')` will evaluate to `true`, `IsFoo('FOO')` will be `false`, `IsFoo('FOO') ci`
-will be `true`, and `IsFoo(42)` will be undefined.
+In the example, `IsHello('Hello')` will evaluate to `true`, `IsHello('HELLO')` will be `false`, `IsHello('HELLO') ci`
+will be `true`, and `IsHello(42)` will be undefined.
 
 User-defined functions are supplied through an instance of `NameResolver`:
 
 ```csharp
 var myFunctions = new StaticMemberNameResolver(typeof(MyFunctions));
-var expr = SerilogExpression.Compile("IsFoo(User.Name)", new[] { myFunctions });
+var expr = SerilogExpression.Compile("IsHello(User.Name)", new[] { myFunctions });
 // Filter events based on whether `User.Name` is `'Foo'` :-)
 ```
