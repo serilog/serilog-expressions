@@ -285,5 +285,5 @@ User-defined functions are supplied through an instance of `NameResolver`:
 ```csharp
 var myFunctions = new StaticMemberNameResolver(typeof(MyFunctions));
 var expr = SerilogExpression.Compile("IsHello(User.Name)", new[] { myFunctions });
-// Filter events based on whether `User.Name` is `'Foo'` :-)
+// Filter events based on whether `User.Name` is `'Hello'` :-)
 ```
