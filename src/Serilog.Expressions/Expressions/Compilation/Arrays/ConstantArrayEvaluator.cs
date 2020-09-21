@@ -2,7 +2,6 @@
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
-using Serilog.Expressions.Runtime;
 
 namespace Serilog.Expressions.Compilation.Arrays
 {

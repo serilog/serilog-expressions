@@ -250,3 +250,40 @@ convert the result to plain-old-.NET-types like `string`, `bool`, `Dictionary<K,
         Console.WriteLine("The event matched.");
     }
 ```
+
+## Implementing user-defined functions
+
+User-defined functions can be plugged in by implementing static methods that:
+
+ * Return `LogEventPropertyValue?`,
+ * Have arguments of type `LogEventPropertyValue?`, and
+ * If the `ci` modifier is supported, accept a `StringComparison` in the first argument position.
+ 
+For example:
+
+```csharp
+public static class MyFunctions
+{    
+    public static LogEventPropertyValue? IsFoo(
+        StringComparison comparison,
+        LogEventPropertyValue? maybeFoo)
+    {
+        if (maybeFoo is ScalarValue sv && sv.Value is string s)
+            return new ScalarValue(s.Equals("Foo", comparison));
+
+        // Undefined - argument was not a string.
+        return null;
+    }
+}
+```
+
+In the example, `IsFoo('Foo')` will evaluate to `true`, `IsFoo('FOO')` will be `false`, `IsFoo('FOO') ci`
+will be `true`, and `IsFoo(42)` will be undefined.
+
+User-defined functions are supplied through an instance of `NameResolver`:
+
+```csharp
+var myFunctions = new StaticMemberNameResolver(typeof(MyFunctions));
+var expr = SerilogExpression.Compile("IsFoo(User.Name)", new[] { myFunctions });
+// Filter events based on whether `User.Name` is `'Foo'` :-)
+```

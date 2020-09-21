@@ -6,7 +6,6 @@ using System.Reflection;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
-using Serilog.Expressions.Runtime;
 using ConstantExpression = Serilog.Expressions.Ast.ConstantExpression;
 using Expression = Serilog.Expressions.Ast.Expression;
 using ParameterExpression = System.Linq.Expressions.ParameterExpression;
@@ -17,10 +16,7 @@ namespace Serilog.Expressions.Compilation.Linq
 {
     class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     {
-        static readonly IDictionary<string, MethodInfo> OperatorMethods = typeof(RuntimeOperators)
-            .GetTypeInfo()
-            .GetMethods(BindingFlags.Static | BindingFlags.Public)
-            .ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
+        readonly NameResolver _nameResolver;
 
         static readonly MethodInfo ConstructSequenceValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public)!;
@@ -38,11 +34,16 @@ namespace Serilog.Expressions.Compilation.Linq
             .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public)!;
 
         ParameterExpression Context { get; } = LX.Variable(typeof(LogEvent), "evt");
+
+        public LinqExpressionCompiler(NameResolver nameResolver)
+        {
+            _nameResolver = nameResolver;
+        }
         
-        public static CompiledExpression Compile(Expression expression)
+        public static CompiledExpression Compile(Expression expression, NameResolver nameResolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            var compiler = new LinqExpressionCompiler();
+            var compiler = new LinqExpressionCompiler(nameResolver);
             var body = compiler.Transform(expression); 
             return LX.Lambda<CompiledExpression>(body, compiler.Context).Compile();
         }
@@ -54,8 +55,8 @@ namespace Serilog.Expressions.Compilation.Linq
         
         protected override ExpressionBody Transform(CallExpression lx)
         {
-            if (!OperatorMethods.TryGetValue(lx.OperatorName, out var m))
-                throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognised.");
+            if (!_nameResolver.TryResolveFunctionName(lx.OperatorName, out var m))
+                throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognized.");
 
             var parameterCount = m.GetParameters().Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
             if (parameterCount != lx.Operands.Length)

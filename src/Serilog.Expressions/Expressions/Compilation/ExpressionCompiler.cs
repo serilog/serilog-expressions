@@ -10,7 +10,7 @@ namespace Serilog.Expressions.Compilation
 {
     static class ExpressionCompiler
     {
-        public static CompiledExpression Compile(Expression expression)
+        public static CompiledExpression Compile(Expression expression, NameResolver nameResolver)
         {
             var actual = expression;
             actual = VariadicCallRewriter.Rewrite(actual);
@@ -20,7 +20,7 @@ namespace Serilog.Expressions.Compilation
             actual = ConstantArrayEvaluator.Evaluate(actual);
             actual = WildcardComprehensionTransformer.Expand(actual);
 
-            return LinqExpressionCompiler.Compile(actual);
+            return LinqExpressionCompiler.Compile(actual, nameResolver);
         }
     }
 }

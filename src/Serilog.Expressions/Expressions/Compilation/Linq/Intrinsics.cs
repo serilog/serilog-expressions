@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
-using Serilog.Expressions.Runtime;
 using Serilog.Formatting.Display;
 
 namespace Serilog.Expressions.Compilation.Linq

@@ -14,7 +14,7 @@ namespace Serilog.Expressions.Tests
         [InlineData("Syntax {1 + 2 and}or", "Invalid expression, unexpected `}`, expected expression.")]
         public void ErrorsAreReported(string input, string error)
         {
-            Assert.False(OutputTemplate.TryParse(input, null, out _, out var actual));
+            Assert.False(OutputTemplate.TryParse(input, null, null, out _, out var actual));
             Assert.Equal(error, actual);
         }
     }

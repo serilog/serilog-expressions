@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Serilog.Expressions.Tests.Support;
+﻿using Serilog.Expressions.Tests.Support;
 using Xunit;
 
 namespace Serilog.Expressions.Tests

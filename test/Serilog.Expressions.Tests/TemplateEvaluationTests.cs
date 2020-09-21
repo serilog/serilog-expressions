@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using Serilog.Events;
-using Serilog.Expressions.Runtime;
 using Serilog.Expressions.Tests.Support;
 using Serilog.Templates;
 using Xunit;
