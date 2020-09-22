@@ -8,6 +8,8 @@ false                                ⇶ false
 [5, 6]                               ⇶ [5, 6]
 {}                                   ⇶ {}
 {a: 1, 'b c': 2}                     ⇶ {a: 1, 'b c': 2}
+{User}                               ⇶ {User: {Id: 42, Name: 'nblumhardt'}}
+{@l}                                 ⇶ {'@l': @l}
 
 // Collections
 [5, undefined()]                     ⇶ undefined()
@@ -173,6 +175,7 @@ null in [1, null, 3]                 ⇶ true
 null is null                         ⇶ true
 null is not null                     ⇶ false
 undefined() is null                  ⇶ true
+10 is null                           ⇶ false
 
 // Property names and accessors
 [5, 6, 7][1]                         ⇶ 6

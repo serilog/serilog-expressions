@@ -55,17 +55,6 @@ namespace Serilog.Expressions.Parsing
                 .IgnoreThen(Token.EqualTo(ExpressionToken.In))
                 .Value(Operators.RuntimeOpNotIn);
 
-        static readonly TokenListParser<ExpressionToken, string> IsNull = 
-            Token.EqualTo(ExpressionToken.Is)
-                .IgnoreThen(Token.EqualTo(ExpressionToken.Null))
-                .Value(Operators.RuntimeOpIsNull);
-        
-        static readonly TokenListParser<ExpressionToken, string> IsNotNull = 
-            Token.EqualTo(ExpressionToken.Is)
-                .IgnoreThen(Token.EqualTo(ExpressionToken.Not))
-                .IgnoreThen(Token.EqualTo(ExpressionToken.Null))
-                .Value(Operators.RuntimeOpIsNotNull);
-
         static readonly TokenListParser<ExpressionToken, Func<Expression, Expression>> PropertyPathStep =
             Token.EqualTo(ExpressionToken.Period)
                 .IgnoreThen(Token.EqualTo(ExpressionToken.Identifier))
@@ -86,7 +75,7 @@ namespace Serilog.Expressions.Parsing
              from lparen in Token.EqualTo(ExpressionToken.LParen)
              from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
              from rparen in Token.EqualTo(ExpressionToken.RParen)
-             from ci in Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault(false)
+             from ci in Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault()
              select (Expression)new CallExpression(ci, name.ToStringValue(), expr)).Named("function");
 
         static readonly TokenListParser<ExpressionToken, Expression> ArrayLiteral =
@@ -94,14 +83,27 @@ namespace Serilog.Expressions.Parsing
             from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
             from rbracket in Token.EqualTo(ExpressionToken.RBracket)
             select (Expression)new ArrayExpression(expr)).Named("array");
-        
+
+        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> IdentifierMember =
+            from key in Token.EqualTo(ExpressionToken.Identifier).Or(Token.EqualTo(ExpressionToken.BuiltInIdentifier))
+            from value in Token.EqualTo(ExpressionToken.Colon)
+                .IgnoreThen(Parse.Ref(() => Expr))
+                .Cast<ExpressionToken, Expression, Expression?>()
+                .OptionalOrDefault()
+            select KeyValuePair.Create<string, Expression>(
+                key.ToStringValue(),
+                value ?? (key.Kind == ExpressionToken.BuiltInIdentifier ?
+                    new AmbientPropertyExpression(key.ToStringValue().Substring(1), true) :
+                    new AmbientPropertyExpression(key.ToStringValue(), false)));
+
+        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> StringMember =
+            from key in Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String)
+            from colon in Token.EqualTo(ExpressionToken.Colon)
+            from value in Parse.Ref(() => Expr)
+            select KeyValuePair.Create(key, value);
+
         static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> ObjectMember =
-            (from key in Token.EqualTo(ExpressionToken.Identifier)
-                    .Select(t => t.ToStringValue())
-                    .Or(Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String))
-                from colon in Token.EqualTo(ExpressionToken.Colon)
-                from value in Parse.Ref(() => Expr)
-                select KeyValuePair.Create(key, value)).Named("object member");
+            IdentifierMember.Or(StringMember).Named("object member");
 
         static readonly TokenListParser<ExpressionToken, Expression> ObjectLiteral =
             (from lbrace in Token.EqualTo(ExpressionToken.LBrace)
