@@ -14,13 +14,13 @@ namespace Serilog.Templates
     /// <summary>
     /// Formats <see cref="LogEvent"/>s into text using embedded expressions.
     /// </summary>
-    public class OutputTemplate : ITextFormatter
+    public class ExpressionTemplate : ITextFormatter
     {
         readonly IFormatProvider? _formatProvider;
         readonly CompiledTemplate _compiled;
 
         /// <summary>
-        /// Construct an <see cref="OutputTemplate"/>.
+        /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
         /// <param name="template">The template text.</param>
         /// <param name="result">The parsed template, if successful.</param>
@@ -28,7 +28,7 @@ namespace Serilog.Templates
         /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
         public static bool TryParse(
             string template,
-            [MaybeNullWhen(false)] out OutputTemplate result,
+            [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
@@ -36,7 +36,7 @@ namespace Serilog.Templates
         }
 
         /// <summary>
-        /// Construct an <see cref="OutputTemplate"/>.
+        /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
@@ -50,7 +50,7 @@ namespace Serilog.Templates
             string template,
             IFormatProvider? formatProvider,
             IEnumerable<NameResolver>? orderedResolvers,
-            [MaybeNullWhen(false)] out OutputTemplate result,
+            [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
@@ -61,25 +61,25 @@ namespace Serilog.Templates
                 return false;
             }
 
-            result = new OutputTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(orderedResolvers)), formatProvider);
+            result = new ExpressionTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(orderedResolvers)), formatProvider);
             return true;
         }
         
-        OutputTemplate(CompiledTemplate compiled, IFormatProvider? formatProvider)
+        ExpressionTemplate(CompiledTemplate compiled, IFormatProvider? formatProvider)
         {
             _compiled = compiled;
             _formatProvider = formatProvider;
         }
 
         /// <summary>
-        /// Construct an <see cref="OutputTemplate"/>.
+        /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
         /// embedded values.</param>
         /// <param name="orderedResolvers">Optionally, an ordered list of <see cref="NameResolver"/>s
         /// from which to resolve function names that appear in the template.</param>
-        public OutputTemplate(
+        public ExpressionTemplate(
             string template,
             IFormatProvider? formatProvider = null,
             IEnumerable<NameResolver>? orderedResolvers = null)

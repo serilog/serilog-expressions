@@ -12,7 +12,7 @@ dotnet add package Serilog.Expressions
 ```
 
 The package adds extension methods to Serilog's `Filter`, `WriteTo`, and 
-`Enrich` configuration objects, along with an `OutputTemplate`
+`Enrich` configuration objects, along with an `ExpressionTemplate`
 type that's compatible with Serilog sinks accepting an
 `ITextFormatter`.
 
@@ -81,12 +81,12 @@ _Serilog.Expressions_ adds a number of expression-based overloads and helper met
 
 ## Formatting
 
-_Serilog.Expressions_ includes the `OutputTemplate` class for text formatting. `OutputTemplate` implements `ITextFormatter`, so
+_Serilog.Expressions_ includes the `ExpressionTemplate` class for text formatting. `ExpressionTemplate` implements `ITextFormatter`, so
 it works with any text-based Serilog sink:
 
 ```csharp
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(new OutputTemplate(
+    .WriteTo.Console(new ExpressionTemplate(
         "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
     .CreateLogger();
 ```

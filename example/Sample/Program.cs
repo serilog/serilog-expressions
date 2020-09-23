@@ -19,7 +19,7 @@ namespace Sample
                 .Filter.ByIncludingOnly("@l = 'Information' and AppId is not null and Items[?] like 'C%'")
                 .WriteTo.Console(outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3} ({SourceContext})] {Message:lj} (first item is {FirstItem}){NewLine}{Exception}")
-                .WriteTo.Console(new OutputTemplate(
+                .WriteTo.Console(new ExpressionTemplate(
                     "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
                     .CreateLogger();
 
