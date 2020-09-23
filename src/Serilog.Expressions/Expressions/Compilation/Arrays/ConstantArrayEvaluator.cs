@@ -18,12 +18,13 @@ namespace Serilog.Expressions.Compilation.Arrays
         {
             // This should probably go depth-first.
 
-            if (ax.Elements.All(el => el is ConstantExpression))
+            if (ax.Elements.All(el => el is ItemElement item &&
+                                      item.Value is ConstantExpression))
             {
                 return new ConstantExpression(
                     new SequenceValue(ax.Elements
-                        .Cast<ConstantExpression>()
-                        .Select(ce => ce.Constant)));
+                        .Cast<ItemElement>()
+                        .Select(item => ((ConstantExpression)item.Value).Constant)));
             }
 
             return base.Transform(ax);

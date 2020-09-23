@@ -69,12 +69,22 @@ namespace Serilog.Expressions.Compilation.Transformations
         protected override Expression Transform(ArrayExpression ax)
         {
             var any = false;
-            var elements = new List<Expression>();
+            var elements = new List<Element>();
             foreach (var el in ax.Elements)
             {
-                if (TryTransform(el, out var result))
-                    any = true;
-                elements.Add(result);
+                if (el is ItemElement item)
+                {
+                    if (TryTransform(item.Value, out var result))
+                        any = true;
+                    elements.Add(new ItemElement(result));
+                }
+                else
+                {
+                    var spread = (SpreadElement) el;
+                    if (TryTransform(spread.Content, out var result))
+                        any = true;
+                    elements.Add(new SpreadElement(result));
+                }
             }
 
             if (!any)
@@ -89,18 +99,18 @@ namespace Serilog.Expressions.Compilation.Transformations
             var members = new List<Member>();
             foreach (var m in ox.Members)
             {
-                if (m is Property p)
+                if (m is PropertyMember p)
                 {
                     if (TryTransform(p.Value, out var result))
                         any = true;
-                    members.Add(new Property(p.Name, result));
+                    members.Add(new PropertyMember(p.Name, result));
                 }
                 else
                 {
-                    var s = (Spread) m;
+                    var s = (SpreadMember) m;
                     if (TryTransform(s.Content, out var result))
                         any = true;
-                    members.Add(new Spread(result));
+                    members.Add(new SpreadMember(result));
                 }
             }
 

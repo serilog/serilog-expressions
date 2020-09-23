@@ -1,10 +1,10 @@
 ﻿namespace Serilog.Expressions.Ast
 {
-    class Spread : Member
+    class SpreadMember : Member
     {
         public Expression Content { get; }
 
-        public Spread(Expression content)
+        public SpreadMember(Expression content)
         {
             Content = content;
         }

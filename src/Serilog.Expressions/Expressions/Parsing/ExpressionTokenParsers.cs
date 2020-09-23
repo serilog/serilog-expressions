@@ -77,11 +77,17 @@ namespace Serilog.Expressions.Parsing
              from ci in Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault()
              select (Expression)new CallExpression(ci, name.ToStringValue(), expr)).Named("function");
 
+        static readonly TokenListParser<ExpressionToken, Element> ArrayElement =
+            Token.EqualTo(ExpressionToken.Spread)
+                .IgnoreThen(Parse.Ref(() => Expr))
+                .Select(content => (Element)new SpreadElement(content))
+                .Or(Parse.Ref(() => Expr).Select(item => (Element) new ItemElement(item)));
+        
         static readonly TokenListParser<ExpressionToken, Expression> ArrayLiteral =
         (from lbracket in Token.EqualTo(ExpressionToken.LBracket)
-            from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
+            from elements in ArrayElement.ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
             from rbracket in Token.EqualTo(ExpressionToken.RBracket)
-            select (Expression)new ArrayExpression(expr)).Named("array");
+            select (Expression)new ArrayExpression(elements)).Named("array");
 
         static readonly TokenListParser<ExpressionToken, Member> IdentifierMember =
             from key in Token.EqualTo(ExpressionToken.Identifier).Or(Token.EqualTo(ExpressionToken.BuiltInIdentifier))
@@ -89,7 +95,7 @@ namespace Serilog.Expressions.Parsing
                 .IgnoreThen(Parse.Ref(() => Expr))
                 .Cast<ExpressionToken, Expression, Expression?>()
                 .OptionalOrDefault()
-            select (Member) new Property(
+            select (Member) new PropertyMember(
                 key.ToStringValue(),
                 value ?? (key.Kind == ExpressionToken.BuiltInIdentifier ?
                     new AmbientPropertyExpression(key.ToStringValue().Substring(1), true) :
@@ -99,12 +105,12 @@ namespace Serilog.Expressions.Parsing
             from key in Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String)
             from colon in Token.EqualTo(ExpressionToken.Colon)
             from value in Parse.Ref(() => Expr)
-            select (Member)new Property(key, value);
+            select (Member)new PropertyMember(key, value);
 
         static readonly TokenListParser<ExpressionToken, Member> SpreadMember =
             from spread in Token.EqualTo(ExpressionToken.Spread)
             from content in Parse.Ref(() => Expr)
-            select (Member) new Spread(content);
+            select (Member) new SpreadMember(content);
 
         static readonly TokenListParser<ExpressionToken, Member> ObjectMember =
             IdentifierMember.Or(StringMember).Or(SpreadMember).Named("object member");

@@ -2,15 +2,15 @@
 using System.Linq;
 
 namespace Serilog.Expressions.Ast
-{ 
+{
     class ArrayExpression : Expression
     {
-        public ArrayExpression(Expression[] elements)
+        public ArrayExpression(Element[] elements)
         {
             Elements = elements ?? throw new ArgumentNullException(nameof(elements));
         }
 
-        public Expression[] Elements { get; }
+        public Element[] Elements { get; }
 
         public override string ToString()
         {

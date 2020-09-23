@@ -18,6 +18,15 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         readonly NameResolver _nameResolver;
 
+        static readonly MethodInfo CollectSequenceElementsMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.CollectSequenceElements), BindingFlags.Static | BindingFlags.Public)!;
+
+        static readonly MethodInfo ExtendSequenceValueWithSpreadMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.ExtendSequenceValueWithSpread), BindingFlags.Static | BindingFlags.Public)!;
+
+        static readonly MethodInfo ExtendSequenceValueWithItemMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.ExtendSequenceValueWithItem), BindingFlags.Static | BindingFlags.Public)!;
+
         static readonly MethodInfo ConstructSequenceValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public)!;
 
@@ -176,9 +185,33 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override ExpressionBody Transform(ArrayExpression ax)
         {
-            var elements = ax.Elements.Select(Transform).ToArray();
-            var arr = LX.NewArrayInit(typeof(LogEventPropertyValue), elements);
-            return LX.Call(ConstructSequenceValueMethod, arr);
+            var elements = new List<ExpressionBody>(ax.Elements.Length);
+            var i = 0;
+            for (; i < ax.Elements.Length; ++i)
+            {
+                var element = ax.Elements[i];
+                if (element is ItemElement item)
+                    elements.Add(Transform(item.Value));
+                else
+                    break;
+            }
+            
+            var arr = LX.NewArrayInit(typeof(LogEventPropertyValue), elements.ToArray());
+            var collected = LX.Call(CollectSequenceElementsMethod, arr);
+
+            for (; i < ax.Elements.Length; ++i)
+            {
+                var element = ax.Elements[i];
+                if (element is ItemElement item)
+                    collected = LX.Call(ExtendSequenceValueWithItemMethod, collected, Transform(item.Value));
+                else
+                {
+                    var spread = (SpreadElement) element;
+                    collected = LX.Call(ExtendSequenceValueWithSpreadMethod, collected, Transform(spread.Content));
+                }
+            }
+            
+            return LX.Call(ConstructSequenceValueMethod, collected);
         }
         
         protected override ExpressionBody Transform(ObjectExpression ox)
@@ -190,7 +223,7 @@ namespace Serilog.Expressions.Compilation.Linq
             for (; i < ox.Members.Length; ++i)
             {
                 var member = ox.Members[i];
-                if (member is Property property)
+                if (member is PropertyMember property)
                 {
                     if (names.Contains(property.Name))
                     {
@@ -211,37 +244,36 @@ namespace Serilog.Expressions.Compilation.Linq
             
             var namesConstant = LX.Constant(names.ToArray(), typeof(string[]));
             var valuesArr = LX.NewArrayInit(typeof(LogEventPropertyValue), values.ToArray());
-            var collect = LX.Call(CollectStructurePropertiesMethod, namesConstant, valuesArr);
+            var properties = LX.Call(CollectStructurePropertiesMethod, namesConstant, valuesArr);
 
             if (i == ox.Members.Length)
             {
-                // No spreads
-                return LX.Call(ConstructStructureValueMethod, collect);
+                // No spreads; more efficient than `Complete*` because erasure is not required.
+                return LX.Call(ConstructStructureValueMethod, properties);
             }
 
-            var extended = collect;
             for (; i < ox.Members.Length; ++i)
             {
                 var member = ox.Members[i];
-                if (member is Property property)
+                if (member is PropertyMember property)
                 {
-                    extended = LX.Call(
+                    properties = LX.Call(
                         ExtendStructureValueWithPropertyMethod,
-                        extended,
+                        properties,
                         LX.Constant(property.Name),
                         Transform(property.Value));
                 }
                 else
                 {
-                    var spread = (Spread) member;
-                    extended = LX.Call(
+                    var spread = (SpreadMember) member;
+                    properties = LX.Call(
                         ExtendStructureValueWithSpreadMethod,
-                        extended,
+                        properties,
                         Transform(spread.Content));
                 }
             }
 
-            return LX.Call(CompleteStructureValueMethod, extended);
+            return LX.Call(CompleteStructureValueMethod, properties);
         }
 
         protected override ExpressionBody Transform(IndexerExpression ix)

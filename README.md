@@ -136,7 +136,7 @@ A typical set of operators is supported:
  * Wildcard indexing - `a[?]` any, and `a[*]` all
  * Conditional `if a then b else c` (all branches required)
  
-Comparision operators that act on text all accept an optional post-fix `ci` modifier to select case-insensitive comparisons:
+Comparision operators that act on text all accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 
 ```
 User.Name like 'n%' ci

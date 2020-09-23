@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+
 // ReSharper disable ParameterTypeCanBeEnumerable.Global
 
 namespace Serilog.Expressions.Compilation.Linq
@@ -16,7 +17,31 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly LogEventPropertyValue Tombstone = new ScalarValue("😬 (if you see this you have found a bug.)");
         static readonly MessageTemplateTextFormatter MessageFormatter = new MessageTemplateTextFormatter("{Message:lj}");
 
-        public static LogEventPropertyValue ConstructSequenceValue(LogEventPropertyValue?[] elements)
+        public static List<LogEventPropertyValue?> CollectSequenceElements(LogEventPropertyValue?[] elements)
+        {
+            return elements.ToList();
+        }
+
+        public static List<LogEventPropertyValue?> ExtendSequenceValueWithItem(List<LogEventPropertyValue?> elements,
+            LogEventPropertyValue? element)
+        {
+            // Mutates the list; returned so we can nest calls instead of emitting a block.
+            if (element != null)
+                elements.Add(element);
+            return elements;
+        }
+
+        public static List<LogEventPropertyValue?> ExtendSequenceValueWithSpread(List<LogEventPropertyValue?> elements,
+            LogEventPropertyValue? content)
+        {
+            if (content is SequenceValue sequence)
+                foreach (var element in sequence.Elements)
+                    elements.Add(element);
+            
+            return elements;
+        }
+
+        public static LogEventPropertyValue ConstructSequenceValue(List<LogEventPropertyValue?> elements)
         {
             if (elements.Any(el => el == null))
                 return new SequenceValue(elements.Where(el => el != null));
