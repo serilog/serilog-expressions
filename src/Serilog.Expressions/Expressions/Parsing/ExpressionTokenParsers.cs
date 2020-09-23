@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Serilog.Events;
@@ -84,26 +83,31 @@ namespace Serilog.Expressions.Parsing
             from rbracket in Token.EqualTo(ExpressionToken.RBracket)
             select (Expression)new ArrayExpression(expr)).Named("array");
 
-        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> IdentifierMember =
+        static readonly TokenListParser<ExpressionToken, Member> IdentifierMember =
             from key in Token.EqualTo(ExpressionToken.Identifier).Or(Token.EqualTo(ExpressionToken.BuiltInIdentifier))
             from value in Token.EqualTo(ExpressionToken.Colon)
                 .IgnoreThen(Parse.Ref(() => Expr))
                 .Cast<ExpressionToken, Expression, Expression?>()
                 .OptionalOrDefault()
-            select KeyValuePair.Create<string, Expression>(
+            select (Member) new Property(
                 key.ToStringValue(),
                 value ?? (key.Kind == ExpressionToken.BuiltInIdentifier ?
                     new AmbientPropertyExpression(key.ToStringValue().Substring(1), true) :
                     new AmbientPropertyExpression(key.ToStringValue(), false)));
 
-        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> StringMember =
+        static readonly TokenListParser<ExpressionToken, Member> StringMember =
             from key in Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String)
             from colon in Token.EqualTo(ExpressionToken.Colon)
             from value in Parse.Ref(() => Expr)
-            select KeyValuePair.Create(key, value);
+            select (Member)new Property(key, value);
 
-        static readonly TokenListParser<ExpressionToken, KeyValuePair<string, Expression>> ObjectMember =
-            IdentifierMember.Or(StringMember).Named("object member");
+        static readonly TokenListParser<ExpressionToken, Member> SpreadMember =
+            from spread in Token.EqualTo(ExpressionToken.Spread)
+            from content in Parse.Ref(() => Expr)
+            select (Member) new Spread(content);
+
+        static readonly TokenListParser<ExpressionToken, Member> ObjectMember =
+            IdentifierMember.Or(StringMember).Or(SpreadMember).Named("object member");
 
         static readonly TokenListParser<ExpressionToken, Expression> ObjectLiteral =
             (from lbrace in Token.EqualTo(ExpressionToken.LBrace)

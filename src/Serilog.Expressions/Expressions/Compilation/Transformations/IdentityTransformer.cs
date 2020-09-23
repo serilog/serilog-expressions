@@ -86,12 +86,22 @@ namespace Serilog.Expressions.Compilation.Transformations
         protected override Expression Transform(ObjectExpression ox)
         {
             var any = false;
-            var members = new List<KeyValuePair<string, Expression>>();
+            var members = new List<Member>();
             foreach (var m in ox.Members)
             {
-                if (TryTransform(m.Value, out var result))
-                    any = true;
-                members.Add(KeyValuePair.Create(m.Key, result));
+                if (m is Property p)
+                {
+                    if (TryTransform(p.Value, out var result))
+                        any = true;
+                    members.Add(new Property(p.Name, result));
+                }
+                else
+                {
+                    var s = (Spread) m;
+                    if (TryTransform(s.Content, out var result))
+                        any = true;
+                    members.Add(new Spread(result));
+                }
             }
 
             if (!any)

@@ -9,8 +9,9 @@ namespace Serilog.Expressions.Parsing
         static readonly TextParser<ExpressionToken> LessOrEqual = Span.EqualTo("<=").Value(ExpressionToken.LessThanOrEqual);
         static readonly TextParser<ExpressionToken> GreaterOrEqual = Span.EqualTo(">=").Value(ExpressionToken.GreaterThanOrEqual);
         static readonly TextParser<ExpressionToken> NotEqual = Span.EqualTo("<>").Value(ExpressionToken.NotEqual);
+        static readonly TextParser<ExpressionToken> Spread = Span.EqualTo("..").Value(ExpressionToken.Spread);
 
-        public static readonly TextParser<ExpressionToken> CompoundOperator = GreaterOrEqual.Or(LessOrEqual.Try().Or(NotEqual));
+        public static readonly TextParser<ExpressionToken> CompoundOperator = GreaterOrEqual.Or(LessOrEqual.Try().Or(NotEqual)).Or(Spread);
 
         public static readonly TextParser<string> HexInteger =
             Span.EqualTo("0x")

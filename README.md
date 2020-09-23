@@ -116,7 +116,10 @@ The following properties are available in expressions:
 | String | A single-quoted Unicode string literal; to escape `'`, double it | `'pie'`, `'isn''t'`, `'😋'` |
 | Boolean | A Boolean value | `true`, `false` |
 | Array | An array of values, in square brackets | `[1, 'two', null]` |
-| Object | A mapping of string keys to values; keys that are valid identifiers do not need to be quoted | `{a: 1, 'b c': 2}` |
+| Object | A mapping of string keys to values; keys that are valid identifiers do not need to be quoted | `{a: 1, 'b c': 2, d}` |
+
+Array and object literals support the spread operator: `[1, 2, ..rest]`, `{a: 1, ..other}`. Specifying an undefined
+property in an object literal will remove it from the result: `{..User, Email: Undefined()}`
 
 ### Operators and conditionals
 
@@ -166,6 +169,7 @@ calling a function will be undefined if:
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
+| `Undefined()` | Explicitly mark an undefined value. |
 
 Functions that compare text accept an optional post-fix `ci` modifier to select case-insensitive comparisons:
 

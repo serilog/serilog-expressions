@@ -21,8 +21,20 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly MethodInfo ConstructSequenceValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.ConstructSequenceValue), BindingFlags.Static | BindingFlags.Public)!;
 
+        static readonly MethodInfo CollectStructurePropertiesMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.CollectStructureProperties), BindingFlags.Static | BindingFlags.Public)!;
+
         static readonly MethodInfo ConstructStructureValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.ConstructStructureValue), BindingFlags.Static | BindingFlags.Public)!;
+
+        static readonly MethodInfo CompleteStructureValueMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.CompleteStructureValue), BindingFlags.Static | BindingFlags.Public)!;
+
+        static readonly MethodInfo ExtendStructureValueWithSpreadMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.ExtendStructureValueWithSpread), BindingFlags.Static | BindingFlags.Public)!;
+
+        static readonly MethodInfo ExtendStructureValueWithPropertyMethod = typeof(Intrinsics)
+            .GetMethod(nameof(Intrinsics.ExtendStructureValueWithProperty), BindingFlags.Static | BindingFlags.Public)!;
 
         static readonly MethodInfo CoerceToScalarBooleanMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.CoerceToScalarBoolean), BindingFlags.Static | BindingFlags.Public)!;
@@ -35,7 +47,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         ParameterExpression Context { get; } = LX.Variable(typeof(LogEvent), "evt");
 
-        public LinqExpressionCompiler(NameResolver nameResolver)
+        LinqExpressionCompiler(NameResolver nameResolver)
         {
             _nameResolver = nameResolver;
         }
@@ -173,22 +185,63 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             var names = new List<string>();
             var values = new List<ExpressionBody>();
-            foreach (var member in ox.Members)
+
+            var i = 0;
+            for (; i < ox.Members.Length; ++i)
             {
-                if (names.Contains(member.Key))
+                var member = ox.Members[i];
+                if (member is Property property)
                 {
-                    var oldPos = names.IndexOf(member.Key);
-                    values[oldPos] = Transform(member.Value);
+                    if (names.Contains(property.Name))
+                    {
+                        var oldPos = names.IndexOf(property.Name);
+                        values[oldPos] = Transform(property.Value);
+                    }
+                    else
+                    {
+                        names.Add(property.Name);
+                        values.Add(Transform(property.Value));
+                    }
                 }
                 else
                 {
-                    names.Add(member.Key);
-                    values.Add(Transform(member.Value));
+                    break;
                 }
             }
+            
             var namesConstant = LX.Constant(names.ToArray(), typeof(string[]));
             var valuesArr = LX.NewArrayInit(typeof(LogEventPropertyValue), values.ToArray());
-            return LX.Call(ConstructStructureValueMethod, namesConstant, valuesArr);
+            var collect = LX.Call(CollectStructurePropertiesMethod, namesConstant, valuesArr);
+
+            if (i == ox.Members.Length)
+            {
+                // No spreads
+                return LX.Call(ConstructStructureValueMethod, collect);
+            }
+
+            var extended = collect;
+            for (; i < ox.Members.Length; ++i)
+            {
+                var member = ox.Members[i];
+                if (member is Property property)
+                {
+                    extended = LX.Call(
+                        ExtendStructureValueWithPropertyMethod,
+                        extended,
+                        LX.Constant(property.Name),
+                        Transform(property.Value));
+                }
+                else
+                {
+                    var spread = (Spread) member;
+                    extended = LX.Call(
+                        ExtendStructureValueWithSpreadMethod,
+                        extended,
+                        Transform(spread.Content));
+                }
+            }
+
+            return LX.Call(CompleteStructureValueMethod, extended);
         }
 
         protected override ExpressionBody Transform(IndexerExpression ix)

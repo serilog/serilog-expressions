@@ -27,6 +27,9 @@ namespace Serilog.Expressions.Parsing
         [Token(Example = ".")]
         Period,
 
+        [Token(Example = "..")]
+        Spread,
+
         [Token(Example = "[")]
         LBracket,
 
