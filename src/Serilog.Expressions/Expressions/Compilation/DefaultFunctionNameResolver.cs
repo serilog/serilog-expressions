@@ -1,18 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Serilog.Expressions.Runtime;
+﻿using Serilog.Expressions.Runtime;
 
 namespace Serilog.Expressions.Compilation
 {
     static class DefaultFunctionNameResolver
     {
-        public static NameResolver Build(IEnumerable<NameResolver>? orderedResolvers)
+        public static NameResolver Build(NameResolver? additionalNameResolver)
         {
             var defaultResolver = new StaticMemberNameResolver(typeof(RuntimeOperators));
-            return orderedResolvers == null
+            return additionalNameResolver == null
                 ? (NameResolver) defaultResolver
-                : new OrderedNameResolver(
-                    new NameResolver[] {defaultResolver}.Concat(orderedResolvers));
+                : new OrderedNameResolver(new[] {defaultResolver, additionalNameResolver });
         }
     }
 }

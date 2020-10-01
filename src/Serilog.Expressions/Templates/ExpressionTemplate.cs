@@ -43,13 +43,13 @@ namespace Serilog.Templates
         /// embedded values.</param>
         /// <param name="result">The parsed template, if successful.</param>
         /// <param name="error">A description of the error, if unsuccessful.</param>
-        /// <param name="orderedResolvers">Optionally, an ordered list of <see cref="NameResolver"/>s
-        /// from which to resolve function names that appear in the template.</param>
+        /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
+        /// with which to resolve function names that appear in the template.</param>
         /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
         public static bool TryParse(
             string template,
             IFormatProvider? formatProvider,
-            IEnumerable<NameResolver>? orderedResolvers,
+            NameResolver? nameResolver,
             [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
@@ -61,7 +61,7 @@ namespace Serilog.Templates
                 return false;
             }
 
-            result = new ExpressionTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(orderedResolvers)), formatProvider);
+            result = new ExpressionTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
             return true;
         }
         
@@ -77,19 +77,19 @@ namespace Serilog.Templates
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
         /// embedded values.</param>
-        /// <param name="orderedResolvers">Optionally, an ordered list of <see cref="NameResolver"/>s
-        /// from which to resolve function names that appear in the template.</param>
+        /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
+        /// with which to resolve function names that appear in the template.</param>
         public ExpressionTemplate(
             string template,
             IFormatProvider? formatProvider = null,
-            IEnumerable<NameResolver>? orderedResolvers = null)
+            NameResolver? nameResolver = null)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
             if (!TemplateParser.TryParse(template, out var parsed, out var error))
                 throw new ArgumentException(error);
             
-            _compiled = TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(orderedResolvers));
+            _compiled = TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver));
             _formatProvider = formatProvider;
         }
 

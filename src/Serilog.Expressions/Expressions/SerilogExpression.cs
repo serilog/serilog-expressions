@@ -32,15 +32,15 @@ namespace Serilog.Expressions
         /// Create an evaluation function based on the provided expression.
         /// </summary>
         /// <param name="expression">An expression.</param>
-        /// <param name="orderedResolvers">Optionally, an ordered list of <see cref="NameResolver"/>s
-        /// from which to resolve function names that appear in the template.</param>
+        /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
+        /// with which to resolve function names that appear in the template.</param>
         /// <returns>A function that evaluates the expression in the context of a log event.</returns>
         public static CompiledExpression Compile(
             string expression,
-            IEnumerable<NameResolver>? orderedResolvers = null)
+            NameResolver? nameResolver = null)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (!TryCompileImpl(expression, orderedResolvers, out var filter, out var error))
+            if (!TryCompileImpl(expression, nameResolver, out var filter, out var error))
                 throw new ArgumentException(error);
 
             return filter;
@@ -70,25 +70,25 @@ namespace Serilog.Expressions
         /// <param name="expression">An expression.</param>
         /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
         /// <param name="error">The reported error, if compilation was unsuccessful.</param>
-        /// <param name="orderedResolvers">An ordered list of <see cref="NameResolver"/>s
-        /// from which to resolve function names that appear in the template.</param>
+        /// <param name="nameResolver">A <see cref="NameResolver"/>
+        /// with which to resolve function names that appear in the template.</param>
         /// <returns>True if the function could be created; otherwise, false.</returns>
         /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
         /// errors.</remarks>
         public static bool TryCompile(
             string expression,
-            IEnumerable<NameResolver> orderedResolvers,
+            NameResolver nameResolver,
             [MaybeNullWhen(false)] out CompiledExpression result,
             [MaybeNullWhen(true)] out string error)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (orderedResolvers == null) throw new ArgumentNullException(nameof(orderedResolvers));
-            return TryCompileImpl(expression, orderedResolvers, out result, out error);
+            if (nameResolver == null) throw new ArgumentNullException(nameof(nameResolver));
+            return TryCompileImpl(expression, nameResolver, out result, out error);
         }
         
         static bool TryCompileImpl(
             string expression,
-            IEnumerable<NameResolver>? orderedResolvers,
+            NameResolver? nameResolver,
             [MaybeNullWhen(false)] out CompiledExpression result,
             [MaybeNullWhen(true)] out string error)
         {
@@ -98,7 +98,7 @@ namespace Serilog.Expressions
                 return false;
             }
 
-            result = ExpressionCompiler.Compile(root, DefaultFunctionNameResolver.Build(orderedResolvers));
+            result = ExpressionCompiler.Compile(root, DefaultFunctionNameResolver.Build(nameResolver));
             error = null;
             return true;
         }
