@@ -171,7 +171,7 @@ calling a function will be undefined if:
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 | `Undefined()` | Explicitly mark an undefined value. |
 
-Functions that compare text accept an optional post-fix `ci` modifier to select case-insensitive comparisons:
+Functions that compare text accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 
 ```
 StartsWith(User.Name, 'n') ci
