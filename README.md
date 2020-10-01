@@ -91,7 +91,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 ```
 
-Note the use of `{Items[0]}`: "holes" in expression-based output templates can include arbitrary expressions.
+Note the use of `{Items[0]}`: "holes" in expression templates can include any valid expression.
 
 ## Language reference
 
