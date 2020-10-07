@@ -1,4 +1,4 @@
-# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/2wg3tsdybwmf8tp1/branch/dev?svg=true)](https://ci.appveyor.com/project/NicholasBlumhardt/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
+# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/w7igkk3w51h481r6/branch/dev?svg=true)](https://ci.appveyor.com/project/serilog/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog 
 events, ideal for use with JSON or XML configuration.
@@ -8,7 +8,7 @@ events, ideal for use with JSON or XML configuration.
 Install the package from NuGet:
 
 ```shell
-dotnet add package Serilog.Expressions
+dotnet add package Serilog.Expressions -v 1.0.0-*
 ```
 
 The package adds extension methods to Serilog's `Filter`, `WriteTo`, and 
