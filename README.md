@@ -93,6 +93,14 @@ Log.Logger = new LoggerConfiguration()
 
 Note the use of `{Items[0]}`: "holes" in expression templates can include any valid expression.
 
+Newline-delimited JSON (for example, emulating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
+using object literals:
+
+```csharp
+    .WriteTo.Console(new ExpressionTemplate(
+        "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
+```
+
 ## Language reference
 
 ### Built-in properties
