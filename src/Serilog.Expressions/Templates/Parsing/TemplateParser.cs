@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Serilog.Expressions.Parsing;
 using Serilog.Templates.Ast;
+using Serilog.Parsing;
 using Superpower.Model;
 
 namespace Serilog.Templates.Parsing
@@ -65,6 +67,48 @@ namespace Serilog.Templates.Parsing
                             return false;
                         }
 
+                        Alignment? alignment = null;
+                        if (template[i] == ',')
+                        {
+                            i++;
+
+                            if (i >= template.Length || template[i] == '}')
+                            {
+                                error = "Incomplete alignment specifier, expected width.";
+                                return false;
+                            }
+
+                            AlignmentDirection direction;
+                            if (template[i] == '-')
+                            {
+                                direction = AlignmentDirection.Left;
+                                i++;
+
+                                if (i >= template.Length || template[i] == '}')
+                                {
+                                    error = "Incomplete alignment specifier, expected digits.";
+                                    return false;
+                                }
+                            }
+                            else
+                                direction = AlignmentDirection.Right;
+
+                            if (!char.IsDigit(template[i]))
+                            {
+                                error = "Invalid alignment specifier, expected digits.";
+                                return false;
+                            }
+
+                            var width = 0;
+                            while (i < template.Length && char.IsDigit(template[i]))
+                            {
+                                width = 10 * width + CharUnicodeInfo.GetDecimalDigitValue(template[i]);
+                                i++;
+                            }
+
+                            alignment = new Alignment(direction, width);
+                        }
+
                         string? format = null;
                         if (template[i] == ':')
                         {
@@ -94,7 +138,7 @@ namespace Serilog.Templates.Parsing
 
                         i++;
                         
-                        elements.Add(new FormattedExpression(expr.Value, format));
+                        elements.Add(new FormattedExpression(expr.Value, format, alignment));
                     }
                 }
                 else if (ch == '}')

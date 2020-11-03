@@ -15,7 +15,7 @@ namespace Serilog.Templates.Compilation
             {
                 LiteralText text => new CompiledLiteralText(text.Text),
                 FormattedExpression expression => new CompiledFormattedExpression(
-                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format),
+                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment),
                 TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, nameResolver)).ToArray()),
                 _ => throw new NotSupportedException()
             };

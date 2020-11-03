@@ -14,6 +14,8 @@
 
 using Serilog.Events;
 
+// ReSharper disable StringLiteralTypo
+
 namespace Serilog.Templates.Rendering
 {
     /// <summary>

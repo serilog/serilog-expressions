@@ -9,4 +9,7 @@ Text only                                ⇶ Text only
 {{ Escaped {{ left {{                    ⇶ { Escaped { left {
 }} Escaped }} right }}                   ⇶ } Escaped } right }
 Formatted {42:0000}                      ⇶ Formatted 0042
+Aligned {42,4}!                          ⇶ Aligned   42!
+Left {42,-4}!                            ⇶ Left 42  !
+Under width {42,0}!                      ⇶ Under width 42!
 {@m}                                     ⇶ Hello, nblumhardt!
