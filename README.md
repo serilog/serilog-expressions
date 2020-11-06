@@ -85,6 +85,8 @@ _Serilog.Expressions_ includes the `ExpressionTemplate` class for text formattin
 it works with any text-based Serilog sink:
 
 ```csharp
+// using Serilog.Templates;
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new ExpressionTemplate(
         "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
