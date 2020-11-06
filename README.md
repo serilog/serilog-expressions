@@ -8,7 +8,7 @@ events, ideal for use with JSON or XML configuration.
 Install the package from NuGet:
 
 ```shell
-dotnet add package Serilog.Expressions -v 1.0.0-*
+dotnet add package Serilog.Expressions
 ```
 
 The package adds extension methods to Serilog's `Filter`, `WriteTo`, and 
