@@ -105,11 +105,11 @@ using object literals:
 
 ## Language reference
 
-### Built-in properties
+### Properties
 
 The following properties are available in expressions:
 
- * All first-class properties of the event; no special syntax: `SourceContext` and `Items` are used in the formatting example above
+ * **All first-class properties of the event** &mdash; no special syntax: `SourceContext` and `Items` are used in the formatting example above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
  * `@m` - the rendered message
  * `@mt` - the raw message template
@@ -142,7 +142,8 @@ A typical set of operators is supported:
  * Existence `is null` and `is not null`
  * SQL-style `like` and `not like`, with `%` and `_` wildcards (double wildcards to escape them)
  * Array membership with `in` and `not in`
- * Indexers `a[b]` and accessors `a.b`
+ * Accessors `a.b`
+ * Indexers `a['b']` and `a[0]`
  * Wildcard indexing - `a[?]` any, and `a[*]` all
  * Conditional `if a then b else c` (all branches required)
  
