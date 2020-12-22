@@ -1,4 +1,5 @@
-﻿using Serilog.Expressions.Ast;
+﻿using System.Linq;
+using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
 
 namespace Serilog.Expressions.Compilation.Wildcards
@@ -15,17 +16,25 @@ namespace Serilog.Expressions.Compilation.Wildcards
 
         protected override Expression Transform(CallExpression lx)
         {
-            if (!Operators.WildcardComparators.Contains(lx.OperatorName) || lx.Operands.Length != 2)
+            if (!Operators.WildcardComparators.Contains(lx.OperatorName))
                 return base.Transform(lx);
 
-            var lhsIs = WildcardSearch.FindElementAtWildcard(lx.Operands[0]);
-            var rhsIs = WildcardSearch.FindElementAtWildcard(lx.Operands[1]);
-            if (lhsIs != null && rhsIs != null || lhsIs == null && rhsIs == null)
+            IndexerExpression? indexer = null;
+            Expression? wildcardPath = null;
+            var indexerOperand = -1;
+            for (var i = 0; i < lx.Operands.Length; ++i)
+            {
+                indexer = WildcardSearch.FindElementAtWildcard(lx.Operands[i]);
+                if (indexer != null)
+                {
+                    indexerOperand = i;
+                    wildcardPath = lx.Operands[i];
+                    break;
+                }
+            }
+            
+            if (indexer == null || wildcardPath == null)
                 return base.Transform(lx); // N/A, or invalid
-
-            var wildcardPath = lhsIs != null ? lx.Operands[0] : lx.Operands[1];
-            var comparand = lhsIs != null ? lx.Operands[1] : lx.Operands[0];
-            var indexer = lhsIs ?? rhsIs!;
 
             var px = new ParameterExpression("p" + _nextParameter++);
             var nestedComparand = NodeReplacer.Replace(wildcardPath, indexer, px);
@@ -33,7 +42,8 @@ namespace Serilog.Expressions.Compilation.Wildcards
             var coll = indexer.Receiver;
             var wc = ((IndexerWildcardExpression)indexer.Index).Wildcard;
 
-            var comparisonArgs = lhsIs != null ? new[] { nestedComparand, comparand } : new[] { comparand, nestedComparand };
+            var comparisonArgs = lx.Operands.ToArray();
+            comparisonArgs[indexerOperand] = nestedComparand;
             var body = new CallExpression(lx.IgnoreCase, lx.OperatorName, comparisonArgs);
             
             var lambda = new LambdaExpression(new[] { px }, body);

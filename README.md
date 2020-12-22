@@ -95,12 +95,12 @@ Log.Logger = new LoggerConfiguration()
 
 Note the use of `{Items[0]}`: "holes" in expression templates can include any valid expression.
 
-Newline-delimited JSON (for example, emulating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
+Newline-delimited JSON (for example, replicating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
 using object literals:
 
 ```csharp
     .WriteTo.Console(new ExpressionTemplate(
-        "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
+        "{ {@t, @mt, @r, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
 ```
 
 ## Language reference
@@ -116,6 +116,10 @@ The following properties are available in expressions:
  * `@l` - the event's level, as a `LogEventLevel`
  * `@x` - the exception associated with the event, if any, as an `Exception`
  * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
+ * `@i` - event id; a 32-bit numeric hash of the event's message template
+ * `@r` - renderings; if any tokens in the message template include .NET-specific formatting, an array of rendered values for each such token
+
+The built-in properties mirror those available in the CLEF format.
 
 ### Literals
 
@@ -175,12 +179,15 @@ calling a function will be undefined if:
 | `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
 | `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `Length(x)` | Returns the length of a string or array. |
+| `Now()` | Returns `DateTimeOffset.Now`. |
 | `Round(n, m)` | Round the number `n` to `m` decimal places. |
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
+| `ToString(x, f)` | Applies the format string `f` to the formattable value `x`. |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 | `Undefined()` | Explicitly mark an undefined value. |
+| `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
 
 Functions that compare text accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 

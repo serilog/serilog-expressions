@@ -467,5 +467,38 @@ namespace Serilog.Expressions.Runtime
         {
             return Coerce.IsTrue(condition) ? consequent : alternative;
         }
+
+        public static LogEventPropertyValue? ToString(LogEventPropertyValue? value, LogEventPropertyValue? format)
+        {
+            if (!(value is ScalarValue sv && sv.Value is IFormattable formattable) ||
+                !Coerce.String(format, out var fmt))
+            {
+                return null;
+            }
+
+            // TODO #19: formatting is culture-specific.
+            return new ScalarValue(formattable.ToString(fmt, null));
+        }
+        
+        public static LogEventPropertyValue? UtcDateTime(LogEventPropertyValue? dateTime)
+        {
+            if (dateTime is ScalarValue sv)
+            {
+                if (sv.Value is DateTimeOffset dto)
+                    return new ScalarValue(dto.UtcDateTime);
+                
+                if (sv.Value is DateTime dt)
+                    return new ScalarValue(dt.ToUniversalTime());
+            }
+
+            return null;
+        }
+        
+        // ReSharper disable once UnusedMember.Global
+        public static LogEventPropertyValue? Now()
+        {
+            // DateTimeOffset.Now is the generator for LogEvent.Timestamp.
+            return new ScalarValue(DateTimeOffset.Now);
+        }
     }
 }
