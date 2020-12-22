@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright © Serilog Contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -124,25 +138,22 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             if (px.IsBuiltIn)
             {
-                if (px.PropertyName == BuiltInProperty.Level)
-                    return Splice(context => new ScalarValue(context.Level));
-
-                if (px.PropertyName == BuiltInProperty.Message)
-                    return Splice(context => new ScalarValue(Intrinsics.RenderMessage(context)));
-
-                if (px.PropertyName == BuiltInProperty.Exception)
-                    return Splice(context => context.Exception == null ? null : new ScalarValue(context.Exception));
-
-                if (px.PropertyName == BuiltInProperty.Timestamp)
-                    return Splice(context => new ScalarValue(context.Timestamp));
-
-                if (px.PropertyName == BuiltInProperty.MessageTemplate)
-                    return Splice(context => new ScalarValue(context.MessageTemplate.Text));
-
-                if (px.PropertyName == BuiltInProperty.Properties)
-                    return Splice(context => new StructureValue(context.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)), null));
-
-                return LX.Constant(null, typeof(LogEventPropertyValue));
+                return px.PropertyName switch
+                {
+                    BuiltInProperty.Level => Splice(context => new ScalarValue(context.Level)),
+                    BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(context))),
+                    BuiltInProperty.Exception => Splice(context =>
+                        context.Exception == null ? null : new ScalarValue(context.Exception)),
+                    BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.Timestamp)),
+                    BuiltInProperty.MessageTemplate => Splice(context => new ScalarValue(context.MessageTemplate.Text)),
+                    BuiltInProperty.Properties => Splice(context =>
+                        new StructureValue(context.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
+                            null)),
+                    BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context)),
+                    BuiltInProperty.EventId => Splice(context =>
+                        new ScalarValue(EventIdHash.Compute(context.MessageTemplate.Text))),
+                    _ => LX.Constant(null, typeof(LogEventPropertyValue))
+                };
             }
 
             var propertyName = px.PropertyName;

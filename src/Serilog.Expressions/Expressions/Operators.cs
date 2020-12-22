@@ -24,12 +24,15 @@ namespace Serilog.Expressions
         public const string OpIsDefined = "IsDefined";
         public const string OpLastIndexOf = "LastIndexOf";
         public const string OpLength = "Length";
+        public const string OpNow = "Now";
         public const string OpRound = "Round";
         public const string OpStartsWith = "StartsWith";
         public const string OpSubstring = "Substring";
         public const string OpTagOf = "TagOf";
+        public const string OpToString = "ToString";
         public const string OpTypeOf = "TypeOf";
         public const string OpUndefined = "Undefined";
+        public const string OpUtcDateTime = "UtcDateTime";
 
         public const string IntermediateOpLike = "_Internal_Like";
         public const string IntermediateOpNotLike = "_Internal_NotLike";
