@@ -1,5 +1,8 @@
-﻿#if NETSTANDARD2_0
-//https://medium.com/@SergioPedri/enabling-and-using-c-9-features-on-older-and-unsupported-runtimes-ce384d8debb
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#if NETSTANDARD2_0
+//From: https://medium.com/@SergioPedri/enabling-and-using-c-9-features-on-older-and-unsupported-runtimes-ce384d8debb
 namespace System.Diagnostics.CodeAnalysis
 {
     /// <summary>Specifies that an output will not be null even if the corresponding type allows it. Specifies that an input argument was not null when the call returns.</summary>
@@ -19,9 +22,5 @@ namespace System.Diagnostics.CodeAnalysis
         /// <summary>Gets the return value condition.</summary>
         public bool ReturnValue { get; }
     }
-
-    // NOTE: you can find the full list of attributes in this gist:
-    // https://gist.github.com/Sergio0694/eb988b243dd4a720a66fe369b63e5b08.
-    // Keeping this one shorter so that the Medium embed doesn't take up too much space.
 }
 #endif

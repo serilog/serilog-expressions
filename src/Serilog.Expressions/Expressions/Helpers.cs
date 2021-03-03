@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if NETSTANDARD2_0
+
 using System;
 
-namespace Serilog.Extensions
+namespace Serilog.Expressions
 {
     /// <summary>
     /// Helper methods.
     /// </summary>
-    public static class Helpers
+    internal static class Helpers
     {
-#if NETSTANDARD2_0
         /// <summary>
         /// Backport .NET Standard 2.1 additions to maintain .NET Standard 2.0 compatibility.
         /// Returns a value indicating whether a specified string occurs within this string, using the specified comparison rules.
+        /// 
+        /// From;
+        /// https://github.com/dotnet/runtime/issues/22198
+        /// https://stackoverflow.com/questions/444798/case-insensitive-containsstring/444818#444818
         /// </summary>
         /// <param name="source">input string</param>
         /// <param name="value">The string to seek.</param>
@@ -32,11 +37,8 @@ namespace Serilog.Extensions
         /// <returns></returns>
         public static bool Contains(this string source, string value, StringComparison comparisonType)
         {
-            // See;
-            // https://github.com/dotnet/runtime/issues/22198
-            // https://stackoverflow.com/questions/444798/case-insensitive-containsstring/444818#444818
             return source?.IndexOf(value, comparisonType) >= 0;
         }
-#endif
     }
 }
+#endif
