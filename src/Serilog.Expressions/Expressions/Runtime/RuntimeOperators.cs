@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
+using Serilog.Extensions;
 
 // ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global
 
