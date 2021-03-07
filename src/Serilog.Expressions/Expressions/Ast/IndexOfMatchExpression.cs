@@ -13,5 +13,10 @@ namespace Serilog.Expressions.Ast
             Corpus = corpus ?? throw new ArgumentNullException(nameof(corpus));
             Regex = regex ?? throw new ArgumentNullException(nameof(regex));
         }
+
+        public override string ToString()
+        {
+            return $"_Internal_IndexOfMatch({Corpus}, '{Regex.ToString().Replace("'", "''")}')";
+        }
     }
 }

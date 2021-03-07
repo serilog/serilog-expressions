@@ -1,0 +1,16 @@
+﻿// Like
+A like 'a'                                    ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '^a$'), -1)
+A like 'a%'                                   ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '^a'), -1)
+A like '%a%'                                  ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, 'a'), -1)
+A like '%a'                                   ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, 'a$'), -1)
+A like '%a_b%'                                ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, 'a.b'), -1)
+A like 'a%b%'                                 ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '^a(?:.|\r|\n)*b'), -1)
+A like '%'                                    ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '.*'), -1)
+
+// Variadics
+coalesce(A, B, C, D)                          ⇶ coalesce(A, coalesce(B, coalesce(C, D)))
+
+// Wildcards!
+A[?]                                          ⇶ _Internal_Any(A, |$$p0| {$$p0})
+A or B[*]                                     ⇶ _Internal_Or(A, _Internal_All(B, |$$p0| {$$p0}))
+not (A is not null) or not (A[?] = 'a')       ⇶ _Internal_Or(_Internal_Not(_Internal_IsNotNull(A)), _Internal_Not(_Internal_Any(A, |$$p0| {_Internal_Equal($$p0, 'a')})))
