@@ -8,7 +8,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
     {
         static readonly WildcardSearch Instance = new WildcardSearch();
         
-        public static IndexerExpression? FindElementAtWildcard(Expression fx)
+        public static IndexerExpression? FindWildcardIndexer(Expression fx)
         {
             return Instance.Transform(fx);
         }
@@ -59,6 +59,11 @@ namespace Serilog.Expressions.Compilation.Wildcards
 
         protected override IndexerExpression? Transform(CallExpression lx)
         {
+            // If we hit a wildcard-compatible operation, then any wildcards within its operands "belong" to
+            // it and can't be the result of this search.
+            if (Operators.WildcardComparators.Contains(lx.OperatorName))
+                return null;
+    
             return lx.Operands.Select(Transform).FirstOrDefault(e => e != null);
         }
 

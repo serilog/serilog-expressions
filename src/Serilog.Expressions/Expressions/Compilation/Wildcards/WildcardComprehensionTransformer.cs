@@ -14,6 +14,15 @@ namespace Serilog.Expressions.Compilation.Wildcards
             return wc.Transform(root);
         }
 
+        // This matches expression fragments such as `A[?] = 'test'` and
+        // transforms them into `any(A, |p| p = 'test)`.
+        //
+        // As the comparand in such expressions can be complex, e.g.
+        // `Substring(A[?], 0, 4) = 'test')`, the search for `?` and `*` wildcards
+        // is deep, but, it terminates upon reaching any other wildcard-compatible
+        // comparison. Thus `(A[?] = 'test') = true` will result in `any(A, |p| p = 'test') = true` and
+        // not `any(A, |p| (p = 'test') = true)`, which is important because short-circuiting when the first
+        // argument to `any()` is undefined will change the semantics of the resulting expression, otherwise.
         protected override Expression Transform(CallExpression lx)
         {
             if (!Operators.WildcardComparators.Contains(lx.OperatorName))
@@ -24,7 +33,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
             var indexerOperand = -1;
             for (var i = 0; i < lx.Operands.Length; ++i)
             {
-                indexer = WildcardSearch.FindElementAtWildcard(lx.Operands[i]);
+                indexer = WildcardSearch.FindWildcardIndexer(lx.Operands[i]);
                 if (indexer != null)
                 {
                     indexerOperand = i;
@@ -51,6 +60,20 @@ namespace Serilog.Expressions.Compilation.Wildcards
             var op = Operators.ToRuntimeWildcardOperator(wc);
             var call = new CallExpression(false, op, coll, lambda);
             return Transform(call);
+        }
+        
+        // Detects and transforms standalone `A[?]` fragments that are not part of a comparision; these
+        // are effectively Boolean tests.
+        protected override Expression Transform(IndexerExpression ix)
+        {
+            if (!(ix.Index is IndexerWildcardExpression wx))
+                return base.Transform(ix);
+
+            var px = new ParameterExpression("p" + _nextParameter++);
+            var coll = Transform(ix.Receiver);
+            var lambda = new LambdaExpression(new[] { px }, px);
+            var op = Operators.ToRuntimeWildcardOperator(wx.Wildcard);
+            return new CallExpression(false, op, coll, lambda);
         }
     }
 }

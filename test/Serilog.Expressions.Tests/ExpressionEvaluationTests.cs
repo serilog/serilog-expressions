@@ -11,20 +11,8 @@ namespace Serilog.Expressions.Tests
 {
     public class ExpressionEvaluationTests
     {
-        static readonly string CasesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Cases");
-
-        static IEnumerable<object[]> ReadCases(string filename)
-        {
-            foreach (var line in File.ReadLines(Path.Combine(CasesPath, filename)))
-            {
-                var cols = line.Split("⇶", StringSplitOptions.RemoveEmptyEntries);
-                if (cols.Length == 2)
-                    yield return cols.Select(c => c.Trim()).ToArray<object>();
-            }
-        }
-
         public static IEnumerable<object[]> ExpressionEvaluationCases =>
-            ReadCases("expression-evaluation-cases.asv");
+            AsvCases.ReadCases("expression-evaluation-cases.asv");
 
         [Theory]
         [MemberData(nameof(ExpressionEvaluationCases))]
