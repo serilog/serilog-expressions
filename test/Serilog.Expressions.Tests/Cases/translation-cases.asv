@@ -7,6 +7,10 @@ A like '%a_b%'                                ⇶ _Internal_NotEqual(_Internal_I
 A like 'a%b%'                                 ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '^a(?:.|\r|\n)*b'), -1)
 A like '%'                                    ⇶ _Internal_NotEqual(_Internal_IndexOfMatch(A, '.*'), -1)
 
+// Root properties
+@p['Test']                                    ⇶ Test
+@p[Test]                                      ⇶ @p[Test]
+
 // Variadics
 coalesce(A, B, C, D)                          ⇶ coalesce(A, coalesce(B, coalesce(C, D)))
 
