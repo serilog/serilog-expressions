@@ -8,7 +8,7 @@ events, ideal for use with JSON or XML configuration.
 Install the package from NuGet:
 
 ```shell
-dotnet add package Serilog.Expressions -v 1.0.0-*
+dotnet add package Serilog.Expressions
 ```
 
 The package adds extension methods to Serilog's `Filter`, `WriteTo`, and 
@@ -85,6 +85,8 @@ _Serilog.Expressions_ includes the `ExpressionTemplate` class for text formattin
 it works with any text-based Serilog sink:
 
 ```csharp
+// using Serilog.Templates;
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new ExpressionTemplate(
         "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
@@ -93,27 +95,31 @@ Log.Logger = new LoggerConfiguration()
 
 Note the use of `{Items[0]}`: "holes" in expression templates can include any valid expression.
 
-Newline-delimited JSON (for example, emulating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
+Newline-delimited JSON (for example, replicating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
 using object literals:
 
 ```csharp
     .WriteTo.Console(new ExpressionTemplate(
-        "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
+        "{ {@t, @mt, @r, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
 ```
 
 ## Language reference
 
-### Built-in properties
+### Properties
 
 The following properties are available in expressions:
 
- * All first-class properties of the event; no special syntax: `SourceContext` and `Items` are used in the formatting example above
+ * **All first-class properties of the event** &mdash; no special syntax: `SourceContext` and `Items` are used in the formatting example above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
  * `@m` - the rendered message
  * `@mt` - the raw message template
  * `@l` - the event's level, as a `LogEventLevel`
  * `@x` - the exception associated with the event, if any, as an `Exception`
  * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
+ * `@i` - event id; a 32-bit numeric hash of the event's message template
+ * `@r` - renderings; if any tokens in the message template include .NET-specific formatting, an array of rendered values for each such token
+
+The built-in properties mirror those available in the CLEF format.
 
 ### Literals
 
@@ -140,7 +146,8 @@ A typical set of operators is supported:
  * Existence `is null` and `is not null`
  * SQL-style `like` and `not like`, with `%` and `_` wildcards (double wildcards to escape them)
  * Array membership with `in` and `not in`
- * Indexers `a[b]` and accessors `a.b`
+ * Accessors `a.b`
+ * Indexers `a['b']` and `a[0]`
  * Wildcard indexing - `a[?]` any, and `a[*]` all
  * Conditional `if a then b else c` (all branches required)
  
@@ -172,12 +179,15 @@ calling a function will be undefined if:
 | `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
 | `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `Length(x)` | Returns the length of a string or array. |
+| `Now()` | Returns `DateTimeOffset.Now`. |
 | `Round(n, m)` | Round the number `n` to `m` decimal places. |
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
+| `ToString(x, f)` | Applies the format string `f` to the formattable value `x`. |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 | `Undefined()` | Explicitly mark an undefined value. |
+| `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
 
 Functions that compare text accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 

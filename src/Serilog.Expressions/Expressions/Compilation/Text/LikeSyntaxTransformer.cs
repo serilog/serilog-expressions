@@ -54,7 +54,10 @@ namespace Serilog.Expressions.Compilation.Text
         
         static string LikeToRegex(string like)
         {
+            var begin = "^";
             var regex = "";
+            var end = "$";
+            
             for (var i = 0; i < like.Length; ++i)
             {
                 var ch = like[i];
@@ -68,7 +71,17 @@ namespace Serilog.Expressions.Compilation.Text
                     }
                     else
                     {
-                        regex += "(?:.|\\r|\\n)*"; // ~= RegexOptions.Singleline
+                        if (i == 0)
+                            begin = "";
+                        
+                        if (i == like.Length - 1)
+                            end = "";
+                        
+                        if (i == 0 && i == like.Length - 1)
+                            regex += ".*";
+                        
+                        if (i != 0 && i != like.Length - 1)
+                            regex += "(?:.|\\r|\\n)*"; // ~= RegexOptions.Singleline
                     }
                 }
                 else if (ch == '_')
@@ -87,7 +100,7 @@ namespace Serilog.Expressions.Compilation.Text
                     regex += Regex.Escape(ch.ToString());
             }
 
-            return regex;
+            return begin + regex + end;
         }
     }
 }

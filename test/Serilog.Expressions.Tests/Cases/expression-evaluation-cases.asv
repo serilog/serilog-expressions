@@ -217,7 +217,13 @@ if undefined() then 1 else 2         ⇶ 2
 if 'string' then 1 else 2            ⇶ 2
 if true then if false then 1 else 2 else 3 ⇶ 2
 
-// Typeof
+// ToString
+tostring(16, '000')                  ⇶ '016'
+tostring('test', '000')              ⇶ undefined()
+tostring(16, undefined())            ⇶ undefined()
+tostring(16, null)                   ⇶ undefined()
+
+// TypeOf
 typeof(undefined())                  ⇶ 'undefined'
 typeof('test')                       ⇶ 'System.String'
 typeof(10)                           ⇶ 'System.Decimal'
@@ -225,6 +231,9 @@ typeof(true)                         ⇶ 'System.Boolean'
 typeof(null)                         ⇶ 'null'
 typeof([])                           ⇶ 'array'
 typeof({})                           ⇶ 'object'
+
+// UtcDateTime
+tostring(utcdatetime(now()), 'o') like '20%' ⇶ true
 
 // Case comparison
 'test' = 'TEST'                      ⇶ false
@@ -258,3 +267,7 @@ undefined() = undefined() ci         ⇶ undefined()
 'test' like '%s_'                    ⇶ true
 'test' like '%'                      ⇶ true
 'test' like 't%s%'                   ⇶ true
+'test' like 'es'                     ⇶ false
+'test' like '%'                      ⇶ true
+'test' like ''                       ⇶ false
+'' like ''                           ⇶ true

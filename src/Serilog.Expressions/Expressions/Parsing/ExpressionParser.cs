@@ -8,9 +8,9 @@ namespace Serilog.Expressions.Parsing
     {
         static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
         
-        public static Expression Parse(string filterExpression)
+        public static Expression Parse(string expression)
         {
-            if (!TryParse(filterExpression, out var root, out var error))
+            if (!TryParse(expression, out var root, out var error))
                 throw new ArgumentException(error);
 
             return root;

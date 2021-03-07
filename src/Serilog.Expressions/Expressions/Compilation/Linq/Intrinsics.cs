@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Formatting.Display;
+using Serilog.Parsing;
 
 // ReSharper disable ParameterTypeCanBeEnumerable.Global
 
@@ -15,6 +16,8 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         static readonly LogEventPropertyValue Tombstone = new ScalarValue("😬 (if you see this you have found a bug.)");
+        
+        // TODO #19: formatting is culture-specific.
         static readonly MessageTemplateTextFormatter MessageFormatter = new MessageTemplateTextFormatter("{Message:lj}");
 
         public static List<LogEventPropertyValue?> CollectSequenceElements(LogEventPropertyValue?[] elements)
@@ -158,6 +161,26 @@ namespace Serilog.Expressions.Compilation.Linq
             var sw = new StringWriter();
             MessageFormatter.Format(logEvent, sw);
             return sw.ToString();
+        }
+
+        public static LogEventPropertyValue? GetRenderings(LogEvent logEvent)
+        {
+            List<LogEventPropertyValue>? elements = null;
+            foreach (var token in logEvent.MessageTemplate.Tokens)
+            {
+                if (token is PropertyToken pt && pt.Format != null)
+                {
+                    elements ??= new List<LogEventPropertyValue>();
+                    
+                    var space = new StringWriter();
+                  
+                    // TODO #19: formatting is culture-specific.
+                    pt.Render(logEvent.Properties, space);
+                    elements.Add(new ScalarValue(space.ToString()));
+                }
+            }
+
+            return elements == null ? null : new SequenceValue(elements);
         }
     }
 }
