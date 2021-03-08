@@ -80,7 +80,9 @@ namespace Serilog.Expressions
             OpIsMatch,
             OpIsDefined,
             RuntimeOpIsNull,
-            RuntimeOpIsNotNull
+            RuntimeOpIsNotNull,
+            RuntimeOpAny,
+            RuntimeOpAll
         };
 
         public static bool SameOperator(string op1, string op2)
