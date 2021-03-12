@@ -13,14 +13,14 @@ namespace Serilog.Templates.Parsing
 {
     static class TemplateParser
     {
-        static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
-        
         public static bool TryParse(
             string template,
             [MaybeNullWhen(false)] out Template parsed, 
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
+
+            var tokenizer = new ExpressionTokenizer();
 
             parsed = null;
             var elements = new List<Template>();
@@ -47,7 +47,7 @@ namespace Serilog.Templates.Parsing
                     else
                     {
                         // No line/column tracking
-                        var tokens = Tokenizer.GreedyTokenize(new TextSpan(template, new Position(i, 0, 0), template.Length - i));
+                        var tokens = tokenizer.GreedyTokenize(new TextSpan(template, new Position(i, 0, 0), template.Length - i));
                         var expr = ExpressionTokenParsers.TryPartialParse(tokens);
                         if (!expr.HasValue)
                         {
