@@ -6,15 +6,15 @@ namespace Serilog.Expressions.Tests
     public class TemplateParserTests
     {
         [Theory]
-        [InlineData("Trailing {", "Character `{` must be escaped by doubling in literal text.")]
-        [InlineData("Lonely } bracket", "Character `}` must be escaped by doubling in literal text.")]
-        [InlineData("Trailing }", "Character `}` must be escaped by doubling in literal text.")]
-        [InlineData("Unclosed {hole", "Un-closed hole, `}` expected.")]
-        [InlineData("Syntax {+Err}or", "Invalid expression, unexpected operator `+`, expected expression.")]
-        [InlineData("Syntax {1 + 2 and}or", "Invalid expression, unexpected `}`, expected expression.")]
-        [InlineData("Missing {Align,-} digits", "Incomplete alignment specifier, expected digits.")]
-        [InlineData("Non-digit {Align,x} specifier", "Invalid alignment specifier, expected digits.")]
-        [InlineData("Empty {Align,} digits", "Incomplete alignment specifier, expected width.")]
+        [InlineData("Trailing {", "Syntax error: unexpected end of input, expected expression.")]
+        [InlineData("Lonely } bracket", "Syntax error (line 1, column 9): unexpected space, expected escaped `}`.")]
+        [InlineData("Trailing }", "Syntax error: unexpected end of input, expected escaped `}`.")]
+        [InlineData("Unclosed {hole", "Syntax error: unexpected end of input, expected `}`.")]
+        [InlineData("Syntax {+Err}or", "Syntax error (line 1, column 9): unexpected operator `+`, expected expression.")]
+        [InlineData("Syntax {1 + 2 and}or", "Syntax error (line 1, column 18): unexpected `}`, expected expression.")]
+        [InlineData("Missing {Align,-} digits", "Syntax error (line 1, column 17): unexpected `}`, expected number.")]
+        [InlineData("Non-digit {Align,x} specifier", "Syntax error (line 1, column 18): unexpected identifier `x`, expected alignment and width.")]
+        [InlineData("Empty {Align,} digits", "Syntax error (line 1, column 14): unexpected `}`, expected alignment and width.")]
         public void ErrorsAreReported(string input, string error)
         {
             Assert.False(ExpressionTemplate.TryParse(input, null, null, out _, out var actual));

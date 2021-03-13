@@ -129,16 +129,18 @@ namespace Serilog.Expressions.Parsing
         [Token(Category = "keyword", Example = "ci")]
         CI,
         
-        // Template syntax
+        // Template syntax only
         
         [Token(Description = "text")]
         Text,
         
-        
         [Token(Example = "{{")]
-        LBraceEscape,
+        DoubleLBrace,
 
         [Token(Example = "}}")]
-        RBraceEscape,
+        DoubleRBrace,
+        
+        [Token(Description = "format specifier")]
+        Format,
     }
 }

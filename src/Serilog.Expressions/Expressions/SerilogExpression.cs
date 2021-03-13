@@ -91,7 +91,8 @@ namespace Serilog.Expressions
             [MaybeNullWhen(false)] out CompiledExpression result,
             [MaybeNullWhen(true)] out string error)
         {
-            if (!ExpressionParser.TryParse(expression, out var root, out error))
+            var expressionParser = new ExpressionParser();
+            if (!expressionParser.TryParse(expression, out var root, out error))
             {
                 result = null;
                 return false;

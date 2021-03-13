@@ -215,7 +215,7 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Disjunction = Parse.Chain(Or, Conjunction, MakeBinary);
 
-        static readonly TokenListParser<ExpressionToken, Expression> Expr = Disjunction;
+        public static readonly TokenListParser<ExpressionToken, Expression> Expr = Disjunction;
 
         static Expression MakeBinary(string operatorName, Expression leftOperand, Expression rightOperand)
         {

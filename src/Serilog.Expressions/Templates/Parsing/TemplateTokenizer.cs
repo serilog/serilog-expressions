@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Serilog.Expressions.Parsing;
 using Superpower;
 using Superpower.Model;
@@ -33,7 +32,7 @@ namespace Serilog.Templates.Parsing
                     var peek = next.Remainder.ConsumeChar();
                     if (peek.HasValue && peek.Value == '{')
                     {
-                        yield return Result.Value(ExpressionToken.LBraceEscape, next.Location, peek.Remainder);
+                        yield return Result.Value(ExpressionToken.DoubleLBrace, next.Location, peek.Remainder);
                         start = rem = peek.Remainder;
                     }
                     else
@@ -56,7 +55,7 @@ namespace Serilog.Templates.Parsing
                     var peek = next.Remainder.ConsumeChar();
                     if (peek.HasValue && peek.Value == '}')
                     {
-                        yield return Result.Value(ExpressionToken.RBraceEscape, next.Location, peek.Remainder);
+                        yield return Result.Value(ExpressionToken.DoubleRBrace, next.Location, peek.Remainder);
                         start = rem = peek.Remainder;
                     }
                     else
@@ -76,7 +75,7 @@ namespace Serilog.Templates.Parsing
         {
             // Stack braces, brackets, and parens.
             // If we hit , or :, the stack is empty, and everything we've seen is balanced, we switch into
-            // aligmment/width tokenization.
+            // alignment/width tokenization.
             // If we hit } and the stack is empty, and everything we've seen is balanced, we yield the final
             // '}' and return to literal text mode.
 
@@ -91,7 +90,7 @@ namespace Serilog.Templates.Parsing
                 yield return token;
 
                 if (!token.HasValue)
-                    break;
+                    yield break;
 
                 if (token.Value == ExpressionToken.LParen ||
                     token.Value == ExpressionToken.LBrace ||
@@ -125,12 +124,31 @@ namespace Serilog.Templates.Parsing
                 }
                 else if (token.Value == ExpressionToken.RBrace)
                 {
-                    break;
+                    yield break;
                 }
-                else if (token.Value == ExpressionToken.Comma ||
-                         token.Value == ExpressionToken.Colon)
+                // The default tokenization of `,` alignment (comma, [minus], number) is fine, only
+                // formats require special handling.
+                else if (token.Value == ExpressionToken.Colon)
                 {
-                    throw new NotImplementedException("Tokenize alignment/format.");
+                    var formatStart = token.Remainder;
+                    var next = formatStart.ConsumeChar();
+                    while (next.HasValue)
+                    {
+                        if (next.Value == '}')
+                        {
+                            yield return Result.Value(ExpressionToken.Format, formatStart, next.Location);
+                            yield return Result.Value(ExpressionToken.RBrace, next.Location, next.Remainder);
+                            yield break;
+                        }
+                        next = next.Remainder.ConsumeChar();
+                    }
+
+                    if (formatStart != next.Location)
+                    {
+                        yield return Result.Value(ExpressionToken.Format, formatStart, next.Location);
+                    }
+                    
+                    yield break;
                 }
             }
         }

@@ -34,12 +34,17 @@ namespace Serilog.Expressions.Tests
                     new object[]
                     {
                         "aa{{bb}}",
-                        new[] {Text, LBraceEscape, Text, RBraceEscape}
+                        new[] {Text, DoubleLBrace, Text, DoubleRBrace}
                     },
                     new object[]
                     {
                         "{ {b: b} }c",
                         new[] {LBrace, LBrace, Identifier, Colon, Identifier, RBrace, RBrace, Text}
+                    },
+                    new object[]
+                    {
+                        "{bb,-10:cc}",
+                        new[] {LBrace, Identifier, Comma, Minus, Number, Colon, Format, RBrace}
                     },
                 };
             }

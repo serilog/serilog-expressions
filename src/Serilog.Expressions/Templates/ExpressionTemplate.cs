@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Serilog.Events;
@@ -54,8 +53,9 @@ namespace Serilog.Templates
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            
-            if (!TemplateParser.TryParse(template, out var parsed, out error))
+
+            var templateParser = new TemplateParser();
+            if (!templateParser.TryParse(template, out var parsed, out error))
             {
                 result = null;
                 return false;
@@ -86,7 +86,8 @@ namespace Serilog.Templates
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
-            if (!TemplateParser.TryParse(template, out var parsed, out var error))
+            var templateParser = new TemplateParser();
+            if (!templateParser.TryParse(template, out var parsed, out var error))
                 throw new ArgumentException(error);
             
             _compiled = TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver));

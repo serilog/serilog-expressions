@@ -42,7 +42,8 @@ namespace Serilog.Expressions.Tests
         [InlineData("A.B is null", "_Internal_IsNull(A.B)")]
         public void ValidSyntaxIsAccepted(string input, string? expected = null)
         {
-            var roundTrip = ExpressionParser.Parse(input).ToString();
+            var expressionParser = new ExpressionParser();
+            var roundTrip = expressionParser.Parse(input).ToString();
             Assert.Equal(expected ?? input, roundTrip);
         }
 
@@ -59,7 +60,8 @@ namespace Serilog.Expressions.Tests
         [InlineData("A = 0x99999999999999999999999999999999999999999999")]
         public void InvalidSyntaxIsRejected(string input)
         {
-            Assert.Throws<ArgumentException>(() => ExpressionParser.Parse(input));
+            var expressionParser = new ExpressionParser();
+            Assert.Throws<ArgumentException>(() => expressionParser.Parse(input));
         }
 
         [Theory]
@@ -69,7 +71,8 @@ namespace Serilog.Expressions.Tests
         [InlineData("A > 1234f", "Syntax error (line 1, column 9): unexpected `f`, expected digit.")]
         public void PreciseErrorsAreReported(string input, string expectedMessage)
         {
-            var ex = Assert.Throws<ArgumentException>(() => ExpressionParser.Parse(input));
+            var expressionParser = new ExpressionParser();
+            var ex = Assert.Throws<ArgumentException>(() => expressionParser.Parse(input));
             Assert.Equal(expectedMessage, ex.Message);
         }
     }
