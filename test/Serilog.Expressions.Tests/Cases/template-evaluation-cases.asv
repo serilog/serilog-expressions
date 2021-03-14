@@ -13,5 +13,11 @@ Aligned {42,4}!                          ⇶ Aligned   42!
 Left {42,-4}!                            ⇶ Left 42  !
 Under width {42,0}!                      ⇶ Under width 42!
 {@m}                                     ⇶ Hello, nblumhardt!
-Hello, {#if 1 = 1}world{#end}!           ⇶ Hello, world!
-Hello, {#if true}world{#else}there{#end}! ⇶ Hello, world!
+Hello, {#if true}world{#end}!            ⇶ Hello, world!
+Hello, {#if true}w{42}d{#end}!           ⇶ Hello, w42d!
+Hello, {#if 1 = 1}world{#else}there{#end}!           ⇶ Hello, world!
+Hello, {#if 1 = 2}world{#else}there{#end}!           ⇶ Hello, there!
+Hello, {#if undefined()}world{#else}there{#end}!     ⇶ Hello, there!
+A{#if false}B{#else if false}C{#else if true}D{#else}E{#end} ⇶ AD
+A{#if false}B{#else if true}C{#end}                  ⇶ AC
+{#if true}A{#if false}B{#else}C{#end}D{#end}         ⇶ ACD

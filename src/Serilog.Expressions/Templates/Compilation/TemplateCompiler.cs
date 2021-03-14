@@ -20,7 +20,7 @@ namespace Serilog.Templates.Compilation
                 Conditional conditional => new CompiledConditional(
                     ExpressionCompiler.Compile(conditional.Condition, nameResolver),
                     Compile(conditional.Consequent, nameResolver),
-                    conditional.Alternative == null ? null : Compile(conditional.Consequent, nameResolver)),
+                    conditional.Alternative == null ? null : Compile(conditional.Alternative, nameResolver)),
                 _ => throw new NotSupportedException()
             };
         }
