@@ -23,6 +23,7 @@ namespace Serilog.Expressions.Parsing
             new ExpressionKeyword("if", ExpressionToken.If),
             new ExpressionKeyword("then", ExpressionToken.Then),
             new ExpressionKeyword("else", ExpressionToken.Else),
+            new ExpressionKeyword("end", ExpressionToken.End),
             new ExpressionKeyword("ci", ExpressionToken.CI)
         };
 

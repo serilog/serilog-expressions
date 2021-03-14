@@ -17,6 +17,10 @@ namespace Serilog.Templates.Compilation
                 FormattedExpression expression => new CompiledFormattedExpression(
                     ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment),
                 TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, nameResolver)).ToArray()),
+                Conditional conditional => new CompiledConditional(
+                    ExpressionCompiler.Compile(conditional.Condition, nameResolver),
+                    Compile(conditional.Consequent, nameResolver),
+                    conditional.Alternative == null ? null : Compile(conditional.Consequent, nameResolver)),
                 _ => throw new NotSupportedException()
             };
         }

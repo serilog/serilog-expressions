@@ -37,8 +37,16 @@ namespace Serilog.Templates.Parsing
                     }
                     else
                     {
-                        yield return Result.Value(ExpressionToken.LBrace, next.Location, next.Remainder);
-                        start = rem = next.Remainder;
+                        if (peek.HasValue && peek.Value == '#')
+                        {
+                            yield return Result.Value(ExpressionToken.LBraceHash, next.Location, peek.Remainder);
+                            start = rem = peek.Remainder;
+                        }
+                        else
+                        {
+                            yield return Result.Value(ExpressionToken.LBrace, next.Location, next.Remainder);
+                            start = rem = next.Remainder;
+                        }
 
                         foreach (var token in TokenizeHole(rem))
                         {
