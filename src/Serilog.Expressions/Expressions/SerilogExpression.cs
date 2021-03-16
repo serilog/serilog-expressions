@@ -98,7 +98,8 @@ namespace Serilog.Expressions
                 return false;
             }
 
-            result = ExpressionCompiler.Compile(root, DefaultFunctionNameResolver.Build(nameResolver));
+            var evaluate = ExpressionCompiler.Compile(root, DefaultFunctionNameResolver.Build(nameResolver));
+            result = evt => evaluate(new EvaluationContext(evt));
             error = null;
             return true;
         }

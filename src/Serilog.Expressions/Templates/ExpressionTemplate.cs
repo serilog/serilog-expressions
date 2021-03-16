@@ -97,7 +97,7 @@ namespace Serilog.Templates
         /// <inheritdoc />
         public void Format(LogEvent logEvent, TextWriter output)
         {
-            _compiled.Evaluate(logEvent, output, _formatProvider);
+            _compiled.Evaluate(new EvaluationContext(logEvent), output, _formatProvider);
         }
     }
 }

@@ -18,7 +18,7 @@ using Serilog.Expressions.Runtime;
 namespace Serilog.Expressions
 {
     /// <summary>
-    /// Helper functions for working with the results of <see cref="CompiledExpression"/>s.
+    /// Helper functions for working with the results of <see cref="Evaluatable"/>s.
     /// </summary>
     public static class ExpressionResult
     {
