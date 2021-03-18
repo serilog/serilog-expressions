@@ -156,8 +156,16 @@ namespace Serilog.Expressions.Compilation.Linq
                 };
             }
 
+            // Don't close over the AST node.
             var propertyName = px.PropertyName;
             return Splice(context => Intrinsics.GetPropertyValue(context, propertyName));
+        }
+
+        protected override ExpressionBody Transform(NamedLocalExpression nlx)
+        {
+            // Don't close over the AST node.
+            var name = nlx.Name;
+            return Splice(context => Intrinsics.GetLocalValue(context, name));
         }
 
         protected override ExpressionBody Transform(Ast.LambdaExpression lmx)

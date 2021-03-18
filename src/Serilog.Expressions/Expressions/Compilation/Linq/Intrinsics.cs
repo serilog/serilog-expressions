@@ -134,8 +134,15 @@ namespace Serilog.Expressions.Compilation.Linq
 
         public static LogEventPropertyValue? GetPropertyValue(EvaluationContext ctx, string propertyName)
         {
-            if (!Locals.TryGetValue(ctx.Locals, propertyName, out var value) &&
-                !ctx.LogEvent.Properties.TryGetValue(propertyName, out value))
+            if (!ctx.LogEvent.Properties.TryGetValue(propertyName, out var value))
+                return null;
+
+            return value;
+        }
+
+        public static LogEventPropertyValue? GetLocalValue(EvaluationContext ctx, string localName)
+        {
+            if (!Locals.TryGetValue(ctx.Locals, localName, out var value))
                 return null;
 
             return value;

@@ -31,6 +31,11 @@ namespace Serilog.Expressions.Compilation.Wildcards
             return null;
         }
 
+        protected override IndexerExpression? Transform(NamedLocalExpression nlx)
+        {
+            return null;
+        }
+
         protected override IndexerExpression? Transform(AccessorExpression spx)
         {
             return Transform(spx.Receiver);

@@ -38,6 +38,11 @@ namespace Serilog.Expressions.Compilation.Transformations
             return px;
         }
 
+        protected override Expression Transform(NamedLocalExpression nlx)
+        {
+            return nlx;
+        }
+
         protected override Expression Transform(AccessorExpression spx)
         {
             if (!TryTransform(spx.Receiver, out var recv))

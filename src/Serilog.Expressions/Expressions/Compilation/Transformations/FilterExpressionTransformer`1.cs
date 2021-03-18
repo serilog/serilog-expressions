@@ -29,6 +29,7 @@ namespace Serilog.Expressions.Compilation.Transformations
         protected abstract TResult Transform(CallExpression lx);
         protected abstract TResult Transform(ConstantExpression cx);
         protected abstract TResult Transform(AmbientPropertyExpression px);
+        protected abstract TResult Transform(NamedLocalExpression nlx);
         protected abstract TResult Transform(AccessorExpression spx);
         protected abstract TResult Transform(LambdaExpression lmx);
         protected abstract TResult Transform(ParameterExpression prx);
