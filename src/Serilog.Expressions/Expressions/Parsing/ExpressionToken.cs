@@ -5,9 +5,6 @@ namespace Serilog.Expressions.Parsing
     enum ExpressionToken
     {
         None,
-        
-        [Token(Description = "literal text")]
-        TemplateLiteral,
 
         Identifier,
 
@@ -148,5 +145,11 @@ namespace Serilog.Expressions.Parsing
         
         [Token(Category = "keyword", Example = "end")]
         End,
+        
+        [Token(Category = "keyword", Example = "each")]
+        Each,
+
+        [Token(Category = "keyword", Example = "delimit")]
+        Delimit,
     }
 }

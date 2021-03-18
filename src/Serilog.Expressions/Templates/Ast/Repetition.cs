@@ -6,25 +6,22 @@ namespace Serilog.Templates.Ast
     class Repetition: Template
     {
         public Expression Enumerable { get; }
-        public string? KeyOrElementName { get; }
-        public string? ValueName { get; }
+        public string[] BindingNames { get; }
         public Template Body { get; }
-        public Template? Separator { get; }
+        public Template? Delimiter { get; }
         public Template? Alternative { get; }
 
         public Repetition(
             Expression enumerable,
-            string? keyOrElementName,
-            string? valueName,
+            string[] bindingNames,
             Template body,
-            Template? separator,
+            Template? delimiter,
             Template? alternative)
         {
             Enumerable = enumerable ?? throw new ArgumentNullException(nameof(enumerable));
-            KeyOrElementName = keyOrElementName;
-            ValueName = valueName;
+            BindingNames = bindingNames;
             Body = body ?? throw new ArgumentNullException(nameof(body));
-            Separator = separator;
+            Delimiter = delimiter;
             Alternative = alternative;
         }
     }

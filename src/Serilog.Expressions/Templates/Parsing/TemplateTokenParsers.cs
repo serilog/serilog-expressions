@@ -49,13 +49,13 @@ namespace Serilog.Templates.Parsing
                     return open
                         .IgnoreThen(ExpressionTokenParsers.Expr.Cast<ExpressionToken, Expression, Expression?>())
                         .Then(v => Token.EqualTo(RBrace).Value(v));
-                
-                return open.IgnoreThen(Token.EqualTo(RBrace)).Value((Expression?)null);
+
+                return open.IgnoreThen(Token.EqualTo(RBrace)).Value((Expression?) null);
             }
 
             static Template? LeftReduceConditional((Expression?, Template)[] first, Template? last)
             {
-                for (var i = first.Length -1; i >= 0; i--)
+                for (var i = first.Length - 1; i >= 0; i--)
                 {
                     last = new Conditional(first[i].Item1!, first[i].Item2, last);
                 }
@@ -72,16 +72,47 @@ namespace Serilog.Templates.Parsing
                 from final in Directive(false, Else)
                     .IgnoreThen(Parse.Ref(() => block).Select(b => ((Expression?) null, b)))
                     .OptionalOrDefault()
-                from _ in Directive(false, End)
+                from end in Directive(false, End)
                 let firstAlt = LeftReduceConditional(alternatives, final.b)
-                select (Template)new Conditional(iff!, consequent, firstAlt);
-            
+                select (Template) new Conditional(iff!, consequent, firstAlt);
+
+            var eachDirective =
+                Token.EqualTo(LBraceHash)
+                    .IgnoreThen(Token.EqualTo(Each)).Try()
+                    .IgnoreThen(Token.EqualTo(ExpressionToken.Identifier)
+                        .Select(i => i.ToStringValue())
+                        .AtLeastOnceDelimitedBy(Token.EqualTo(Comma)))
+                    .Then(bindings => Token.EqualTo(In).Value(bindings))
+                    .Then(bindings => ExpressionTokenParsers.Expr.Cast<ExpressionToken, Expression, Expression?>()
+                        .Select(enumerable => new {enumerable, bindings}))
+                    .Then(v => Token.EqualTo(RBrace).Value(v));
+
+            var repetition =
+                from each in eachDirective
+                from body in Parse.Ref(() => block)
+                from delimiter in Directive(false, Delimit)
+                    .IgnoreThen(Parse.Ref(() => block))
+                    .Cast<ExpressionToken, Template, Template?>()
+                    .OptionalOrDefault()
+                from alternative in Directive(false, Else)
+                    .IgnoreThen(Parse.Ref(() => block))
+                    .Cast<ExpressionToken, Template, Template?>()
+                    .OptionalOrDefault()
+                from end in Directive(false, End)
+                select (Template) new Repetition(
+                    each.enumerable,
+                    each.bindings,
+                    body,
+                    delimiter,
+                    alternative);
+
             var element = Token.EqualTo(Text).Select(t => (Template)new LiteralText(t.ToStringValue()))
                 .Or(Token.EqualTo(DoubleLBrace)
                     .Value((Template) new LiteralText("{")))
                 .Or(Token.EqualTo(DoubleRBrace)
                     .Value((Template) new LiteralText("}")))
                 .Or(conditional)
+                .Or(repetition)
                 .Or(hole);
 
             block = element.Many().Select(elements => elements.Length == 1 ?

@@ -56,23 +56,19 @@ namespace Serilog.Templates.Compilation.NameResolution
 
         Template Transform(Repetition rep, Stack<string> locals)
         {
-            var orig = locals.Count;
-            if (rep.KeyOrElementName != null)
-                locals.Push(rep.KeyOrElementName);
-            if (rep.ValueName != null)
-                locals.Push(rep.ValueName);
+            foreach (var name in rep.BindingNames)
+                locals.Push(name);
 
             var body = Transform(rep.Body, locals);
 
-            while (locals.Count != orig)
+            foreach (var _ in rep.BindingNames)
                 locals.Pop();
             
             return new Repetition(
                 rep.Enumerable,
-                rep.KeyOrElementName,
-                rep.ValueName,
+                rep.BindingNames,
                 body,
-                rep.Separator != null ? Transform(rep.Separator, locals) : null,
+                rep.Delimiter != null ? Transform(rep.Delimiter, locals) : null,
                 rep.Alternative != null ? Transform(rep.Alternative, locals) : null);
         }
     }

@@ -12,7 +12,7 @@ namespace Serilog.Templates.Compilation
         readonly string? _keyOrElementName;
         readonly string? _valueName;
         readonly CompiledTemplate _body;
-        readonly CompiledTemplate? _separator;
+        readonly CompiledTemplate? _delimiter;
         readonly CompiledTemplate? _alternative;
 
         public CompiledRepetition(
@@ -20,14 +20,14 @@ namespace Serilog.Templates.Compilation
             string? keyOrElementName,
             string? valueName,
             CompiledTemplate body,
-            CompiledTemplate? separator,
+            CompiledTemplate? delimiter,
             CompiledTemplate? alternative)
         {
             _enumerable = enumerable;
             _keyOrElementName = keyOrElementName;
             _valueName = valueName;
             _body = body;
-            _separator = separator;
+            _delimiter = delimiter;
             _alternative = alternative;
         }
 
@@ -58,7 +58,7 @@ namespace Serilog.Templates.Compilation
                     if (first)
                     {
                         first = false;
-                        _separator?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output, formatProvider);
                     }
 
                     var local = _keyOrElementName != null
@@ -85,7 +85,7 @@ namespace Serilog.Templates.Compilation
                     if (first)
                     {
                         first = false;
-                        _separator?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output, formatProvider);
                     }
 
                     var local = _keyOrElementName != null
@@ -114,7 +114,7 @@ namespace Serilog.Templates.Compilation
                     if (first)
                     {
                         first = false;
-                        _separator?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output, formatProvider);
                     }
 
                     var local = _keyOrElementName != null
