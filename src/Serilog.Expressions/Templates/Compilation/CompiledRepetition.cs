@@ -56,10 +56,9 @@ namespace Serilog.Templates.Compilation
                         continue; // Should have been invalid but Serilog didn't check and so this does occur in the wild.
                     
                     if (first)
-                    {
                         first = false;
+                    else
                         _delimiter?.Evaluate(ctx, output, formatProvider);
-                    }
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element))
@@ -83,10 +82,9 @@ namespace Serilog.Templates.Compilation
                 foreach (var member in structure.Properties)
                 {
                     if (first)
-                    {
                         first = false;
+                    else
                         _delimiter?.Evaluate(ctx, output, formatProvider);
-                    }
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, new ScalarValue(member.Name)))
@@ -112,10 +110,9 @@ namespace Serilog.Templates.Compilation
                 foreach (var element in dict.Elements)
                 {
                     if (first)
-                    {
                         first = false;
+                    else
                         _delimiter?.Evaluate(ctx, output, formatProvider);
-                    }
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element.Key))

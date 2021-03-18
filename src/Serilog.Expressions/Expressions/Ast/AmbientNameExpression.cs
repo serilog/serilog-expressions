@@ -2,15 +2,15 @@
 
 namespace Serilog.Expressions.Ast
 {
-    class AmbientPropertyExpression : Expression
+    class AmbientNameExpression : Expression
     {
         readonly bool _requiresEscape;
 
-        public AmbientPropertyExpression(string propertyName, bool isBuiltIn)
+        public AmbientNameExpression(string Name, bool isBuiltIn)
         {
-            PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+            PropertyName = Name ?? throw new ArgumentNullException(nameof(Name));
             IsBuiltIn = isBuiltIn;
-            _requiresEscape = !SerilogExpression.IsValidIdentifier(propertyName);
+            _requiresEscape = !SerilogExpression.IsValidIdentifier(Name);
         }
 
         public string PropertyName { get; }

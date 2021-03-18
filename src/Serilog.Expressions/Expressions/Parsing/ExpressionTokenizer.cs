@@ -24,7 +24,9 @@ namespace Serilog.Expressions.Parsing
             new ExpressionKeyword("then", ExpressionToken.Then),
             new ExpressionKeyword("else", ExpressionToken.Else),
             new ExpressionKeyword("end", ExpressionToken.End),
-            new ExpressionKeyword("ci", ExpressionToken.CI)
+            new ExpressionKeyword("ci", ExpressionToken.CI),
+            new ExpressionKeyword("each", ExpressionToken.Each),
+            new ExpressionKeyword("delimit", ExpressionToken.Delimit),
         };
 
         public ExpressionTokenizer()

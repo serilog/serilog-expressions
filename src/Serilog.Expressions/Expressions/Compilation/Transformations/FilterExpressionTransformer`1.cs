@@ -12,7 +12,8 @@ namespace Serilog.Expressions.Compilation.Transformations
                 CallExpression call => Transform(call),
                 ConstantExpression constant => Transform(constant),
                 AccessorExpression accessor => Transform(accessor),
-                AmbientPropertyExpression property => Transform(property),
+                AmbientNameExpression property => Transform(property),
+                LocalNameExpression local => Transform(local),
                 LambdaExpression lambda => Transform(lambda),
                 ParameterExpression parameter => Transform(parameter),
                 IndexerWildcardExpression wildcard => Transform(wildcard),
@@ -28,8 +29,8 @@ namespace Serilog.Expressions.Compilation.Transformations
 
         protected abstract TResult Transform(CallExpression lx);
         protected abstract TResult Transform(ConstantExpression cx);
-        protected abstract TResult Transform(AmbientPropertyExpression px);
-        protected abstract TResult Transform(NamedLocalExpression nlx);
+        protected abstract TResult Transform(AmbientNameExpression px);
+        protected abstract TResult Transform(LocalNameExpression nlx);
         protected abstract TResult Transform(AccessorExpression spx);
         protected abstract TResult Transform(LambdaExpression lmx);
         protected abstract TResult Transform(ParameterExpression prx);

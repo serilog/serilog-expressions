@@ -134,7 +134,7 @@ namespace Serilog.Expressions.Compilation.Linq
             return LX.Constant(cx.Constant);
         }
 
-        protected override ExpressionBody Transform(AmbientPropertyExpression px)
+        protected override ExpressionBody Transform(AmbientNameExpression px)
         {
             if (px.IsBuiltIn)
             {
@@ -161,7 +161,7 @@ namespace Serilog.Expressions.Compilation.Linq
             return Splice(context => Intrinsics.GetPropertyValue(context, propertyName));
         }
 
-        protected override ExpressionBody Transform(NamedLocalExpression nlx)
+        protected override ExpressionBody Transform(LocalNameExpression nlx)
         {
             // Don't close over the AST node.
             var name = nlx.Name;

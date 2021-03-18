@@ -6,6 +6,7 @@ using Serilog.Expressions;
 using Serilog.Expressions.Compilation;
 using Serilog.Formatting;
 using Serilog.Templates.Compilation;
+using Serilog.Templates.Compilation.NameResolution;
 using Serilog.Templates.Parsing;
 
 namespace Serilog.Templates
@@ -61,7 +62,9 @@ namespace Serilog.Templates
                 return false;
             }
 
-            result = new ExpressionTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
+            var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
+
+            result = new ExpressionTemplate(TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
             return true;
         }
         
@@ -90,7 +93,9 @@ namespace Serilog.Templates
             if (!templateParser.TryParse(template, out var parsed, out var error))
                 throw new ArgumentException(error);
             
-            _compiled = TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver));
+            var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
+            
+            _compiled = TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver));
             _formatProvider = formatProvider;
         }
 

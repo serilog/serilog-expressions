@@ -2,9 +2,9 @@
 
 namespace Serilog.Expressions.Ast
 {
-    class NamedLocalExpression : Expression
+    class LocalNameExpression : Expression
     {
-        public NamedLocalExpression(string name)
+        public LocalNameExpression(string name)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
