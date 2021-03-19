@@ -49,8 +49,8 @@ namespace Serilog.Templates.Compilation.NameResolution
         Template Transform(Conditional cond, Stack<string> locals)
         {
             return new Conditional(
-                cond.Condition,
-                cond.Consequent,
+                ExpressionLocalNameBinder.BindLocalValueNames(cond.Condition, locals),
+                Transform(cond.Consequent, locals),
                 cond.Alternative != null ? Transform(cond.Alternative, locals) : null);
         }
 
