@@ -3,7 +3,7 @@ using Serilog.Expressions.Runtime;
 using Serilog.Expressions.Tests.Support;
 using Xunit;
 
-namespace Serilog.Expressions.Tests
+namespace Serilog.Expressions.Tests.Expressions
 {
     public class NameResolverTests
     {

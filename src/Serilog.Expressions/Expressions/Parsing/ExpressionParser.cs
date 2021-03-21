@@ -4,11 +4,11 @@ using Serilog.Expressions.Ast;
 
 namespace Serilog.Expressions.Parsing
 {
-    static class ExpressionParser
+    class ExpressionParser
     {
-        static ExpressionTokenizer Tokenizer { get; } = new ExpressionTokenizer();
+        readonly ExpressionTokenizer _tokenizer = new ExpressionTokenizer();
         
-        public static Expression Parse(string expression)
+        public Expression Parse(string expression)
         {
             if (!TryParse(expression, out var root, out var error))
                 throw new ArgumentException(error);
@@ -16,12 +16,12 @@ namespace Serilog.Expressions.Parsing
             return root;
         }
 
-        public static bool TryParse(string filterExpression,
+        public bool TryParse(string filterExpression,
             [MaybeNullWhen(false)] out Expression root, [MaybeNullWhen(true)] out string error)
         {
             if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
 
-            var tokenList = Tokenizer.TryTokenize(filterExpression);       
+            var tokenList = _tokenizer.TryTokenize(filterExpression);       
             if (!tokenList.HasValue)
             {
                 error = tokenList.ToString();

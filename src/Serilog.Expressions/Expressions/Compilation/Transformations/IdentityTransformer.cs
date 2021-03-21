@@ -33,9 +33,14 @@ namespace Serilog.Expressions.Compilation.Transformations
             return cx;
         }
 
-        protected override Expression Transform(AmbientPropertyExpression px)
+        protected override Expression Transform(AmbientNameExpression px)
         {
             return px;
+        }
+
+        protected override Expression Transform(LocalNameExpression nlx)
+        {
+            return nlx;
         }
 
         protected override Expression Transform(AccessorExpression spx)

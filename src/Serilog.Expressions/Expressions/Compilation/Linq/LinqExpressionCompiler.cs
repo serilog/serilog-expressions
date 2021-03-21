@@ -68,22 +68,22 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly MethodInfo TryGetStructurePropertyValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public)!;
 
-        ParameterExpression Context { get; } = LX.Variable(typeof(LogEvent), "evt");
+        ParameterExpression Context { get; } = LX.Variable(typeof(EvaluationContext), "ctx");
 
         LinqExpressionCompiler(NameResolver nameResolver)
         {
             _nameResolver = nameResolver;
         }
         
-        public static CompiledExpression Compile(Expression expression, NameResolver nameResolver)
+        public static Evaluatable Compile(Expression expression, NameResolver nameResolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var compiler = new LinqExpressionCompiler(nameResolver);
             var body = compiler.Transform(expression); 
-            return LX.Lambda<CompiledExpression>(body, compiler.Context).Compile();
+            return LX.Lambda<Evaluatable>(body, compiler.Context).Compile();
         }
 
-        ExpressionBody Splice(Expression<CompiledExpression> lambda)
+        ExpressionBody Splice(Expression<Evaluatable> lambda)
         {
             return ParameterReplacementVisitor.ReplaceParameters(lambda, Context);
         }
@@ -134,30 +134,38 @@ namespace Serilog.Expressions.Compilation.Linq
             return LX.Constant(cx.Constant);
         }
 
-        protected override ExpressionBody Transform(AmbientPropertyExpression px)
+        protected override ExpressionBody Transform(AmbientNameExpression px)
         {
             if (px.IsBuiltIn)
             {
                 return px.PropertyName switch
                 {
-                    BuiltInProperty.Level => Splice(context => new ScalarValue(context.Level)),
-                    BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(context))),
+                    BuiltInProperty.Level => Splice(context => new ScalarValue(context.LogEvent.Level)),
+                    BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(context.LogEvent))),
                     BuiltInProperty.Exception => Splice(context =>
-                        context.Exception == null ? null : new ScalarValue(context.Exception)),
-                    BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.Timestamp)),
-                    BuiltInProperty.MessageTemplate => Splice(context => new ScalarValue(context.MessageTemplate.Text)),
+                        context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),
+                    BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.LogEvent.Timestamp)),
+                    BuiltInProperty.MessageTemplate => Splice(context => new ScalarValue(context.LogEvent.MessageTemplate.Text)),
                     BuiltInProperty.Properties => Splice(context =>
-                        new StructureValue(context.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
+                        new StructureValue(context.LogEvent.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
                             null)),
-                    BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context)),
+                    BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context.LogEvent)),
                     BuiltInProperty.EventId => Splice(context =>
-                        new ScalarValue(EventIdHash.Compute(context.MessageTemplate.Text))),
+                        new ScalarValue(EventIdHash.Compute(context.LogEvent.MessageTemplate.Text))),
                     _ => LX.Constant(null, typeof(LogEventPropertyValue))
                 };
             }
 
+            // Don't close over the AST node.
             var propertyName = px.PropertyName;
             return Splice(context => Intrinsics.GetPropertyValue(context, propertyName));
+        }
+
+        protected override ExpressionBody Transform(LocalNameExpression nlx)
+        {
+            // Don't close over the AST node.
+            var name = nlx.Name;
+            return Splice(context => Intrinsics.GetLocalValue(context, name));
         }
 
         protected override ExpressionBody Transform(Ast.LambdaExpression lmx)

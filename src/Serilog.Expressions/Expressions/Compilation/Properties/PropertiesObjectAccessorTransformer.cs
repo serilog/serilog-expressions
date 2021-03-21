@@ -15,7 +15,7 @@ namespace Serilog.Expressions.Compilation.Properties
             if (!Pattern.IsAmbientProperty(ax.Receiver, BuiltInProperty.Properties, true))
                 return base.Transform(ax);
             
-            return new AmbientPropertyExpression(ax.MemberName, false);
+            return new AmbientNameExpression(ax.MemberName, false);
         }
 
         protected override Expression Transform(IndexerExpression ix)
@@ -24,7 +24,7 @@ namespace Serilog.Expressions.Compilation.Properties
                 !Pattern.IsStringConstant(ix.Index, out var name))
                 return base.Transform(ix);
             
-            return new AmbientPropertyExpression(name, false);
+            return new AmbientNameExpression(name, false);
         }
     }
 }

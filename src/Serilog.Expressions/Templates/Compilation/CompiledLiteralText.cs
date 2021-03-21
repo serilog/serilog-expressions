@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Serilog.Events;
+using Serilog.Expressions;
 
 namespace Serilog.Templates.Compilation
 {
@@ -13,7 +14,7 @@ namespace Serilog.Templates.Compilation
             _text = text ?? throw new ArgumentNullException(nameof(text));
         }
 
-        public override void Evaluate(LogEvent logEvent, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
         {
             output.Write(_text);
         }

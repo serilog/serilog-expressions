@@ -12,34 +12,34 @@ namespace Serilog.Templates.Compilation
     {
         static readonly JsonValueFormatter JsonFormatter = new JsonValueFormatter("$type");
         
-        readonly CompiledExpression _expression;
+        readonly Evaluatable _expression;
         readonly string? _format;
         readonly Alignment? _alignment;
 
-        public CompiledFormattedExpression(CompiledExpression expression, string? format, Alignment? alignment)
+        public CompiledFormattedExpression(Evaluatable expression, string? format, Alignment? alignment)
         {
             _expression = expression ?? throw new ArgumentNullException(nameof(expression));
             _format = format;
             _alignment = alignment;
         }
 
-        public override void Evaluate(LogEvent logEvent, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
         {
             if (_alignment == null)
             {
-                EvaluateUnaligned(logEvent, output, formatProvider);
+                EvaluateUnaligned(ctx, output, formatProvider);
             }
             else
             {
                 var writer = new StringWriter();
-                EvaluateUnaligned(logEvent, writer, formatProvider);
+                EvaluateUnaligned(ctx, writer, formatProvider);
                 Padding.Apply(output, writer.ToString(), _alignment.Value);
             }
         }
         
-        void EvaluateUnaligned(LogEvent logEvent, TextWriter output, IFormatProvider? formatProvider)
+        void EvaluateUnaligned(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
         {
-            var value = _expression(logEvent);
+            var value = _expression(ctx);
             if (value == null)
                 return; // Undefined is empty
             
