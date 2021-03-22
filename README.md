@@ -187,7 +187,7 @@ calling a function will be undefined if:
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
-| `ToString(x, f)` | Applies the format string `f` to the formattable value `x`. |
+| `ToString(x, [format])` | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`. |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 | `Undefined()` | Explicitly mark an undefined value. |
 | `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
