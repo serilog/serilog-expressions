@@ -4,6 +4,7 @@ using Serilog.Expressions.Compilation.Transformations;
 
 namespace Serilog.Expressions.Compilation.Variadics
 {
+    // Now a bit of a misnomer - handles variadic `coalesce()`, as well as optional arguments for other functions.
     class VariadicCallRewriter : IdentityTransformer
     {
         static readonly VariadicCallRewriter Instance = new VariadicCallRewriter();
@@ -19,7 +20,7 @@ namespace Serilog.Expressions.Compilation.Variadics
             {
                 var operands = lx.Operands
                     .Select(Transform)
-                    .Concat(new[] {new CallExpression(false, Operators.OpUndefined)})
+                    .Concat(new[] {CallUndefined()})
                     .ToArray();
                 return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands);
             }
@@ -27,18 +28,29 @@ namespace Serilog.Expressions.Compilation.Variadics
             if (Operators.SameOperator(lx.OperatorName, Operators.OpCoalesce))
             {
                 if (lx.Operands.Length == 0)
-                    return new CallExpression(false, Operators.OpUndefined);
+                    return CallUndefined();
                 if (lx.Operands.Length == 1)
                     return Transform(lx.Operands.Single());
                 if (lx.Operands.Length > 2)
                 {
                     var first = Transform(lx.Operands.First());
-                    return new CallExpression(false, lx.OperatorName, first,
-                        Transform(new CallExpression(false, lx.OperatorName, lx.Operands.Skip(1).ToArray())));
+                    return new CallExpression(lx.IgnoreCase, lx.OperatorName, first,
+                        Transform(new CallExpression(lx.IgnoreCase, lx.OperatorName, lx.Operands.Skip(1).ToArray())));
                 }
             }
 
+            if (Operators.SameOperator(lx.OperatorName, Operators.OpToString) &&
+                lx.Operands.Length == 1)
+            {
+                return new CallExpression(lx.IgnoreCase, lx.OperatorName, lx.Operands[0], CallUndefined());
+            }
+
             return base.Transform(lx);
+        }
+
+        static CallExpression CallUndefined()
+        {
+            return new CallExpression(false, Operators.OpUndefined);
         }
     }
 }

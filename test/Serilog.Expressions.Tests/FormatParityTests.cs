@@ -53,7 +53,7 @@ namespace Serilog.Expressions.Tests
         // ReSharper disable once UnusedMember.Global
         public static LogEventPropertyValue? ClassicRender(LogEventPropertyValue? messageTemplate, LogEventPropertyValue? properties)
         {
-            if (!(messageTemplate is ScalarValue svt && svt.Value is string smt) ||
+            if (!(messageTemplate is ScalarValue {Value: string smt}) ||
                 !(properties is StructureValue stp))
             {
                 return null;
@@ -69,7 +69,7 @@ namespace Serilog.Expressions.Tests
         // ReSharper disable once UnusedMember.Global
         public static LogEventPropertyValue? ClassicRenderings(LogEventPropertyValue? messageTemplate, LogEventPropertyValue? properties)
         {
-            if (!(messageTemplate is ScalarValue svt && svt.Value is string smt) ||
+            if (!(messageTemplate is ScalarValue {Value: string smt}) ||
                 !(properties is StructureValue stp))
             {
                 return null;
