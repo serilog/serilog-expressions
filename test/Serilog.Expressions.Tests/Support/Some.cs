@@ -30,5 +30,15 @@ namespace Serilog.Expressions.Tests.Support
             }
             return new LogEvent(DateTimeOffset.Now, level, null, template, properties);
         }
+
+        public static object AnonymousObject()
+        {
+            return new {A = 42};
+        }
+
+        public static LogEventPropertyValue LogEventPropertyValue()
+        {
+            return new ScalarValue(AnonymousObject());
+        }
     }
 }

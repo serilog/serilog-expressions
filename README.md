@@ -1,4 +1,4 @@
-# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/w7igkk3w51h481r6/branch/dev?svg=true)](https://ci.appveyor.com/project/serilog/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
+# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/vmcskdk2wjn1rpps/branch/dev?svg=true)](https://ci.appveyor.com/project/serilog/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog 
 events, ideal for use with JSON or XML configuration.
@@ -79,7 +79,7 @@ _Serilog.Expressions_ adds a number of expression-based overloads and helper met
  * `Enrich.When()` - conditionally enable an enricher when events match an expression
  * `Enrich.WithComputed()` - add or modify event properties using an expression
 
-## Formatting
+## Formatting with `ExpressionTemplate`
 
 _Serilog.Expressions_ includes the `ExpressionTemplate` class for text formatting. `ExpressionTemplate` implements `ITextFormatter`, so
 it works with any text-based Serilog sink:
@@ -89,11 +89,14 @@ it works with any text-based Serilog sink:
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new ExpressionTemplate(
-        "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Items[0]})\n{@x}"))
+        "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Cart[0]})\n{@x}"))
     .CreateLogger();
+    
+// Produces log events like:
+// [21:21:40 INF (Sample.Program)] Cart contains ["Tea","Coffee"] (first item is Tea)
 ```
 
-Note the use of `{Items[0]}`: "holes" in expression templates can include any valid expression.
+Note the use of `{Cart[0]}`: "holes" in expression templates can include any valid expression over properties from the event.
 
 Newline-delimited JSON (for example, replicating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
 using object literals:
@@ -109,7 +112,7 @@ using object literals:
 
 The following properties are available in expressions:
 
- * **All first-class properties of the event** &mdash; no special syntax: `SourceContext` and `Items` are used in the formatting example above
+ * **All first-class properties of the event** &mdash; no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
  * `@m` - the rendered message
  * `@mt` - the raw message template
@@ -149,7 +152,7 @@ A typical set of operators is supported:
  * Accessors `a.b`
  * Indexers `a['b']` and `a[0]`
  * Wildcard indexing - `a[?]` any, and `a[*]` all
- * Conditional `if a then b else c` (all branches required)
+ * Conditional `if a then b else c` (all branches required; see also the section below on _conditional blocks_)
  
 Comparision operators that act on text all accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 
@@ -184,7 +187,7 @@ calling a function will be undefined if:
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
 | `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
-| `ToString(x, f)` | Applies the format string `f` to the formattable value `x`. |
+| `ToString(x, [format])` | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`. |
 | `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
 | `Undefined()` | Explicitly mark an undefined value. |
 | `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
@@ -194,6 +197,64 @@ Functions that compare text accept an optional postfix `ci` modifier to select c
 ```
 StartsWith(User.Name, 'n') ci
 ```
+
+### Template directives
+
+#### Conditional blocks
+
+Within an `ExpressionTemplate`, a portion of the template can be conditionally evaluated using `#if`.
+
+```csharp
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console(new ExpressionTemplate(
+        "[{@t:HH:mm:ss} {@l:u3}{#if SourceContext is not null} ({SourceContext}){#end}] {@m}\n{@x}"))
+    .CreateLogger();
+    
+// Produces log events like:
+// [21:21:45 INF] Starting up
+// [21:21:46 INF (Sample.Program)] Firing engines   
+```
+
+The block between the `{#if <expr>}` and `{#end}` directives will only appear in the output if `<expr>` is `true` - in the example, events with a `SourceContext` include this in parentheses, while those without, don't.
+
+It's important to notice that the directive requires a Boolean `true` before the conditional block will be evaluated. It wouldn't be sufficient in this case to write `{#if SourceContext}`, since no values other than `true` are considered "truthy".
+
+The syntax supports `{#if <expr>}`, chained `{#else if <expr>}`, `{#else}`, and `{#end}`, with arbitrary nesting.
+
+#### Repetition
+
+If a log event includes structured data in arrays or objects, a template block can be repeated for each element or member using `#each`/`in` (newlines, double quotes and construction of the `ExpressionTemplate` omitted for clarity):
+
+```
+{@l:w4}: {SourceContext}
+      {#each s in Scope}=> {s}{#delimit} {#end}
+      {@m}
+{@x}
+```
+
+This example uses the optional `#delimit` to add a space between each element, producing output like:
+
+```
+info: Sample.Program
+      => Main => TextFormattingExample
+      Hello, world!
+```
+
+When using `{#each <name> in <expr>}` over an object, such as the built-in `@p` (properties) object, `<name>` will be bound to the _names_ of the properties of the object.
+
+To get to the _values_ of the properties, use a second binding:
+
+```
+{#each k, v in @p}{k} = {v}{#delimit},{#end}
+```
+
+This example, if an event has three properties, will produce output like:
+
+```
+Account = "nblumhardt", Cart = ["Tea", "Coffee"], Powerup = 42
+```
+
+The syntax supports `{#each <name>[, <name>] in <expr>}`, an optional `{#delimit}` block, and finally an optional `{#else}` block, which will be evaluated if the array or object is empty.
 
 ## Recipes
 

@@ -4,7 +4,7 @@ using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
 
-// ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global
+// ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global, InconsistentNaming, ReturnTypeCanBeNotNullable
 
 namespace Serilog.Expressions.Runtime
 {
@@ -470,14 +470,25 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue? ToString(LogEventPropertyValue? value, LogEventPropertyValue? format)
         {
-            if (!(value is ScalarValue sv && sv.Value is IFormattable formattable) ||
-                !Coerce.String(format, out var fmt))
+            if (!(value is ScalarValue sv) ||
+                sv.Value == null ||
+                !(Coerce.String(format, out var fmt) || format == null || format is ScalarValue { Value: null }))
             {
                 return null;
             }
 
-            // TODO #19: formatting is culture-specific.
-            return new ScalarValue(formattable.ToString(fmt, null));
+            string toString;
+            if (sv.Value is IFormattable formattable)
+            {
+                // TODO #19: formatting is culture-specific.
+                toString = formattable.ToString(fmt, null);
+            }
+            else
+            {
+                toString = sv.Value.ToString();
+            }
+
+            return new ScalarValue(toString);
         }
         
         public static LogEventPropertyValue? UtcDateTime(LogEventPropertyValue? dateTime)

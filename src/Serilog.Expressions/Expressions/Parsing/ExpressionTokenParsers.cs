@@ -98,8 +98,8 @@ namespace Serilog.Expressions.Parsing
             select (Member) new PropertyMember(
                 key.ToStringValue(),
                 value ?? (key.Kind == ExpressionToken.BuiltInIdentifier ?
-                    new AmbientPropertyExpression(key.ToStringValue().Substring(1), true) :
-                    new AmbientPropertyExpression(key.ToStringValue(), false)));
+                    new AmbientNameExpression(key.ToStringValue().Substring(1), true) :
+                    new AmbientNameExpression(key.ToStringValue(), false)));
 
         static readonly TokenListParser<ExpressionToken, Member> StringMember =
             from key in Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String)
@@ -123,8 +123,8 @@ namespace Serilog.Expressions.Parsing
         
         static readonly TokenListParser<ExpressionToken, Expression> RootProperty =
             (from notFunction in Parse.Not(Token.EqualTo(ExpressionToken.Identifier).IgnoreThen(Token.EqualTo(ExpressionToken.LParen)))
-                from p in Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression) new AmbientPropertyExpression(b.ToStringValue().Substring(1), true))
-                    .Or(Token.EqualTo(ExpressionToken.Identifier).Select(t => (Expression) new AmbientPropertyExpression(t.ToStringValue(), false)))
+                from p in Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression) new AmbientNameExpression(b.ToStringValue().Substring(1), true))
+                    .Or(Token.EqualTo(ExpressionToken.Identifier).Select(t => (Expression) new AmbientNameExpression(t.ToStringValue(), false)))
                 select p).Named("property");
 
         static readonly TokenListParser<ExpressionToken, Expression> String =
@@ -215,7 +215,7 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Disjunction = Parse.Chain(Or, Conjunction, MakeBinary);
 
-        static readonly TokenListParser<ExpressionToken, Expression> Expr = Disjunction;
+        public static readonly TokenListParser<ExpressionToken, Expression> Expr = Disjunction;
 
         static Expression MakeBinary(string operatorName, Expression leftOperand, Expression rightOperand)
         {

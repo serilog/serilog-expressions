@@ -8,7 +8,7 @@ namespace Serilog.Expressions.Compilation
     {
         public static bool IsAmbientProperty(Expression expression, string name, bool isBuiltIn)
         {
-            return expression is AmbientPropertyExpression px &&
+            return expression is AmbientNameExpression px &&
                    px.PropertyName == name &&
                    px.IsBuiltIn == isBuiltIn;
         }

@@ -26,7 +26,12 @@ namespace Serilog.Expressions.Compilation.Wildcards
             return null;
         }
         
-        protected override IndexerExpression? Transform(AmbientPropertyExpression px)
+        protected override IndexerExpression? Transform(AmbientNameExpression px)
+        {
+            return null;
+        }
+
+        protected override IndexerExpression? Transform(LocalNameExpression nlx)
         {
             return null;
         }

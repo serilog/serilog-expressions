@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
+using Serilog.Expressions.Runtime;
 using Serilog.Formatting.Display;
 using Serilog.Parsing;
 
@@ -131,9 +132,17 @@ namespace Serilog.Expressions.Compilation.Linq
             return null;
         }
 
-        public static LogEventPropertyValue? GetPropertyValue(LogEvent context, string propertyName)
+        public static LogEventPropertyValue? GetPropertyValue(EvaluationContext ctx, string propertyName)
         {
-            if (!context.Properties.TryGetValue(propertyName, out var value))
+            if (!ctx.LogEvent.Properties.TryGetValue(propertyName, out var value))
+                return null;
+
+            return value;
+        }
+
+        public static LogEventPropertyValue? GetLocalValue(EvaluationContext ctx, string localName)
+        {
+            if (!Locals.TryGetValue(ctx.Locals, localName, out var value))
                 return null;
 
             return value;

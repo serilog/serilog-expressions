@@ -12,25 +12,22 @@ namespace Sample
         {
             SelfLog.Enable(Console.Error);
 
-            TextFormattingExample();
+            TextFormattingExample1();
             JsonFormattingExample();
             PipelineComponentExample();
+            TextFormattingExample2();
         }
 
-        static void TextFormattingExample()
+        static void TextFormattingExample1()
         {
             using var log = new LoggerConfiguration()
                 .WriteTo.Console(new ExpressionTemplate(
-                    "[{@t:HH:mm:ss} " +
-                    "{@l:u3} " +
-                    "({coalesce(Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1), '<no source>')})] " +
-                    "{@m} " +
-                    "(first item is {coalesce(Items[0], '<empty>')})" +
-                    "\n" +
-                    "{@x}"))
+                    "[{@t:HH:mm:ss} {@l:u3}" +
+                    "{#if SourceContext is not null} ({Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}){#end}] " +
+                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}"))
                 .CreateLogger();
 
-            log.Information("Running {Example}", nameof(TextFormattingExample));
+            log.Information("Running {Example}", nameof(TextFormattingExample1));
             
             log.ForContext<Program>()
                 .Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
@@ -74,6 +71,27 @@ namespace Sample
             
             log.ForContext<Program>()
                 .Information("Cart contains {@Items}", new[] { "Apricots" });
+        }
+        
+        static void TextFormattingExample2()
+        {
+            using var log = new LoggerConfiguration()
+                .WriteTo.Console(new ExpressionTemplate(
+                    "{@l:w4}: {SourceContext}\n" +
+                    "{#if Scope is not null}" +
+                    "      {#each s in Scope}=> {s}{#delimit} {#end}\n" +
+                    "{#end}" +
+                    "      {@m}\n" +
+                    "{@x}"))
+                .CreateLogger();
+
+            var program = log.ForContext<Program>();
+            program.Information("Starting up");
+            
+            // Emulate data produced by the Serilog.AspNetCore integration
+            var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
+            
+            scoped.Information("Hello, world!");
         }
     }
 }

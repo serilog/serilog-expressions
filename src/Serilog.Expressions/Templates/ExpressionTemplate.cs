@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Serilog.Events;
@@ -7,6 +6,7 @@ using Serilog.Expressions;
 using Serilog.Expressions.Compilation;
 using Serilog.Formatting;
 using Serilog.Templates.Compilation;
+using Serilog.Templates.Compilation.NameResolution;
 using Serilog.Templates.Parsing;
 
 namespace Serilog.Templates
@@ -54,14 +54,17 @@ namespace Serilog.Templates
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            
-            if (!TemplateParser.TryParse(template, out var parsed, out error))
+
+            var templateParser = new TemplateParser();
+            if (!templateParser.TryParse(template, out var parsed, out error))
             {
                 result = null;
                 return false;
             }
 
-            result = new ExpressionTemplate(TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
+            var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
+
+            result = new ExpressionTemplate(TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
             return true;
         }
         
@@ -86,17 +89,20 @@ namespace Serilog.Templates
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
-            if (!TemplateParser.TryParse(template, out var parsed, out var error))
+            var templateParser = new TemplateParser();
+            if (!templateParser.TryParse(template, out var parsed, out var error))
                 throw new ArgumentException(error);
             
-            _compiled = TemplateCompiler.Compile(parsed, DefaultFunctionNameResolver.Build(nameResolver));
+            var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
+            
+            _compiled = TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver));
             _formatProvider = formatProvider;
         }
 
         /// <inheritdoc />
         public void Format(LogEvent logEvent, TextWriter output)
         {
-            _compiled.Evaluate(logEvent, output, _formatProvider);
+            _compiled.Evaluate(new EvaluationContext(logEvent), output, _formatProvider);
         }
     }
 }

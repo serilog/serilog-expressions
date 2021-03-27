@@ -218,10 +218,18 @@ if 'string' then 1 else 2            ⇶ 2
 if true then if false then 1 else 2 else 3 ⇶ 2
 
 // ToString
+tostring(16)                         ⇶ '16'
+tostring('test')                     ⇶ 'test'
+tostring({})                         ⇶ undefined()
+tostring([])                         ⇶ undefined()
 tostring(16, '000')                  ⇶ '016'
-tostring('test', '000')              ⇶ undefined()
-tostring(16, undefined())            ⇶ undefined()
-tostring(16, null)                   ⇶ undefined()
+tostring(null)                       ⇶ undefined()
+tostring(undefined())                ⇶ undefined()
+tostring('test', '000')              ⇶ 'test'
+tostring('test', [])                 ⇶ undefined()
+tostring('test', 42)                 ⇶ undefined()
+tostring(16, undefined())            ⇶ '16'
+tostring(16, null)                   ⇶ '16'
 
 // TypeOf
 typeof(undefined())                  ⇶ 'undefined'

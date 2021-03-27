@@ -22,7 +22,7 @@ namespace Serilog.Expressions.Compilation
             return actual;
         }
         
-        public static CompiledExpression Compile(Expression expression, NameResolver nameResolver)
+        public static Evaluatable Compile(Expression expression, NameResolver nameResolver)
         {
             var actual = Translate(expression);
             return LinqExpressionCompiler.Compile(actual, nameResolver);
