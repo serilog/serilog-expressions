@@ -1,10 +1,10 @@
 ﻿using Serilog.Expressions.Ast;
 using Serilog.Expressions.Parsing;
 using Serilog.Parsing;
+using Serilog.Superpower;
+using Serilog.Superpower.Model;
+using Serilog.Superpower.Parsers;
 using Serilog.Templates.Ast;
-using Superpower;
-using Superpower.Model;
-using Superpower.Parsers;
 using static Serilog.Expressions.Parsing.ExpressionToken;
 
 // ReSharper disable SuggestBaseTypeForParameter, ConvertIfStatementToSwitchStatement, AccessToModifiedClosure
@@ -65,12 +65,12 @@ namespace Serilog.Templates.Parsing
 
             var conditional =
                 from iff in Directive(true, If)
-                from consequent in Parse.Ref(() => block)
+                from consequent in Parse.Ref(() => block!)
                 from alternatives in Directive(true, Else, If)
-                    .Then(elsif => Parse.Ref(() => block).Select(b => (elsif, b)))
+                    .Then(elsif => Parse.Ref(() => block!).Select(b => (elsif, b)))
                     .Many()
                 from final in Directive(false, Else)
-                    .IgnoreThen(Parse.Ref(() => block).Select(b => ((Expression?) null, b)))
+                    .IgnoreThen(Parse.Ref(() => block!).Select(b => ((Expression?) null, b)))
                     .OptionalOrDefault()
                 from end in Directive(false, End)
                 let firstAlt = LeftReduceConditional(alternatives, final.b)
@@ -89,13 +89,13 @@ namespace Serilog.Templates.Parsing
 
             var repetition =
                 from each in eachDirective
-                from body in Parse.Ref(() => block)
+                from body in Parse.Ref(() => block!)
                 from delimiter in Directive(false, Delimit)
-                    .IgnoreThen(Parse.Ref(() => block))
+                    .IgnoreThen(Parse.Ref(() => block!))
                     .Cast<ExpressionToken, Template, Template?>()
                     .OptionalOrDefault()
                 from alternative in Directive(false, Else)
-                    .IgnoreThen(Parse.Ref(() => block))
+                    .IgnoreThen(Parse.Ref(() => block!))
                     .Cast<ExpressionToken, Template, Template?>()
                     .OptionalOrDefault()
                 from end in Directive(false, End)

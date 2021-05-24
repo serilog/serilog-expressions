@@ -1,6 +1,6 @@
-﻿using Superpower;
-using Superpower.Model;
-using Superpower.Parsers;
+﻿using Serilog.Superpower;
+using Serilog.Superpower.Model;
+using Serilog.Superpower.Parsers;
 
 namespace Serilog.Expressions.Parsing
 {
@@ -31,6 +31,6 @@ namespace Serilog.Expressions.Parsing
         public static readonly TextParser<TextSpan> Real =
             Numerics.Integer
                 .Then(n => Character.EqualTo('.').IgnoreThen(Numerics.Integer).OptionalOrDefault()
-                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source, n.Position, n.Length + f.Length + 1)));
+                    .Select(f => f == TextSpan.None ? n : new TextSpan(n.Source!, n.Position, n.Length + f.Length + 1)));
     }
 }

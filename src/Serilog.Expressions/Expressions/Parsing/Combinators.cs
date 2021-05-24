@@ -1,6 +1,6 @@
 ﻿using System;
-using Superpower;
-using Superpower.Model;
+using Serilog.Superpower;
+using Serilog.Superpower.Model;
 
 namespace Serilog.Expressions.Parsing
 {
