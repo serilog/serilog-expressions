@@ -370,3 +370,8 @@ var myFunctions = new StaticMemberNameResolver(typeof(MyFunctions));
 var expr = SerilogExpression.Compile("IsHello(User.Name)", new[] { myFunctions });
 // Filter events based on whether `User.Name` is `'Hello'` :-)
 ```
+
+## Acknowledgements
+
+Includes the parser combinator implementation from [Superpower](https://github.com/datalust/superpower), copyright Datalust, 
+Superpower Contributors, and Sprache Contributors; licensed under the Apache License, 2.0.

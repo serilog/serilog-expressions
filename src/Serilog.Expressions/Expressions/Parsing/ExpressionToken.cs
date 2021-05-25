@@ -1,4 +1,4 @@
-﻿using Superpower.Display;
+﻿using Serilog.ParserConstruction.Display;
 
 namespace Serilog.Expressions.Parsing
 {
