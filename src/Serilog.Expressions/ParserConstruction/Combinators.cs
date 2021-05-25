@@ -14,13 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using Serilog.Superpower.Display;
-using Serilog.Superpower.Model;
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Display;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Util;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
     /// Functions that construct more complex parsers by combining simpler ones.

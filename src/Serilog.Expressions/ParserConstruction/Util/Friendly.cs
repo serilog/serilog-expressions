@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Serilog.Superpower.Util
+namespace Serilog.ParserConstruction.Util
 {
     static class Friendly
     {

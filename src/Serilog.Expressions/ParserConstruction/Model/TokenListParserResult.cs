@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Model
 {
     /// <summary>
     /// Helper methods for working with <see cref="TokenListParserResult{TKind,T}"/>.

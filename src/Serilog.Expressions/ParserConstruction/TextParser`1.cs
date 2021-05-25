@@ -1,4 +1,4 @@
-﻿// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
+// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Superpower.Util
+using Serilog.ParserConstruction.Model;
+
+namespace Serilog.ParserConstruction
 {
-    static class CharInfo
-    {
-        public static bool IsLatinDigit(char ch)
-        {
-            return ch >= '0' && ch <= '9';
-        }
-    }
+    /// <summary>
+    /// A parser that consumes text from a string span.
+    /// </summary>
+    /// <typeparam name="T">The type of values produced by the parser.</typeparam>
+    /// <param name="input">The span of text to parse.</param>
+    /// <returns>A result with a parsed value, or an empty result indicating error.</returns>
+    delegate Result<T> TextParser<T>(TextSpan input);
 }

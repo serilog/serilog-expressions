@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Serilog.Expressions.Parsing;
-using Serilog.Superpower;
-using Serilog.Superpower.Model;
 
 namespace Serilog.Templates.Parsing
 {

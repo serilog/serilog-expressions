@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Serilog.Superpower.Display;
-using Serilog.Superpower.Model;
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Display;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Util;
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
     /// General parsing helper methods.

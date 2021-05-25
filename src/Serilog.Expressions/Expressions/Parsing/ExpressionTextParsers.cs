@@ -1,8 +1,4 @@
-﻿using Serilog.Superpower;
-using Serilog.Superpower.Model;
-using Serilog.Superpower.Parsers;
-
-namespace Serilog.Expressions.Parsing
+﻿namespace Serilog.Expressions.Parsing
 {
     static class ExpressionTextParsers
     {

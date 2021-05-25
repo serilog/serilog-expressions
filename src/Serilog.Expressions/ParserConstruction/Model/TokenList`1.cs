@@ -16,7 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Model
 {
     /// <summary>
     /// A list of <see cref="Token{TKind}"/>

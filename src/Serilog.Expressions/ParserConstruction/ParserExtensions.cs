@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Serilog.Superpower.Model;
+using Serilog.ParserConstruction.Model;
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
     /// Helper methods for working with parsers.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -27,7 +28,7 @@ namespace Serilog.Expressions
         }
         
         /// <inheritdoc />
-        public override bool TryResolveFunctionName(string name, out MethodInfo implementation)
+        public override bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation)
         {
             return _methods.TryGetValue(name, out implementation);
         }

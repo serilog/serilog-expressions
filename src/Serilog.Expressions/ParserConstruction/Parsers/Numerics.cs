@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Serilog.Superpower.Model;
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Util;
 
-namespace Serilog.Superpower.Parsers
+namespace Serilog.ParserConstruction.Parsers
 {
     /// <summary>
     /// Parsers for numeric patterns.

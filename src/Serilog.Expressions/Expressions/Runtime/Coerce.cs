@@ -62,7 +62,7 @@ namespace Serilog.Expressions.Runtime
 
                 if (sv.Value?.GetType().IsEnum ?? false)
                 {
-                    str = sv.Value.ToString();
+                    str = sv.Value.ToString()!;
                     return true;
                 }
             }

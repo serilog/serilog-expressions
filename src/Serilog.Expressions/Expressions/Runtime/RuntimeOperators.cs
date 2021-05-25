@@ -470,14 +470,14 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue? ToString(LogEventPropertyValue? value, LogEventPropertyValue? format)
         {
-            if (!(value is ScalarValue sv) ||
+            if (value is not ScalarValue sv ||
                 sv.Value == null ||
-                !(Coerce.String(format, out var fmt) || format == null || format is ScalarValue { Value: null }))
+                !(Coerce.String(format, out var fmt) || format is null or ScalarValue { Value: null }))
             {
                 return null;
             }
 
-            string toString;
+            string? toString;
             if (sv.Value is IFormattable formattable)
             {
                 // TODO #19: formatting is culture-specific.

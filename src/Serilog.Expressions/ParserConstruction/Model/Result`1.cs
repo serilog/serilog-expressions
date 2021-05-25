@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Util;
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Model
 {
     /// <summary>
     /// The result of parsing from a text span.

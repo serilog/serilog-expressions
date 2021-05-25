@@ -1,4 +1,4 @@
-﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
+﻿// Copyright 2018 Datalust, Superpower Contributors, Sprache Contributors
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Util
 {
-    /// <summary>
-    /// A structure with no information.
-    /// </summary>
-    struct Unit
+    static class CharInfo
     {
-        /// <summary>
-        /// The singleton value of the struct, with no value.
-        /// </summary>
-        public static Unit Value => default;
+        public static bool IsLatinDigit(char ch)
+        {
+            return ch >= '0' && ch <= '9';
+        }
     }
 }

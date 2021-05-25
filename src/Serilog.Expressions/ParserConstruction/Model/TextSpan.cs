@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Model
 {
     /// <summary>
     /// A span of text within a larger string.

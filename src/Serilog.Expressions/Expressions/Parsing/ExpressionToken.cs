@@ -1,6 +1,4 @@
-﻿using Serilog.Superpower.Display;
-
-namespace Serilog.Expressions.Parsing
+﻿namespace Serilog.Expressions.Parsing
 {
     enum ExpressionToken
     {

@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using Serilog.Superpower.Model;
+using Serilog.ParserConstruction.Model;
 
 // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedAutoPropertyAccessor.Global
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
     /// Represents an error that occurs during parsing.

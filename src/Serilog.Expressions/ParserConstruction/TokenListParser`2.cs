@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Serilog.Superpower.Model;
+using Serilog.ParserConstruction.Model;
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
-    /// A parser that consumes text from a string span.
+    /// A parser that consumes elements from a list of tokens.
     /// </summary>
     /// <typeparam name="T">The type of values produced by the parser.</typeparam>
-    /// <param name="input">The span of text to parse.</param>
+    /// <typeparam name="TKind">The type of tokens being parsed.</typeparam>
+    /// <param name="input">The list of tokens to parse.</param>
     /// <returns>A result with a parsed value, or an empty result indicating error.</returns>
-    delegate Result<T> TextParser<T>(TextSpan input);
+    delegate TokenListParserResult<TKind, T> TokenListParser<TKind, T>(TokenList<TKind> input);
 }

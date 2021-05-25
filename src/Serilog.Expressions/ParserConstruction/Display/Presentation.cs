@@ -14,9 +14,9 @@
 
 using System;
 using System.Reflection;
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Util;
 
-namespace Serilog.Superpower.Display
+namespace Serilog.ParserConstruction.Display
 {
     static class Presentation
     {

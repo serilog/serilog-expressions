@@ -1,9 +1,6 @@
 ﻿using Serilog.Expressions.Ast;
 using Serilog.Expressions.Parsing;
 using Serilog.Parsing;
-using Serilog.Superpower;
-using Serilog.Superpower.Model;
-using Serilog.Superpower.Parsers;
 using Serilog.Templates.Ast;
 using static Serilog.Expressions.Parsing.ExpressionToken;
 

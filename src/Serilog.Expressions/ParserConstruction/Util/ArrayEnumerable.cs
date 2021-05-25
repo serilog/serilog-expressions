@@ -14,7 +14,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Serilog.Superpower.Util
+namespace Serilog.ParserConstruction.Util
 {
     static class ArrayEnumerable
     {

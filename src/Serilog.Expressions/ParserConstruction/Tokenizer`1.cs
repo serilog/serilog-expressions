@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Serilog.Superpower.Display;
-using Serilog.Superpower.Model;
+using Serilog.ParserConstruction.Display;
+using Serilog.ParserConstruction.Model;
 
-namespace Serilog.Superpower
+namespace Serilog.ParserConstruction
 {
     /// <summary>
     /// Base class for tokenizers, types whose instances convert strings into lists of tokens.

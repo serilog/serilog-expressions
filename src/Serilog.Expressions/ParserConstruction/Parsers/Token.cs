@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
-using Serilog.Superpower.Display;
-using Serilog.Superpower.Model;
+using Serilog.ParserConstruction.Display;
+using Serilog.ParserConstruction.Model;
 
-namespace Serilog.Superpower.Parsers
+namespace Serilog.ParserConstruction.Parsers
 {
     /// <summary>
     /// Parsers for matching individual tokens.

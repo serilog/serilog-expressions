@@ -28,7 +28,7 @@ namespace Serilog.Expressions.Ast
                     case IFormattable formattable:
                         return formattable.ToString(null, CultureInfo.InvariantCulture);
                     default:
-                        return (sv.Value ?? "null").ToString();
+                        return (sv.Value ?? "null").ToString() ?? "<ToString() returned null>";
                 }
             }
 

@@ -16,7 +16,7 @@ using System;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global, ClassNeverInstantiated.Global
 
-namespace Serilog.Superpower.Display
+namespace Serilog.ParserConstruction.Display
 {
     /// <summary>
     /// Applied to enum members representing tokens to control how they are rendered.

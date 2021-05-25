@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Serilog.Superpower.Util;
+using Serilog.ParserConstruction.Util;
 
-namespace Serilog.Superpower.Model
+namespace Serilog.ParserConstruction.Model
 {
     /// <summary>
     /// Helper methods for working with <see cref="Result{T}"/>.
