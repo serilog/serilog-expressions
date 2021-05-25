@@ -3,6 +3,9 @@ using System.Globalization;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
+using Serilog.ParserConstruction;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Parsers;
 
 namespace Serilog.Expressions.Parsing
 {

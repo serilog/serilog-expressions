@@ -1,4 +1,6 @@
-﻿namespace Serilog.Expressions.Parsing
+﻿using Serilog.ParserConstruction.Display;
+
+namespace Serilog.Expressions.Parsing
 {
     enum ExpressionToken
     {

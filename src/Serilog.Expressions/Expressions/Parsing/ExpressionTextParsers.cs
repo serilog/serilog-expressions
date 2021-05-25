@@ -1,4 +1,8 @@
-﻿namespace Serilog.Expressions.Parsing
+﻿using Serilog.ParserConstruction;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Parsers;
+
+namespace Serilog.Expressions.Parsing
 {
     static class ExpressionTextParsers
     {

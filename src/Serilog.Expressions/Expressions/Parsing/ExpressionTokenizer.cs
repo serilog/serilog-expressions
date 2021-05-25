@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Serilog.ParserConstruction;
+using Serilog.ParserConstruction.Model;
 
 namespace Serilog.Expressions.Parsing
 {

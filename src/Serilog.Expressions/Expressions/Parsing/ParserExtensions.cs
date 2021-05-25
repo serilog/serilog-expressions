@@ -1,4 +1,6 @@
 ﻿using System;
+using Serilog.ParserConstruction;
+using Serilog.ParserConstruction.Model;
 
 namespace Serilog.Expressions.Parsing
 {
