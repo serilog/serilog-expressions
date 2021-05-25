@@ -5,12 +5,13 @@ using Serilog.Expressions;
 using Serilog.Formatting.Json;
 using Serilog.Parsing;
 using Serilog.Templates.Rendering;
+using Serilog.Templates.Themes;
 
 namespace Serilog.Templates.Compilation
 {
     class CompiledFormattedExpression : CompiledTemplate
     {
-        static readonly JsonValueFormatter JsonFormatter = new JsonValueFormatter("$type");
+        static readonly JsonValueFormatter JsonFormatter = new("$type");
         
         readonly Evaluatable _expression;
         readonly string? _format;

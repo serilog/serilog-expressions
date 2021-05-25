@@ -8,6 +8,7 @@ using Serilog.Formatting;
 using Serilog.Templates.Compilation;
 using Serilog.Templates.Compilation.NameResolution;
 using Serilog.Templates.Parsing;
+using Serilog.Templates.Themes;
 
 namespace Serilog.Templates
 {
@@ -18,7 +19,7 @@ namespace Serilog.Templates
     {
         readonly IFormatProvider? _formatProvider;
         readonly CompiledTemplate _compiled;
-
+        
         /// <summary>
         /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
@@ -32,7 +33,7 @@ namespace Serilog.Templates
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            return TryParse(template, null, null, out result, out error);
+            return TryParse(template, null, null, null, out result, out error);
         }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace Serilog.Templates
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
         /// embedded values.</param>
+        /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
         /// <param name="result">The parsed template, if successful.</param>
         /// <param name="error">A description of the error, if unsuccessful.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
@@ -50,6 +52,7 @@ namespace Serilog.Templates
             string template,
             IFormatProvider? formatProvider,
             NameResolver? nameResolver,
+            TemplateTheme? theme,
             [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
@@ -64,7 +67,13 @@ namespace Serilog.Templates
 
             var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
 
-            result = new ExpressionTemplate(TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
+            result = new ExpressionTemplate(
+                TemplateCompiler.Compile(
+                    planned,
+                    DefaultFunctionNameResolver.Build(nameResolver),
+                    theme ?? TemplateTheme.None),
+                formatProvider);
+            
             return true;
         }
         
@@ -82,10 +91,12 @@ namespace Serilog.Templates
         /// embedded values.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
         /// with which to resolve function names that appear in the template.</param>
+        /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
         public ExpressionTemplate(
             string template,
             IFormatProvider? formatProvider = null,
-            NameResolver? nameResolver = null)
+            NameResolver? nameResolver = null,
+            TemplateTheme? theme = null)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
@@ -95,7 +106,11 @@ namespace Serilog.Templates
             
             var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
             
-            _compiled = TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver));
+            _compiled = TemplateCompiler.Compile(
+                planned,
+                DefaultFunctionNameResolver.Build(nameResolver),
+                theme ?? TemplateTheme.None);
+            
             _formatProvider = formatProvider;
         }
 

@@ -2,6 +2,7 @@
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Templates;
+using Serilog.Templates.Themes;
 
 namespace Sample
 {
@@ -82,7 +83,8 @@ namespace Sample
                     "      {#each s in Scope}=> {s}{#delimit} {#end}\n" +
                     "{#end}" +
                     "      {@m}\n" +
-                    "{@x}"))
+                    "{@x}",
+                    theme: TemplateTheme.Code))
                 .CreateLogger();
 
             var program = log.ForContext<Program>();

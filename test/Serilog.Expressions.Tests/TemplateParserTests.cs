@@ -17,7 +17,7 @@ namespace Serilog.Expressions.Tests
         [InlineData("Empty {Align,} digits", "Syntax error (line 1, column 14): unexpected `}`, expected alignment and width.")]
         public void ErrorsAreReported(string input, string error)
         {
-            Assert.False(ExpressionTemplate.TryParse(input, null, null, out _, out var actual));
+            Assert.False(ExpressionTemplate.TryParse(input, null, null, null, out _, out var actual));
             Assert.Equal(error, actual);
         }
     }

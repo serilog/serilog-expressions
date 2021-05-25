@@ -2,6 +2,7 @@
 using System.IO;
 using Serilog.Events;
 using Serilog.Expressions;
+using Serilog.Templates.Themes;
 
 namespace Serilog.Templates.Compilation
 {
