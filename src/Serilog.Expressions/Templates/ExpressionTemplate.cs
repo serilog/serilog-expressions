@@ -71,7 +71,7 @@ namespace Serilog.Templates
                 TemplateCompiler.Compile(
                     planned,
                     DefaultFunctionNameResolver.Build(nameResolver),
-                    theme ?? TemplateTheme.None),
+                    theme),
                 formatProvider);
             
             return true;
@@ -109,7 +109,7 @@ namespace Serilog.Templates
             _compiled = TemplateCompiler.Compile(
                 planned,
                 DefaultFunctionNameResolver.Build(nameResolver),
-                theme ?? TemplateTheme.None);
+                theme);
             
             _formatProvider = formatProvider;
         }

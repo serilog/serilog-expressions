@@ -43,7 +43,7 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("Application", "Example")
                 .WriteTo.Console(new ExpressionTemplate(
-                    "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n",
+                    "{ {@t: UtcDateTime(@t), @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n",
                     theme: TemplateTheme.Code))
                 .CreateLogger();
 
@@ -95,9 +95,7 @@ namespace Sample
             // Emulate data produced by the Serilog.AspNetCore integration
             var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
 
-            var ex = new DivideByZeroException();
-            try { throw ex; } catch {}
-            scoped.Information(ex, "Hello, world!");
+            scoped.Information("Hello, world!");
         }
     }
 }
