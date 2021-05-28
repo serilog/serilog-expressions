@@ -1,4 +1,6 @@
 ﻿using Serilog.Templates;
+using Serilog.Templates.Ast;
+using Serilog.Templates.Parsing;
 using Xunit;
 
 namespace Serilog.Expressions.Tests
@@ -19,6 +21,15 @@ namespace Serilog.Expressions.Tests
         {
             Assert.False(ExpressionTemplate.TryParse(input, null, null, null, out _, out var actual));
             Assert.Equal(error, actual);
+        }
+
+        [Fact]
+        public void DefaultAlignmentIsNull()
+        {
+            var parser = new TemplateParser();
+            Assert.True(parser.TryParse("{x}", out var template, out _));
+            var avt = Assert.IsType<FormattedExpression>(template);
+            Assert.Null(avt.Alignment);
         }
     }
 }

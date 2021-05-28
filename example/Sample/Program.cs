@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Templates;
@@ -42,7 +43,8 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("Application", "Example")
                 .WriteTo.Console(new ExpressionTemplate(
-                    "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
+                    "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n",
+                    theme: TemplateTheme.Code))
                 .CreateLogger();
 
             log.Information("Running {Example}", nameof(JsonFormattingExample));
@@ -84,7 +86,7 @@ namespace Sample
                     "{#end}" +
                     "      {@m}\n" +
                     "{@x}",
-                    theme: TemplateTheme.Code))
+                    theme: TemplateTheme.Literate))
                 .CreateLogger();
 
             var program = log.ForContext<Program>();
@@ -92,8 +94,10 @@ namespace Sample
             
             // Emulate data produced by the Serilog.AspNetCore integration
             var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
-            
-            scoped.Information("Hello, world!");
+
+            var ex = new DivideByZeroException();
+            try { throw ex; } catch {}
+            scoped.Information(ex, "Hello, world!");
         }
     }
 }

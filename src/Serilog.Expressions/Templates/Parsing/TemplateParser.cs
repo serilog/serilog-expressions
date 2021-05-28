@@ -6,8 +6,8 @@ namespace Serilog.Templates.Parsing
 {
     class TemplateParser
     {
-        readonly TemplateTokenizer _tokenizer = new TemplateTokenizer();
-        readonly TemplateTokenParsers _templateTokenParsers = new TemplateTokenParsers();
+        readonly TemplateTokenizer _tokenizer = new();
+        readonly TemplateTokenParsers _templateTokenParsers = new();
         
         public bool TryParse(
             string template,

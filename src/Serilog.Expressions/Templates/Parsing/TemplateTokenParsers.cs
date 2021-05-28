@@ -33,7 +33,7 @@ namespace Serilog.Templates.Parsing
             var hole =
                 from _ in Token.EqualTo(LBrace)
                 from expr in ExpressionTokenParsers.Expr
-                from align in alignment.OptionalOrDefault()
+                from align in alignment.Select(a => (Alignment?)a).OptionalOrDefault()
                 from fmt in format.OptionalOrDefault()
                 from __ in Token.EqualTo(RBrace)
                 select (Template) new FormattedExpression(expr, fmt, align);
@@ -79,7 +79,7 @@ namespace Serilog.Templates.Parsing
             var eachDirective =
                 Token.EqualTo(LBraceHash)
                     .IgnoreThen(Token.EqualTo(Each)).Try()
-                    .IgnoreThen(Token.EqualTo(ExpressionToken.Identifier)
+                    .IgnoreThen(Token.EqualTo(Identifier)
                         .Select(i => i.ToStringValue())
                         .AtLeastOnceDelimitedBy(Token.EqualTo(Comma)))
                     .Then(bindings => Token.EqualTo(In).Value(bindings))

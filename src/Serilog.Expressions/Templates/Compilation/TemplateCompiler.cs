@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Serilog.Expressions;
+using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation;
 using Serilog.Templates.Ast;
 using Serilog.Templates.Themes;
@@ -15,8 +16,16 @@ namespace Serilog.Templates.Compilation
             return template switch
             {
                 LiteralText text => new CompiledLiteralText(text.Text, theme),
+                FormattedExpression { Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Level} } level => new CompiledLevelToken(
+                    level.Format, level.Alignment, theme),
+                FormattedExpression
+                {
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Exception }, 
+                    Alignment: null,
+                    Format: null
+                } => new CompiledExceptionToken(theme),
                 FormattedExpression expression => new CompiledFormattedExpression(
-                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment),
+                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment, theme),
                 TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, nameResolver, theme)).ToArray()),
                 Conditional conditional => new CompiledConditional(
                     ExpressionCompiler.Compile(conditional.Condition, nameResolver),
