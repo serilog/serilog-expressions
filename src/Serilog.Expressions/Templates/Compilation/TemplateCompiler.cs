@@ -10,24 +10,21 @@ namespace Serilog.Templates.Compilation
 {
     static class TemplateCompiler
     {
-        public static CompiledTemplate Compile(Template template, NameResolver nameResolver, TemplateTheme? theme)
+        public static CompiledTemplate Compile(Template template, NameResolver nameResolver, TemplateTheme theme)
         {
-            // Currently, the same implementations are used for themed and un-themed output; in future we could optimize
-            // here by choosing simpler variants when `theme` is `null`.
-            
             return template switch
             {
-                LiteralText text => new CompiledLiteralText(text.Text, theme ?? TemplateTheme.None),
+                LiteralText text => new CompiledLiteralText(text.Text, theme),
                 FormattedExpression { Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Level} } level => new CompiledLevelToken(
-                    level.Format, level.Alignment, theme ?? TemplateTheme.None),
+                    level.Format, level.Alignment, theme),
                 FormattedExpression
                 {
                     Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Exception }, 
                     Alignment: null,
                     Format: null
-                } => new CompiledExceptionToken(theme ?? TemplateTheme.None),
+                } => new CompiledExceptionToken(theme),
                 FormattedExpression expression => new CompiledFormattedExpression(
-                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment, theme ?? TemplateTheme.None),
+                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment, theme),
                 TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, nameResolver, theme)).ToArray()),
                 Conditional conditional => new CompiledConditional(
                     ExpressionCompiler.Compile(conditional.Condition, nameResolver),
