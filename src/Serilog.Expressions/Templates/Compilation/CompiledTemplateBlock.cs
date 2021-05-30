@@ -13,10 +13,10 @@ namespace Serilog.Templates.Compilation
             _elements = elements ?? throw new ArgumentNullException(nameof(elements));
         }
         
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             foreach (var element in _elements)
-                element.Evaluate(ctx, output, formatProvider);
+                element.Evaluate(ctx, output);
         }
     }
 }

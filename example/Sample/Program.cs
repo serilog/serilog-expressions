@@ -95,7 +95,7 @@ namespace Sample
             // Emulate data produced by the Serilog.AspNetCore integration
             var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
 
-            scoped.Information("Hello, world!");
+            scoped.Information("Hello, {Name} x {Number}!", "world", 42);
         }
     }
 }

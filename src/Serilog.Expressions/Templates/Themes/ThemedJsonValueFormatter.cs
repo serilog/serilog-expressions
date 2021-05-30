@@ -173,7 +173,7 @@ namespace Serilog.Templates.Themes
 
             if (value is ValueType)
             {
-                if (value is int || value is uint || value is long || value is ulong || value is decimal || value is byte || value is sbyte || value is short || value is ushort)
+                if (value is int or uint or long or ulong or decimal or byte or sbyte or short or ushort)
                 {
                     using (_num.Set(output, ref count))
                         output.Write(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));

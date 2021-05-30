@@ -10,7 +10,7 @@ namespace Serilog.Templates.Compilation
 {
     static class TemplateCompiler
     {
-        public static CompiledTemplate Compile(Template template, NameResolver nameResolver, TemplateTheme theme)
+        public static CompiledTemplate Compile(Template template, IFormatProvider? formatProvider, NameResolver nameResolver, TemplateTheme theme)
         {
             return template switch
             {
@@ -23,20 +23,25 @@ namespace Serilog.Templates.Compilation
                     Alignment: null,
                     Format: null
                 } => new CompiledExceptionToken(theme),
+                FormattedExpression
+                {
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Message }, 
+                    Format: null
+                } message => new CompiledMessageToken(formatProvider, message.Alignment, theme),
                 FormattedExpression expression => new CompiledFormattedExpression(
-                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment, theme),
-                TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, nameResolver, theme)).ToArray()),
+                    ExpressionCompiler.Compile(expression.Expression, nameResolver), expression.Format, expression.Alignment, formatProvider, theme),
+                TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, formatProvider, nameResolver, theme)).ToArray()),
                 Conditional conditional => new CompiledConditional(
                     ExpressionCompiler.Compile(conditional.Condition, nameResolver),
-                    Compile(conditional.Consequent, nameResolver, theme),
-                    conditional.Alternative == null ? null : Compile(conditional.Alternative, nameResolver, theme)),
+                    Compile(conditional.Consequent, formatProvider, nameResolver, theme),
+                    conditional.Alternative == null ? null : Compile(conditional.Alternative, formatProvider, nameResolver, theme)),
                 Repetition repetition => new CompiledRepetition(
                     ExpressionCompiler.Compile(repetition.Enumerable, nameResolver),
                     repetition.BindingNames.Length > 0 ? repetition.BindingNames[0] : null,
                     repetition.BindingNames.Length > 1 ? repetition.BindingNames[1] : null,
-                    Compile(repetition.Body, nameResolver, theme),
-                    repetition.Delimiter == null ? null : Compile(repetition.Delimiter, nameResolver, theme),
-                    repetition.Alternative == null ? null : Compile(repetition.Alternative, nameResolver, theme)),
+                    Compile(repetition.Body, formatProvider, nameResolver, theme),
+                    repetition.Delimiter == null ? null : Compile(repetition.Delimiter, formatProvider, nameResolver, theme),
+                    repetition.Alternative == null ? null : Compile(repetition.Alternative, formatProvider, nameResolver, theme)),
                 _ => throw new NotSupportedException()
             };
         }

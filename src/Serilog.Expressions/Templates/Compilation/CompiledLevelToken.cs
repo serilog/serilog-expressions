@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Serilog.Expressions;
 using Serilog.Parsing;
 using Serilog.Templates.Rendering;
@@ -28,7 +27,7 @@ namespace Serilog.Templates.Compilation
             };
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var invisibleCharacterCount = 0;
             

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Serilog.Expressions;
 using Serilog.Templates.Themes;
 
@@ -17,7 +16,7 @@ namespace Serilog.Templates.Compilation
             _secondaryText = theme.GetStyle(TemplateThemeStyle.SecondaryText);
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             // Padding and alignment are not applied by this renderer.
 

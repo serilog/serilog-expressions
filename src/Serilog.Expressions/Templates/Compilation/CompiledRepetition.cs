@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Serilog.Events;
 using Serilog.Expressions;
 using Serilog.Expressions.Runtime;
@@ -31,13 +30,13 @@ namespace Serilog.Templates.Compilation
             _alternative = alternative;
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var enumerable = _enumerable(ctx);
             if (enumerable == null ||
                 enumerable is ScalarValue)
             {
-                _alternative?.Evaluate(ctx, output, formatProvider);
+                _alternative?.Evaluate(ctx, output);
                 return;
             }
 
@@ -45,7 +44,7 @@ namespace Serilog.Templates.Compilation
             {
                 if (sv.Elements.Count == 0)
                 {
-                    _alternative?.Evaluate(ctx, output, formatProvider);
+                    _alternative?.Evaluate(ctx, output);
                     return;
                 }
 
@@ -58,13 +57,13 @@ namespace Serilog.Templates.Compilation
                     if (first)
                         first = false;
                     else
-                        _delimiter?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output);
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element))
                         : ctx;
                     
-                    _body.Evaluate(local, output, formatProvider);
+                    _body.Evaluate(local, output);
                 }
                 
                 return;
@@ -74,7 +73,7 @@ namespace Serilog.Templates.Compilation
             {
                 if (structure.Properties.Count == 0)
                 {
-                    _alternative?.Evaluate(ctx, output, formatProvider);
+                    _alternative?.Evaluate(ctx, output);
                     return;
                 }
 
@@ -84,7 +83,7 @@ namespace Serilog.Templates.Compilation
                     if (first)
                         first = false;
                     else
-                        _delimiter?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output);
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, new ScalarValue(member.Name)))
@@ -94,7 +93,7 @@ namespace Serilog.Templates.Compilation
                         ? new EvaluationContext(local.LogEvent, Locals.Set(local.Locals, _valueName, member.Value))
                         : local;
                     
-                    _body.Evaluate(local, output, formatProvider);
+                    _body.Evaluate(local, output);
                 }
             }
             
@@ -102,7 +101,7 @@ namespace Serilog.Templates.Compilation
             {
                 if (dict.Elements.Count == 0)
                 {
-                    _alternative?.Evaluate(ctx, output, formatProvider);
+                    _alternative?.Evaluate(ctx, output);
                     return;
                 }
 
@@ -112,7 +111,7 @@ namespace Serilog.Templates.Compilation
                     if (first)
                         first = false;
                     else
-                        _delimiter?.Evaluate(ctx, output, formatProvider);
+                        _delimiter?.Evaluate(ctx, output);
 
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element.Key))
@@ -122,7 +121,7 @@ namespace Serilog.Templates.Compilation
                         ? new EvaluationContext(local.LogEvent, Locals.Set(local.Locals, _valueName, element.Value))
                         : local;
                     
-                    _body.Evaluate(local, output, formatProvider);
+                    _body.Evaluate(local, output);
                 }
             }
             

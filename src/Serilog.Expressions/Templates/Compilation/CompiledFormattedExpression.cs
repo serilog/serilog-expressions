@@ -14,29 +14,31 @@ namespace Serilog.Templates.Compilation
         readonly Evaluatable _expression;
         readonly string? _format;
         readonly Alignment? _alignment;
+        readonly IFormatProvider? _formatProvider;
         readonly Style _secondaryText;
 
-        public CompiledFormattedExpression(Evaluatable expression, string? format, Alignment? alignment, TemplateTheme theme)
+        public CompiledFormattedExpression(Evaluatable expression, string? format, Alignment? alignment, IFormatProvider? formatProvider, TemplateTheme theme)
         {
             _expression = expression ?? throw new ArgumentNullException(nameof(expression));
             _format = format;
             _alignment = alignment;
+            _formatProvider = formatProvider;
             _secondaryText = theme.GetStyle(TemplateThemeStyle.SecondaryText);
             _jsonFormatter = new ThemedJsonValueFormatter(theme);
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var invisibleCharacterCount = 0;
             
             if (_alignment == null)
             {
-                EvaluateUnaligned(ctx, output, formatProvider, ref invisibleCharacterCount);
+                EvaluateUnaligned(ctx, output, _formatProvider, ref invisibleCharacterCount);
             }
             else
             {
                 var writer = new StringWriter();
-                EvaluateUnaligned(ctx, writer, formatProvider, ref invisibleCharacterCount);
+                EvaluateUnaligned(ctx, writer, _formatProvider, ref invisibleCharacterCount);
                 Padding.Apply(output, writer.ToString(), _alignment.Value.Widen(invisibleCharacterCount));
             }
         }

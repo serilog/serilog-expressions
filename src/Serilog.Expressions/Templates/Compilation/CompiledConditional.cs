@@ -19,12 +19,12 @@ namespace Serilog.Templates.Compilation
             _alternative = alternative;
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             if (ExpressionResult.IsTrue(_condition.Invoke(ctx)))
-                _consequent.Evaluate(ctx, output, formatProvider);
+                _consequent.Evaluate(ctx, output);
             else
-                _alternative?.Evaluate(ctx, output, formatProvider);
+                _alternative?.Evaluate(ctx, output);
         }
     }
 }

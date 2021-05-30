@@ -17,7 +17,6 @@ namespace Serilog.Templates
     /// </summary>
     public class ExpressionTemplate : ITextFormatter
     {
-        readonly IFormatProvider? _formatProvider;
         readonly CompiledTemplate _compiled;
         
         /// <summary>
@@ -70,17 +69,16 @@ namespace Serilog.Templates
             result = new ExpressionTemplate(
                 TemplateCompiler.Compile(
                     planned,
+                    formatProvider,
                     DefaultFunctionNameResolver.Build(nameResolver),
-                    theme ?? TemplateTheme.None),
-                formatProvider);
+                    theme ?? TemplateTheme.None));
             
             return true;
         }
         
-        ExpressionTemplate(CompiledTemplate compiled, IFormatProvider? formatProvider)
+        ExpressionTemplate(CompiledTemplate compiled)
         {
             _compiled = compiled;
-            _formatProvider = formatProvider;
         }
 
         /// <summary>
@@ -108,16 +106,15 @@ namespace Serilog.Templates
             
             _compiled = TemplateCompiler.Compile(
                 planned,
+                formatProvider,
                 DefaultFunctionNameResolver.Build(nameResolver),
                 theme ?? TemplateTheme.None);
-            
-            _formatProvider = formatProvider;
         }
 
         /// <inheritdoc />
         public void Format(LogEvent logEvent, TextWriter output)
         {
-            _compiled.Evaluate(new EvaluationContext(logEvent), output, _formatProvider);
+            _compiled.Evaluate(new EvaluationContext(logEvent), output);
         }
     }
 }

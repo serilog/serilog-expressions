@@ -16,7 +16,7 @@ namespace Serilog.Templates.Compilation
             _style = theme.GetStyle(TemplateThemeStyle.TertiaryText);
         }
 
-        public override void Evaluate(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider)
+        public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var _ = 0;
             using (_style.Set(output, ref _))
