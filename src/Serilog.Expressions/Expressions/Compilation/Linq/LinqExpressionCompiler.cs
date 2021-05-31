@@ -141,6 +141,7 @@ namespace Serilog.Expressions.Compilation.Linq
                 return px.PropertyName switch
                 {
                     BuiltInProperty.Level => Splice(context => new ScalarValue(context.LogEvent.Level)),
+                    // TODO: for consistency, this should call (an extract of) `CompiledMessageToken.Evaluate(ctx, output)`.
                     BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(context.LogEvent))),
                     BuiltInProperty.Exception => Splice(context =>
                         context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),

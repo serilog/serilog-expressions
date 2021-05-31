@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Templates;
@@ -78,6 +78,16 @@ namespace Sample
         
         static void TextFormattingExample2()
         {
+            // Emulates `Microsoft.Extensions.Logging`'s `ConsoleLogger`.
+            
+            var melon = new TemplateTheme(TemplateTheme.Literate, new Dictionary<TemplateThemeStyle, string>
+            {
+                // `Information` is dark green in MEL.
+                [TemplateThemeStyle.LevelInformation] = "\x1b[38;5;34m",
+                [TemplateThemeStyle.String] = "\x1b[38;5;33m",
+                [TemplateThemeStyle.Number] = "\x1b[38;5;93m"
+            });
+
             using var log = new LoggerConfiguration()
                 .WriteTo.Console(new ExpressionTemplate(
                     "{@l:w4}: {SourceContext}\n" +
@@ -86,16 +96,15 @@ namespace Sample
                     "{#end}" +
                     "      {@m}\n" +
                     "{@x}",
-                    theme: TemplateTheme.Literate))
+                    theme: melon))
                 .CreateLogger();
 
             var program = log.ForContext<Program>();
             program.Information("Starting up");
             
-            // Emulate data produced by the Serilog.AspNetCore integration
-            var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
-
-            scoped.Information("Hello, {Name} x {Number}!", "world", 42);
+            program
+                .ForContext("Scope", new[] {"Main", "TextFormattingExample2()"})
+                .Information("Hello, {Name} x {Number}!", "world", 42);
         }
     }
 }

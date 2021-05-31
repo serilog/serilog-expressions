@@ -27,13 +27,13 @@ using Serilog.Parsing;
 
 namespace Serilog.Expressions.Compilation.Linq
 {
-    static class Intrinsics
+    class Intrinsics
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         static readonly LogEventPropertyValue Tombstone = new ScalarValue("😬 (if you see this you have found a bug.)");
         
         // TODO #19: formatting is culture-specific.
-        static readonly MessageTemplateTextFormatter MessageFormatter = new MessageTemplateTextFormatter("{Message:lj}");
+        static readonly MessageTemplateTextFormatter MessageFormatter = new("{Message:lj}");
 
         public static List<LogEventPropertyValue?> CollectSequenceElements(LogEventPropertyValue?[] elements)
         {
@@ -191,7 +191,7 @@ namespace Serilog.Expressions.Compilation.Linq
             List<LogEventPropertyValue>? elements = null;
             foreach (var token in logEvent.MessageTemplate.Tokens)
             {
-                if (token is PropertyToken pt && pt.Format != null)
+                if (token is PropertyToken {Format: { }} pt)
                 {
                     elements ??= new List<LogEventPropertyValue>();
                     

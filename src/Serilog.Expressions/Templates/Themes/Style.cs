@@ -38,5 +38,10 @@ namespace Serilog.Templates.Themes
             
             return default;
         }
+
+        public string? GetAnsiStyle()
+        {
+            return _ansiStyle;
+        }
     }
 }

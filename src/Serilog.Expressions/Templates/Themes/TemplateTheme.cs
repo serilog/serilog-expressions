@@ -40,17 +40,34 @@ namespace Serilog.Templates.Themes
 
         internal static TemplateTheme None { get; } = new TemplateTheme(new Dictionary<TemplateThemeStyle, string>());
 
-        readonly IReadOnlyDictionary<TemplateThemeStyle, Style> _styles;
+        readonly Dictionary<TemplateThemeStyle, Style> _styles;
 
         /// <summary>
         /// Construct a theme given a set of styles.
         /// </summary>
-        /// <param name="styles">Styles to apply within the theme.</param>
-        /// <exception cref="ArgumentNullException">When <paramref name="styles"/> is <code>null</code></exception>
-        public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> styles)
+        /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
+        /// sequences implementing the styles.</param>
+        /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
+        public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
         {
-            if (styles is null) throw new ArgumentNullException(nameof(styles));
-            _styles = styles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
+            if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+            _styles = ansiStyles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
+        }
+
+        /// <summary>
+        /// Construct a theme given a set of styles.
+        /// </summary>
+        /// <param name="baseTheme">A base template theme, which will supply styles not overridden in <paramref name="ansiStyles"/>.</param>
+        /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
+        /// sequences implementing the styles.</param>
+        /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
+        public TemplateTheme(TemplateTheme baseTheme, IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
+        {
+            if (baseTheme == null) throw new ArgumentNullException(nameof(baseTheme));
+            if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+            _styles = new Dictionary<TemplateThemeStyle, Style>(baseTheme._styles);
+            foreach (var kv in ansiStyles)
+                _styles[kv.Key] = new Style(kv.Value);
         }
 
         internal Style GetStyle(TemplateThemeStyle templateThemeStyle)
