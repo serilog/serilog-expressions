@@ -84,8 +84,8 @@ namespace Sample
             {
                 // `Information` is dark green in MEL.
                 [TemplateThemeStyle.LevelInformation] = "\x1b[38;5;34m",
-                [TemplateThemeStyle.String] = "\x1b[38;5;138m",
-                [TemplateThemeStyle.Number] = "\x1b[38;5;140m"
+                [TemplateThemeStyle.String] = "\x1b[38;5;159m",
+                [TemplateThemeStyle.Number] = "\x1b[38;5;159m"
             });
 
             using var log = new LoggerConfiguration()
