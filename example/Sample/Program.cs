@@ -26,7 +26,8 @@ namespace Sample
                 .WriteTo.Console(new ExpressionTemplate(
                     "[{@t:HH:mm:ss} {@l:u3}" +
                     "{#if SourceContext is not null} ({Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}){#end}] " +
-                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}"))
+                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}",
+                    theme: TemplateTheme.Code))
                 .CreateLogger();
 
             log.Information("Running {Example}", nameof(TextFormattingExample1));
@@ -43,8 +44,7 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("Application", "Example")
                 .WriteTo.Console(new ExpressionTemplate(
-                    "{ {@t: UtcDateTime(@t), @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n",
-                    theme: TemplateTheme.Code))
+                    "{ {@t: UtcDateTime(@t), @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
                 .CreateLogger();
 
             log.Information("Running {Example}", nameof(JsonFormattingExample));
@@ -84,8 +84,8 @@ namespace Sample
             {
                 // `Information` is dark green in MEL.
                 [TemplateThemeStyle.LevelInformation] = "\x1b[38;5;34m",
-                [TemplateThemeStyle.String] = "\x1b[38;5;33m",
-                [TemplateThemeStyle.Number] = "\x1b[38;5;93m"
+                [TemplateThemeStyle.String] = "\x1b[38;5;138m",
+                [TemplateThemeStyle.Number] = "\x1b[38;5;140m"
             });
 
             using var log = new LoggerConfiguration()
@@ -100,11 +100,13 @@ namespace Sample
                 .CreateLogger();
 
             var program = log.ForContext<Program>();
-            program.Information("Starting up");
+            program.Information("Host listening at {ListenUri}", "https://hello-world.local");
             
             program
                 .ForContext("Scope", new[] {"Main", "TextFormattingExample2()"})
-                .Information("Hello, {Name} x {Number}!", "world", 42);
+                .Information("HTTP {Method} {Path} responded {StatusCode} in {Elapsed:0.000} ms", "GET", "/api/hello", 200, 1.23);
+            
+            program.Warning("We've reached the end of the line");
         }
     }
 }
