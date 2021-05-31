@@ -13,20 +13,25 @@
 // limitations under the License.
 
 using System;
-using Serilog.Events;
-using Serilog.Expressions.Runtime;
+using System.IO;
 
-namespace Serilog.Expressions
+namespace Serilog.Templates.Themes
 {
-    readonly struct EvaluationContext
+    readonly struct StyleReset : IDisposable
     {
-        public LogEvent LogEvent { get; }
-        public Locals? Locals { get; }
-
-        public EvaluationContext(LogEvent logEvent, Locals? locals = null)
+        const string AnsiStyleResetSequence = "\x1b[0m";
+        public const int ResetCharCount = 4;
+        
+        readonly TextWriter? _output;
+        
+        public StyleReset(TextWriter output)
         {
-            LogEvent = logEvent ?? throw new ArgumentNullException(nameof(logEvent));
-            Locals = locals;
+            _output = output;
+        }
+
+        public void Dispose()
+        {
+            _output?.Write(AnsiStyleResetSequence);
         }
     }
 }

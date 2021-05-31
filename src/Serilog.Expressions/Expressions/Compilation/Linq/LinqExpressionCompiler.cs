@@ -20,6 +20,8 @@ using System.Reflection;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
+using Serilog.Templates.Compilation;
+using Serilog.Templates.Themes;
 using ConstantExpression = Serilog.Expressions.Ast.ConstantExpression;
 using Expression = Serilog.Expressions.Ast.Expression;
 using ParameterExpression = System.Linq.Expressions.ParameterExpression;
@@ -31,6 +33,7 @@ namespace Serilog.Expressions.Compilation.Linq
     class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     {
         readonly NameResolver _nameResolver;
+        readonly IFormatProvider? _formatProvider;
 
         static readonly MethodInfo CollectSequenceElementsMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.CollectSequenceElements), BindingFlags.Static | BindingFlags.Public)!;
@@ -70,15 +73,17 @@ namespace Serilog.Expressions.Compilation.Linq
 
         ParameterExpression Context { get; } = LX.Variable(typeof(EvaluationContext), "ctx");
 
-        LinqExpressionCompiler(NameResolver nameResolver)
+        LinqExpressionCompiler(IFormatProvider? formatProvider, NameResolver nameResolver)
         {
             _nameResolver = nameResolver;
+            _formatProvider = formatProvider;
         }
         
-        public static Evaluatable Compile(Expression expression, NameResolver nameResolver)
+        public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider,
+            NameResolver nameResolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            var compiler = new LinqExpressionCompiler(nameResolver);
+            var compiler = new LinqExpressionCompiler(formatProvider, nameResolver);
             var body = compiler.Transform(expression); 
             return LX.Lambda<Evaluatable>(body, compiler.Context).Compile();
         }
@@ -93,7 +98,9 @@ namespace Serilog.Expressions.Compilation.Linq
             if (!_nameResolver.TryResolveFunctionName(lx.OperatorName, out var m))
                 throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognized.");
 
-            var parameterCount = m.GetParameters().Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
+            var methodParameters = m.GetParameters();
+            
+            var parameterCount = methodParameters.Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
             if (parameterCount != lx.Operands.Length)
                 throw new ArgumentException($"The function `{lx.OperatorName}` requires {parameterCount} arguments.");
 
@@ -106,9 +113,15 @@ namespace Serilog.Expressions.Compilation.Linq
             if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpOr))
                 return CompileLogical(LX.OrElse, operands[0], operands[1]);
 
-            if (m.GetParameters().Any(pi => pi.ParameterType == typeof(StringComparison)))
-                operands.Insert(0, LX.Constant(lx.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
-
+            for (var i = 0; i < methodParameters.Length; ++i)
+            {
+                var pi = methodParameters[i];
+                if (pi.ParameterType == typeof(StringComparison))
+                    operands.Insert(i, LX.Constant(lx.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                else if (pi.ParameterType == typeof(IFormatProvider))
+                    operands.Insert(i, LX.Constant(_formatProvider, typeof(IFormatProvider)));
+            }
+            
             return LX.Call(m, operands);
         }
 
@@ -138,10 +151,13 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             if (px.IsBuiltIn)
             {
+                var formatter = new CompiledMessageToken(_formatProvider, null, TemplateTheme.None);
+                var formatProvider = _formatProvider;
+                
                 return px.PropertyName switch
                 {
                     BuiltInProperty.Level => Splice(context => new ScalarValue(context.LogEvent.Level)),
-                    BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(context.LogEvent))),
+                    BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(formatter, context))),
                     BuiltInProperty.Exception => Splice(context =>
                         context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),
                     BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.LogEvent.Timestamp)),
@@ -149,7 +165,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     BuiltInProperty.Properties => Splice(context =>
                         new StructureValue(context.LogEvent.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
                             null)),
-                    BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context.LogEvent)),
+                    BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context.LogEvent, formatProvider)),
                     BuiltInProperty.EventId => Splice(context =>
                         new ScalarValue(EventIdHash.Compute(context.LogEvent.MessageTemplate.Text))),
                     _ => LX.Constant(null, typeof(LogEventPropertyValue))

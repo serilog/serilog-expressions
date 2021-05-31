@@ -26,3 +26,4 @@ A{#if false}B{#else if true}C{#end}                  ⇶ AC
 {#each a, b in {x: 1, y: 2}}{a}.{b}{#end}            ⇶ x.1y.2
 {#if true}A{#each a in [1]}B{a}{#end}C{#end}D        ⇶ AB1CD
 {#each a in []}{a}!{#else}none{#end}                 ⇶ none
+Culture-specific {42.34}                             ⇶ Culture-specific 42,34

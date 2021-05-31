@@ -231,6 +231,9 @@ tostring('test', 42)                 ⇶ undefined()
 tostring(16, undefined())            ⇶ '16'
 tostring(16, null)                   ⇶ '16'
 
+// Tests are in fr-FR
+tostring(16.3)                       ⇶ '16,3'
+
 // TypeOf
 typeof(undefined())                  ⇶ 'undefined'
 typeof('test')                       ⇶ 'System.String'

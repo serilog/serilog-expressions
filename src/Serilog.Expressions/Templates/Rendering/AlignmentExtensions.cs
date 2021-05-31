@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Serilog.Events;
-using Serilog.Expressions.Runtime;
+using Serilog.Parsing;
 
-namespace Serilog.Expressions
+namespace Serilog.Templates.Rendering
 {
-    readonly struct EvaluationContext
+    static class AlignmentExtensions
     {
-        public LogEvent LogEvent { get; }
-        public Locals? Locals { get; }
-
-        public EvaluationContext(LogEvent logEvent, Locals? locals = null)
+        public static Alignment Widen(this Alignment alignment, int amount)
         {
-            LogEvent = logEvent ?? throw new ArgumentNullException(nameof(logEvent));
-            Locals = locals;
+            return new(alignment.Direction, alignment.Width + amount);
         }
     }
 }

@@ -12,30 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.IO;
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Templates.Themes
 {
-    class IndexerWildcardExpression : Expression
+    readonly struct Style
     {
-        public IndexerWildcardExpression(IndexerWildcard wildcard)
+        readonly string? _ansiStyle;
+
+        public Style(string ansiStyle)
         {
-            Wildcard = wildcard;
+            _ansiStyle = ansiStyle;
+        }
+        
+        internal StyleReset Set(TextWriter output, ref int invisibleCharacterCount)
+        {
+            if (_ansiStyle != null)
+            {
+                output.Write(_ansiStyle);
+                invisibleCharacterCount += _ansiStyle.Length;
+                invisibleCharacterCount += StyleReset.ResetCharCount;
+
+                return new StyleReset(output);
+            }
+            
+            return default;
         }
 
-        public IndexerWildcard Wildcard { get; }
-
-        public override string ToString()
+        public string? GetAnsiStyle()
         {
-            switch (Wildcard)
-            {
-                case IndexerWildcard.Any:
-                    return "?";
-                case IndexerWildcard.All:
-                    return "*";
-                default:
-                    throw new NotSupportedException("Unrecognized wildcard " + Wildcard);
-            }
+            return _ansiStyle;
         }
     }
 }
