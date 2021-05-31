@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using Serilog.Expressions.Ast;
 
-// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable InconsistentNaming, MemberCanBePrivate.Global
 
 namespace Serilog.Expressions
 {

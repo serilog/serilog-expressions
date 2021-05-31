@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Serilog.Events;
@@ -26,8 +27,9 @@ namespace Serilog.Expressions.Tests
                     new LogEventProperty("Id", new ScalarValue(42)),
                     new LogEventProperty("Name", new ScalarValue("nblumhardt")), 
                 })));
-            
-            var actual = SerilogExpression.Compile(expr)(evt);
+
+            var frFr = CultureInfo.GetCultureInfoByIetfLanguageTag("fr-FR");
+            var actual = SerilogExpression.Compile(expr, formatProvider: frFr)(evt);
             var expected = SerilogExpression.Compile(result)(evt);
 
             if (expected is null)

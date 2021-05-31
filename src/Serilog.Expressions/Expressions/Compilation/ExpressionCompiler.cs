@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Arrays;
 using Serilog.Expressions.Compilation.Linq;
@@ -36,10 +37,11 @@ namespace Serilog.Expressions.Compilation
             return actual;
         }
         
-        public static Evaluatable Compile(Expression expression, NameResolver nameResolver)
+        public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider,
+            NameResolver nameResolver)
         {
             var actual = Translate(expression);
-            return LinqExpressionCompiler.Compile(actual, nameResolver);
+            return LinqExpressionCompiler.Compile(actual, formatProvider, nameResolver);
         }
     }
 }

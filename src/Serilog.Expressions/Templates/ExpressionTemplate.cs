@@ -83,8 +83,7 @@ namespace Serilog.Templates
             result = new ExpressionTemplate(
                 TemplateCompiler.Compile(
                     planned,
-                    formatProvider,
-                    DefaultFunctionNameResolver.Build(nameResolver),
+                    formatProvider, DefaultFunctionNameResolver.Build(nameResolver),
                     theme ?? TemplateTheme.None));
             
             return true;
@@ -120,9 +119,7 @@ namespace Serilog.Templates
             
             _compiled = TemplateCompiler.Compile(
                 planned,
-                formatProvider,
-                DefaultFunctionNameResolver.Build(nameResolver),
-                theme ?? TemplateTheme.None);
+                formatProvider, DefaultFunctionNameResolver.Build(nameResolver), theme ?? TemplateTheme.None);
         }
 
         /// <inheritdoc />

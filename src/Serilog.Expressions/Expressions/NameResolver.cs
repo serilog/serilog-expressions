@@ -32,7 +32,8 @@ namespace Serilog.Expressions
         /// <returns><c>True</c> if the name could be resolved; otherwise, <c>false</c>.</returns>
         /// <remarks>The method implementing a function should be <c>static</c>, return <see cref="LogEventPropertyValue"/>,
         /// and accept parameters of type <see cref="LogEventPropertyValue"/>. If the <c>ci</c> modifier is supported,
-        /// a <see cref="StringComparison"/> should be in the first argument position.</remarks>
+        /// a <see cref="StringComparison"/> should be included in the argument list. If the function is culture-specific,
+        /// an <see cref="IFormatProvider"/> should be included in the argument list.</remarks>
         public abstract bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation);
     }
 }

@@ -423,18 +423,18 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue _Internal_IsNull(LogEventPropertyValue? value)
         {
-            return ScalarBoolean(value is null || value is ScalarValue sv && sv.Value == null);
+            return ScalarBoolean(value is null or ScalarValue {Value: null});
         }
 
         public static LogEventPropertyValue _Internal_IsNotNull(LogEventPropertyValue? value)
         {
-            return ScalarBoolean(!(value is null || value is ScalarValue sv && sv.Value == null));
+            return ScalarBoolean(value is not (null or ScalarValue {Value: null}));
         }
 
         // Ideally this will be compiled as a short-circuiting intrinsic
         public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? v1, LogEventPropertyValue? v2)
         {
-            if (v1 is null || v1 is ScalarValue sv && sv.Value == null)
+            if (v1 is null or ScalarValue {Value: null})
                 return v2;
 
             return v1;
@@ -482,7 +482,7 @@ namespace Serilog.Expressions.Runtime
             return Coerce.IsTrue(condition) ? consequent : alternative;
         }
 
-        public static LogEventPropertyValue? ToString(LogEventPropertyValue? value, LogEventPropertyValue? format)
+        public static LogEventPropertyValue? ToString(IFormatProvider? formatProvider, LogEventPropertyValue? value, LogEventPropertyValue? format)
         {
             if (value is not ScalarValue sv ||
                 sv.Value == null ||
@@ -494,8 +494,7 @@ namespace Serilog.Expressions.Runtime
             string? toString;
             if (sv.Value is IFormattable formattable)
             {
-                // TODO #19: formatting is culture-specific.
-                toString = formattable.ToString(fmt, null);
+                toString = formattable.ToString(fmt, formatProvider);
             }
             else
             {

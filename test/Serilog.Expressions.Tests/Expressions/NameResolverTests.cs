@@ -20,7 +20,7 @@ namespace Serilog.Expressions.Tests.Expressions
         {
             var expr = SerilogExpression.Compile(
                 "magic(10) + 3 = 55",
-                new StaticMemberNameResolver(typeof(NameResolverTests)));
+                nameResolver: new StaticMemberNameResolver(typeof(NameResolverTests)));
             Assert.True(Coerce.IsTrue(expr(Some.InformationEvent())));
         }
     }

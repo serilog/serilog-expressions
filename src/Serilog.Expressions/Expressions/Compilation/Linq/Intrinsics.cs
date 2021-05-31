@@ -22,19 +22,17 @@ using Serilog.Events;
 using Serilog.Expressions.Runtime;
 using Serilog.Formatting.Display;
 using Serilog.Parsing;
+using Serilog.Templates.Compilation;
 
 // ReSharper disable ParameterTypeCanBeEnumerable.Global
 
 namespace Serilog.Expressions.Compilation.Linq
 {
-    class Intrinsics
+    static class Intrinsics
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         static readonly LogEventPropertyValue Tombstone = new ScalarValue("😬 (if you see this you have found a bug.)");
         
-        // TODO #19: formatting is culture-specific.
-        static readonly MessageTemplateTextFormatter MessageFormatter = new("{Message:lj}");
-
         public static List<LogEventPropertyValue?> CollectSequenceElements(LogEventPropertyValue?[] elements)
         {
             return elements.ToList();
@@ -178,15 +176,16 @@ namespace Serilog.Expressions.Compilation.Linq
             return null;
         }
 
-        public static string RenderMessage(LogEvent logEvent)
+        // Use of `CompiledMessageToken` is a layering violation here, but we want to ensure the formatting implementations
+        // line up exactly. Some refactoring here might be worthwhile, though with an eye on indirection costs.
+        public static string RenderMessage(CompiledMessageToken formatter, EvaluationContext ctx)
         {
-            // Use the same `:lj`-style formatting default as Serilog.Sinks.Console.
             var sw = new StringWriter();
-            MessageFormatter.Format(logEvent, sw);
+            formatter.Evaluate(ctx, sw);
             return sw.ToString();
         }
 
-        public static LogEventPropertyValue? GetRenderings(LogEvent logEvent)
+        public static LogEventPropertyValue? GetRenderings(LogEvent logEvent, IFormatProvider? formatProvider)
         {
             List<LogEventPropertyValue>? elements = null;
             foreach (var token in logEvent.MessageTemplate.Tokens)
@@ -197,8 +196,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     
                     var space = new StringWriter();
                   
-                    // TODO #19: formatting is culture-specific.
-                    pt.Render(logEvent.Properties, space);
+                    pt.Render(logEvent.Properties, space, formatProvider);
                     elements.Add(new ScalarValue(space.ToString()));
                 }
             }
