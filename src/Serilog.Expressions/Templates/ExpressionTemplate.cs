@@ -46,7 +46,7 @@ namespace Serilog.Templates
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            return TryParse(template, null, null, null, out result, out error);
+            return TryParse(template, null, null, null, false, out result, out error);
         }
 
         /// <summary>
@@ -60,12 +60,15 @@ namespace Serilog.Templates
         /// <param name="error">A description of the error, if unsuccessful.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
         /// with which to resolve function names that appear in the template.</param>
+        /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
+        /// <see cref="System.Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
         /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
         public static bool TryParse(
             string template,
             IFormatProvider? formatProvider,
             NameResolver? nameResolver,
             TemplateTheme? theme,
+            bool applyThemeWhenOutputIsRedirected,
             [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
@@ -84,7 +87,7 @@ namespace Serilog.Templates
                 TemplateCompiler.Compile(
                     planned,
                     formatProvider, DefaultFunctionNameResolver.Build(nameResolver),
-                    theme ?? TemplateTheme.None));
+                    SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
             
             return true;
         }
@@ -103,11 +106,14 @@ namespace Serilog.Templates
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
         /// with which to resolve function names that appear in the template.</param>
         /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
+        /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
+        /// <see cref="Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
         public ExpressionTemplate(
             string template,
             IFormatProvider? formatProvider = null,
             NameResolver? nameResolver = null,
-            TemplateTheme? theme = null)
+            TemplateTheme? theme = null,
+            bool applyThemeWhenOutputIsRedirected = false)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
@@ -119,7 +125,20 @@ namespace Serilog.Templates
             
             _compiled = TemplateCompiler.Compile(
                 planned,
-                formatProvider, DefaultFunctionNameResolver.Build(nameResolver), theme ?? TemplateTheme.None);
+                formatProvider,
+                DefaultFunctionNameResolver.Build(nameResolver),
+                SelectTheme(theme, applyThemeWhenOutputIsRedirected));
+        }
+
+        static TemplateTheme SelectTheme(TemplateTheme? supplied, bool applyThemeWhenOutputIsRedirected)
+        {
+            if (supplied == null ||
+                (Console.IsOutputRedirected || Console.IsErrorRedirected) && !applyThemeWhenOutputIsRedirected)
+            {
+                return TemplateTheme.None;
+            }
+
+            return supplied;
         }
 
         /// <inheritdoc />
