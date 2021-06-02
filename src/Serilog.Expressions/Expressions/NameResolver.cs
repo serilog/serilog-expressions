@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright © Serilog Contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Serilog.Events;
@@ -18,7 +32,8 @@ namespace Serilog.Expressions
         /// <returns><c>True</c> if the name could be resolved; otherwise, <c>false</c>.</returns>
         /// <remarks>The method implementing a function should be <c>static</c>, return <see cref="LogEventPropertyValue"/>,
         /// and accept parameters of type <see cref="LogEventPropertyValue"/>. If the <c>ci</c> modifier is supported,
-        /// a <see cref="StringComparison"/> should be in the first argument position.</remarks>
+        /// a <see cref="StringComparison"/> should be included in the argument list. If the function is culture-specific,
+        /// an <see cref="IFormatProvider"/> should be included in the argument list.</remarks>
         public abstract bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation);
     }
 }

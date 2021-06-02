@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright © Serilog Contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
@@ -409,18 +423,18 @@ namespace Serilog.Expressions.Runtime
 
         public static LogEventPropertyValue _Internal_IsNull(LogEventPropertyValue? value)
         {
-            return ScalarBoolean(value is null || value is ScalarValue sv && sv.Value == null);
+            return ScalarBoolean(value is null or ScalarValue {Value: null});
         }
 
         public static LogEventPropertyValue _Internal_IsNotNull(LogEventPropertyValue? value)
         {
-            return ScalarBoolean(!(value is null || value is ScalarValue sv && sv.Value == null));
+            return ScalarBoolean(value is not (null or ScalarValue {Value: null}));
         }
 
         // Ideally this will be compiled as a short-circuiting intrinsic
         public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? v1, LogEventPropertyValue? v2)
         {
-            if (v1 is null || v1 is ScalarValue sv && sv.Value == null)
+            if (v1 is null or ScalarValue {Value: null})
                 return v2;
 
             return v1;
@@ -468,20 +482,19 @@ namespace Serilog.Expressions.Runtime
             return Coerce.IsTrue(condition) ? consequent : alternative;
         }
 
-        public static LogEventPropertyValue? ToString(LogEventPropertyValue? value, LogEventPropertyValue? format)
+        public static LogEventPropertyValue? ToString(IFormatProvider? formatProvider, LogEventPropertyValue? value, LogEventPropertyValue? format)
         {
-            if (!(value is ScalarValue sv) ||
+            if (value is not ScalarValue sv ||
                 sv.Value == null ||
-                !(Coerce.String(format, out var fmt) || format == null || format is ScalarValue { Value: null }))
+                !(Coerce.String(format, out var fmt) || format is null or ScalarValue { Value: null }))
             {
                 return null;
             }
 
-            string toString;
+            string? toString;
             if (sv.Value is IFormattable formattable)
             {
-                // TODO #19: formatting is culture-specific.
-                toString = formattable.ToString(fmt, null);
+                toString = formattable.ToString(fmt, formatProvider);
             }
             else
             {

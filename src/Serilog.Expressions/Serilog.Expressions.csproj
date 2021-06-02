@@ -3,9 +3,9 @@
   <PropertyGroup>
     <Description>An embeddable mini-language for filtering, enriching, and formatting Serilog
       events, ideal for use with JSON or XML configuration.</Description>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <Authors>Serilog Contributors</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Serilog</RootNamespace>
@@ -18,13 +18,12 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/serilog/serilog-expressions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <LangVersion>8</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Superpower" Version="2.3.0" />
   </ItemGroup>
   
   <ItemGroup>

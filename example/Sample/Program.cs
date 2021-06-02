@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Templates;
+using Serilog.Templates.Themes;
 
 namespace Sample
 {
@@ -24,7 +26,8 @@ namespace Sample
                 .WriteTo.Console(new ExpressionTemplate(
                     "[{@t:HH:mm:ss} {@l:u3}" +
                     "{#if SourceContext is not null} ({Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}){#end}] " +
-                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}"))
+                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}",
+                    theme: TemplateTheme.Code))
                 .CreateLogger();
 
             log.Information("Running {Example}", nameof(TextFormattingExample1));
@@ -41,7 +44,7 @@ namespace Sample
             using var log = new LoggerConfiguration()
                 .Enrich.WithProperty("Application", "Example")
                 .WriteTo.Console(new ExpressionTemplate(
-                    "{ {@t, @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
+                    "{ {@t: UtcDateTime(@t), @mt, @l: if @l = 'Information' then undefined() else @l, @x, ..@p} }\n"))
                 .CreateLogger();
 
             log.Information("Running {Example}", nameof(JsonFormattingExample));
@@ -75,6 +78,16 @@ namespace Sample
         
         static void TextFormattingExample2()
         {
+            // Emulates `Microsoft.Extensions.Logging`'s `ConsoleLogger`.
+            
+            var melon = new TemplateTheme(TemplateTheme.Literate, new Dictionary<TemplateThemeStyle, string>
+            {
+                // `Information` is dark green in MEL.
+                [TemplateThemeStyle.LevelInformation] = "\x1b[38;5;34m",
+                [TemplateThemeStyle.String] = "\x1b[38;5;159m",
+                [TemplateThemeStyle.Number] = "\x1b[38;5;159m"
+            });
+
             using var log = new LoggerConfiguration()
                 .WriteTo.Console(new ExpressionTemplate(
                     "{@l:w4}: {SourceContext}\n" +
@@ -82,16 +95,18 @@ namespace Sample
                     "      {#each s in Scope}=> {s}{#delimit} {#end}\n" +
                     "{#end}" +
                     "      {@m}\n" +
-                    "{@x}"))
+                    "{@x}",
+                    theme: melon))
                 .CreateLogger();
 
             var program = log.ForContext<Program>();
-            program.Information("Starting up");
+            program.Information("Host listening at {ListenUri}", "https://hello-world.local");
             
-            // Emulate data produced by the Serilog.AspNetCore integration
-            var scoped = program.ForContext("Scope", new[] {"Main", "TextFormattingExample2()"});
+            program
+                .ForContext("Scope", new[] {"Main", "TextFormattingExample2()"})
+                .Information("HTTP {Method} {Path} responded {StatusCode} in {Elapsed:0.000} ms", "GET", "/api/hello", 200, 1.23);
             
-            scoped.Information("Hello, world!");
+            program.Warning("We've reached the end of the line");
         }
     }
 }

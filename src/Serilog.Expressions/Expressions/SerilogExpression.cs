@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Parsing;
@@ -31,15 +32,17 @@ namespace Serilog.Expressions
         /// Create an evaluation function based on the provided expression.
         /// </summary>
         /// <param name="expression">An expression.</param>
+        /// <param name="formatProvider">Optionally, a format provider that will be used for culture-specific formatting;
+        ///     by default, <see cref="CultureInfo.CurrentCulture"/> is used.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
-        /// with which to resolve function names that appear in the template.</param>
+        ///     with which to resolve function names that appear in the template.</param>
         /// <returns>A function that evaluates the expression in the context of a log event.</returns>
-        public static CompiledExpression Compile(
-            string expression,
+        public static CompiledExpression Compile(string expression,
+            IFormatProvider? formatProvider = null,
             NameResolver? nameResolver = null)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (!TryCompileImpl(expression, nameResolver, out var filter, out var error))
+            if (!TryCompileImpl(expression, formatProvider, nameResolver, out var filter, out var error))
                 throw new ArgumentException(error);
 
             return filter;
@@ -60,33 +63,35 @@ namespace Serilog.Expressions
             [MaybeNullWhen(true)] out string error)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return TryCompileImpl(expression, null, out result, out error);
+            return TryCompileImpl(expression, null, null, out result, out error);
         }
 
         /// <summary>
         /// Create an evaluation function based on the provided expression.
         /// </summary>
         /// <param name="expression">An expression.</param>
+        /// <param name="formatProvider">Optionally, a format provider that will be used for culture-specific formatting;
+        ///     by default, <see cref="CultureInfo.CurrentCulture"/> is used.</param>
+        /// <param name="nameResolver">A <see cref="NameResolver"/>
+        ///     with which to resolve function names that appear in the template.</param>
         /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
         /// <param name="error">The reported error, if compilation was unsuccessful.</param>
-        /// <param name="nameResolver">A <see cref="NameResolver"/>
-        /// with which to resolve function names that appear in the template.</param>
         /// <returns>True if the function could be created; otherwise, false.</returns>
         /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
         /// errors.</remarks>
-        public static bool TryCompile(
-            string expression,
+        public static bool TryCompile(string expression,
+            IFormatProvider? formatProvider,
             NameResolver nameResolver,
             [MaybeNullWhen(false)] out CompiledExpression result,
             [MaybeNullWhen(true)] out string error)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (nameResolver == null) throw new ArgumentNullException(nameof(nameResolver));
-            return TryCompileImpl(expression, nameResolver, out result, out error);
+            return TryCompileImpl(expression, formatProvider, nameResolver, out result, out error);
         }
         
-        static bool TryCompileImpl(
-            string expression,
+        static bool TryCompileImpl(string expression,
+            IFormatProvider? formatProvider,
             NameResolver? nameResolver,
             [MaybeNullWhen(false)] out CompiledExpression result,
             [MaybeNullWhen(true)] out string error)
@@ -98,7 +103,7 @@ namespace Serilog.Expressions
                 return false;
             }
 
-            var evaluate = ExpressionCompiler.Compile(root, DefaultFunctionNameResolver.Build(nameResolver));
+            var evaluate = ExpressionCompiler.Compile(root, formatProvider, DefaultFunctionNameResolver.Build(nameResolver));
             result = evt => evaluate(new EvaluationContext(evt));
             error = null;
             return true;

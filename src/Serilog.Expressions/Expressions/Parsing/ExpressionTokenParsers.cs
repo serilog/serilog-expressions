@@ -1,11 +1,25 @@
-﻿using System;
+﻿// Copyright © Serilog Contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using System.Globalization;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
-using Superpower;
-using Superpower.Model;
-using Superpower.Parsers;
+using Serilog.ParserConstruction;
+using Serilog.ParserConstruction.Model;
+using Serilog.ParserConstruction.Parsers;
 
 namespace Serilog.Expressions.Parsing
 {
@@ -65,23 +79,23 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Func<Expression, Expression>> PropertyPathIndexerStep =
             from open in Token.EqualTo(ExpressionToken.LBracket)
-            from indexer in Wildcard.Or(Parse.Ref(() => Expr))
+            from indexer in Wildcard.Or(Parse.Ref(() => Expr!))
             from close in Token.EqualTo(ExpressionToken.RBracket)
             select new Func<Expression, Expression>(r => new IndexerExpression(r, indexer));
 
         static readonly TokenListParser<ExpressionToken, Expression> Function =
             (from name in Token.EqualTo(ExpressionToken.Identifier)
              from lparen in Token.EqualTo(ExpressionToken.LParen)
-             from expr in Parse.Ref(() => Expr).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
+             from expr in Parse.Ref(() => Expr!).ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
              from rparen in Token.EqualTo(ExpressionToken.RParen)
              from ci in Token.EqualTo(ExpressionToken.CI).Value(true).OptionalOrDefault()
              select (Expression)new CallExpression(ci, name.ToStringValue(), expr)).Named("function");
 
         static readonly TokenListParser<ExpressionToken, Element> ArrayElement =
             Token.EqualTo(ExpressionToken.Spread)
-                .IgnoreThen(Parse.Ref(() => Expr))
+                .IgnoreThen(Parse.Ref(() => Expr!))
                 .Select(content => (Element)new SpreadElement(content))
-                .Or(Parse.Ref(() => Expr).Select(item => (Element) new ItemElement(item)));
+                .Or(Parse.Ref(() => Expr!).Select(item => (Element) new ItemElement(item)));
         
         static readonly TokenListParser<ExpressionToken, Expression> ArrayLiteral =
         (from lbracket in Token.EqualTo(ExpressionToken.LBracket)
@@ -92,7 +106,7 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, Member> IdentifierMember =
             from key in Token.EqualTo(ExpressionToken.Identifier).Or(Token.EqualTo(ExpressionToken.BuiltInIdentifier))
             from value in Token.EqualTo(ExpressionToken.Colon)
-                .IgnoreThen(Parse.Ref(() => Expr))
+                .IgnoreThen(Parse.Ref(() => Expr!))
                 .Cast<ExpressionToken, Expression, Expression?>()
                 .OptionalOrDefault()
             select (Member) new PropertyMember(
@@ -104,12 +118,12 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, Member> StringMember =
             from key in Token.EqualTo(ExpressionToken.String).Apply(ExpressionTextParsers.String)
             from colon in Token.EqualTo(ExpressionToken.Colon)
-            from value in Parse.Ref(() => Expr)
+            from value in Parse.Ref(() => Expr!)
             select (Member)new PropertyMember(key, value);
 
         static readonly TokenListParser<ExpressionToken, Member> SpreadMember =
             from spread in Token.EqualTo(ExpressionToken.Spread)
-            from content in Parse.Ref(() => Expr)
+            from content in Parse.Ref(() => Expr!)
             select (Member) new SpreadMember(content);
 
         static readonly TokenListParser<ExpressionToken, Member> ObjectMember =
@@ -146,11 +160,11 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Conditional =
             from _ in Token.EqualTo(ExpressionToken.If)
-            from condition in Parse.Ref(() => Expr)
+            from condition in Parse.Ref(() => Expr!)
             from __ in Token.EqualTo(ExpressionToken.Then)
-            from consequent in Parse.Ref(() => Expr)
+            from consequent in Parse.Ref(() => Expr!)
             from ___ in Token.EqualTo(ExpressionToken.Else)
-            from alternative in Parse.Ref(() => Expr)
+            from alternative in Parse.Ref(() => Expr!)
             select (Expression)new CallExpression(false, Operators.RuntimeOpIfThenElse, condition, consequent, alternative);
         
         static readonly TokenListParser<ExpressionToken, Expression> Literal =
@@ -172,7 +186,7 @@ namespace Serilog.Expressions.Parsing
 
         static readonly TokenListParser<ExpressionToken, Expression> Factor =
             (from lparen in Token.EqualTo(ExpressionToken.LParen)
-             from expr in Parse.Ref(() => Expr)
+             from expr in Parse.Ref(() => Expr!)
              from rparen in Token.EqualTo(ExpressionToken.RParen)
              select expr)
                 .Or(Item);

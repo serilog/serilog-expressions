@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Serilog.Expressions.Tests.Support;
 using Serilog.Templates;
@@ -16,7 +17,8 @@ namespace Serilog.Expressions.Tests
         public void TemplatesAreCorrectlyEvaluated(string template, string expected)
         {
             var evt = Some.InformationEvent("Hello, {Name}!", "nblumhardt");
-            var compiled = new ExpressionTemplate(template);
+            var frFr = CultureInfo.GetCultureInfoByIetfLanguageTag("fr-FR");
+            var compiled = new ExpressionTemplate(template, formatProvider: frFr);
             var output = new StringWriter();
             compiled.Format(evt, output);
             var actual = output.ToString();

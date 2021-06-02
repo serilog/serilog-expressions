@@ -1,4 +1,6 @@
 ﻿using Serilog.Templates;
+using Serilog.Templates.Ast;
+using Serilog.Templates.Parsing;
 using Xunit;
 
 namespace Serilog.Expressions.Tests
@@ -17,8 +19,17 @@ namespace Serilog.Expressions.Tests
         [InlineData("Empty {Align,} digits", "Syntax error (line 1, column 14): unexpected `}`, expected alignment and width.")]
         public void ErrorsAreReported(string input, string error)
         {
-            Assert.False(ExpressionTemplate.TryParse(input, null, null, out _, out var actual));
+            Assert.False(ExpressionTemplate.TryParse(input, null, null, null, false, out _, out var actual));
             Assert.Equal(error, actual);
+        }
+
+        [Fact]
+        public void DefaultAlignmentIsNull()
+        {
+            var parser = new TemplateParser();
+            Assert.True(parser.TryParse("{x}", out var template, out _));
+            var avt = Assert.IsType<FormattedExpression>(template);
+            Assert.Null(avt.Alignment);
         }
     }
 }

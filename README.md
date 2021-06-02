@@ -82,7 +82,7 @@ _Serilog.Expressions_ adds a number of expression-based overloads and helper met
 ## Formatting with `ExpressionTemplate`
 
 _Serilog.Expressions_ includes the `ExpressionTemplate` class for text formatting. `ExpressionTemplate` implements `ITextFormatter`, so
-it works with any text-based Serilog sink:
+it works with any text-based Serilog sink, including `Console`, `File`, `Debug`, and `Email`:
 
 ```csharp
 // using Serilog.Templates;
@@ -96,7 +96,19 @@ Log.Logger = new LoggerConfiguration()
 // [21:21:40 INF (Sample.Program)] Cart contains ["Tea","Coffee"] (first item is Tea)
 ```
 
-Note the use of `{Cart[0]}`: "holes" in expression templates can include any valid expression over properties from the event.
+Templates are based on .NET format strings, and support standard padding, alignment, and format specifiers.
+
+Along with standard properties for the event timestamp (`@t`), level (`@l`) and so on, "holes" in expression templates can include complex 
+expressions over the first-class properties of the event, like `{SourceContex}` and `{Cart[0]}` in the example..
+
+Templates support customizable color themes when used with the `Console` sink:
+
+```csharp
+    .WriteTo.Console(new ExpressionTemplate(
+        "[{@t:HH:mm:ss} {@l:u3}] {@m}\n{@x}", theme: TemplateTheme.Code))
+```
+
+![Screenshot showing colored terminal output](https://raw.githubusercontent.com/serilog/serilog-expressions/dev/assets/screenshot.png)
 
 Newline-delimited JSON (for example, replicating the [CLEF format](https://github.com/serilog/serilog-formatting-compact)) can be generated
 using object literals:
@@ -112,7 +124,7 @@ using object literals:
 
 The following properties are available in expressions:
 
- * **All first-class properties of the event** &mdash; no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
+ * **All first-class properties of the event** - no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
  * `@m` - the rendered message
  * `@mt` - the raw message template
@@ -339,8 +351,9 @@ convert the result to plain-old-.NET-types like `string`, `bool`, `Dictionary<K,
 User-defined functions can be plugged in by implementing static methods that:
 
  * Return `LogEventPropertyValue?`,
- * Have arguments of type `LogEventPropertyValue?`, and
- * If the `ci` modifier is supported, accept a `StringComparison` in the first argument position.
+ * Have arguments of type `LogEventPropertyValue?`,
+ * If the `ci` modifier is supported, accept a `StringComparison`, and
+ * If culture-specific formatting or comparisons are used, accepts an `IFormatProvider`.
  
 For example:
 
@@ -370,3 +383,8 @@ var myFunctions = new StaticMemberNameResolver(typeof(MyFunctions));
 var expr = SerilogExpression.Compile("IsHello(User.Name)", new[] { myFunctions });
 // Filter events based on whether `User.Name` is `'Hello'` :-)
 ```
+
+## Acknowledgements
+
+Includes the parser combinator implementation from [Superpower](https://github.com/datalust/superpower), copyright Datalust, 
+Superpower Contributors, and Sprache Contributors; licensed under the Apache License, 2.0.

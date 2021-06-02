@@ -1,3 +1,17 @@
+// Copyright © Serilog Contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -8,6 +22,7 @@ using Serilog.Formatting;
 using Serilog.Templates.Compilation;
 using Serilog.Templates.Compilation.NameResolution;
 using Serilog.Templates.Parsing;
+using Serilog.Templates.Themes;
 
 namespace Serilog.Templates
 {
@@ -16,9 +31,8 @@ namespace Serilog.Templates
     /// </summary>
     public class ExpressionTemplate : ITextFormatter
     {
-        readonly IFormatProvider? _formatProvider;
         readonly CompiledTemplate _compiled;
-
+        
         /// <summary>
         /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
@@ -32,7 +46,7 @@ namespace Serilog.Templates
             [MaybeNullWhen(true)] out string error)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
-            return TryParse(template, null, null, out result, out error);
+            return TryParse(template, null, null, null, false, out result, out error);
         }
 
         /// <summary>
@@ -41,15 +55,20 @@ namespace Serilog.Templates
         /// <param name="template">The template text.</param>
         /// <param name="formatProvider">Optionally, an <see cref="IFormatProvider"/> to use when formatting
         /// embedded values.</param>
+        /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
         /// <param name="result">The parsed template, if successful.</param>
         /// <param name="error">A description of the error, if unsuccessful.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
         /// with which to resolve function names that appear in the template.</param>
+        /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
+        /// <see cref="System.Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
         /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
         public static bool TryParse(
             string template,
             IFormatProvider? formatProvider,
             NameResolver? nameResolver,
+            TemplateTheme? theme,
+            bool applyThemeWhenOutputIsRedirected,
             [MaybeNullWhen(false)] out ExpressionTemplate result,
             [MaybeNullWhen(true)] out string error)
         {
@@ -64,14 +83,18 @@ namespace Serilog.Templates
 
             var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
 
-            result = new ExpressionTemplate(TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver)), formatProvider);
+            result = new ExpressionTemplate(
+                TemplateCompiler.Compile(
+                    planned,
+                    formatProvider, DefaultFunctionNameResolver.Build(nameResolver),
+                    SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
+            
             return true;
         }
         
-        ExpressionTemplate(CompiledTemplate compiled, IFormatProvider? formatProvider)
+        ExpressionTemplate(CompiledTemplate compiled)
         {
             _compiled = compiled;
-            _formatProvider = formatProvider;
         }
 
         /// <summary>
@@ -82,10 +105,15 @@ namespace Serilog.Templates
         /// embedded values.</param>
         /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
         /// with which to resolve function names that appear in the template.</param>
+        /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
+        /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
+        /// <see cref="Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
         public ExpressionTemplate(
             string template,
             IFormatProvider? formatProvider = null,
-            NameResolver? nameResolver = null)
+            NameResolver? nameResolver = null,
+            TemplateTheme? theme = null,
+            bool applyThemeWhenOutputIsRedirected = false)
         {
             if (template == null) throw new ArgumentNullException(nameof(template));
 
@@ -95,14 +123,28 @@ namespace Serilog.Templates
             
             var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
             
-            _compiled = TemplateCompiler.Compile(planned, DefaultFunctionNameResolver.Build(nameResolver));
-            _formatProvider = formatProvider;
+            _compiled = TemplateCompiler.Compile(
+                planned,
+                formatProvider,
+                DefaultFunctionNameResolver.Build(nameResolver),
+                SelectTheme(theme, applyThemeWhenOutputIsRedirected));
+        }
+
+        static TemplateTheme SelectTheme(TemplateTheme? supplied, bool applyThemeWhenOutputIsRedirected)
+        {
+            if (supplied == null ||
+                (Console.IsOutputRedirected || Console.IsErrorRedirected) && !applyThemeWhenOutputIsRedirected)
+            {
+                return TemplateTheme.None;
+            }
+
+            return supplied;
         }
 
         /// <inheritdoc />
         public void Format(LogEvent logEvent, TextWriter output)
         {
-            _compiled.Evaluate(new EvaluationContext(logEvent), output, _formatProvider);
+            _compiled.Evaluate(new EvaluationContext(logEvent), output);
         }
     }
 }
