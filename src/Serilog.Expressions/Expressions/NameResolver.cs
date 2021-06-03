@@ -34,6 +34,24 @@ namespace Serilog.Expressions
         /// and accept parameters of type <see cref="LogEventPropertyValue"/>. If the <c>ci</c> modifier is supported,
         /// a <see cref="StringComparison"/> should be included in the argument list. If the function is culture-specific,
         /// an <see cref="IFormatProvider"/> should be included in the argument list.</remarks>
-        public abstract bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation);
+        public virtual bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation)
+        {
+            implementation = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Provide a value for a non-<see cref="LogEventPropertyValue"/> parameter. This allows user-defined state to
+        /// be threaded through user-defined functions.
+        /// </summary>
+        /// <param name="parameter">A parameter of a method implementing a user-defined function, which could not be
+        /// bound to any of the standard runtime-provided values or operands.</param>
+        /// <param name="boundValue">The value that should be provided when the method is called.</param>
+        /// <returns><c>True</c> if the parameter could be bound; otherwise, <c>false</c>.</returns>
+        public virtual bool TryBindFunctionParameter(ParameterInfo parameter, [MaybeNullWhen(false)] out object boundValue)
+        {
+            boundValue = null;
+            return false;
+        }
     }
 }

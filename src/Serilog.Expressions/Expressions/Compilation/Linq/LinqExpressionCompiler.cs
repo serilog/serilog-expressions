@@ -71,6 +71,9 @@ namespace Serilog.Expressions.Compilation.Linq
         static readonly MethodInfo TryGetStructurePropertyValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public)!;
 
+        static readonly PropertyInfo EvaluationContextLogEventProperty = typeof(EvaluationContext)
+            .GetProperty(nameof(EvaluationContext.LogEvent), BindingFlags.Instance | BindingFlags.Public)!;
+
         ParameterExpression Context { get; } = LX.Variable(typeof(EvaluationContext), "ctx");
 
         LinqExpressionCompiler(IFormatProvider? formatProvider, NameResolver nameResolver)
@@ -93,36 +96,44 @@ namespace Serilog.Expressions.Compilation.Linq
             return ParameterReplacementVisitor.ReplaceParameters(lambda, Context);
         }
         
-        protected override ExpressionBody Transform(CallExpression lx)
+        protected override ExpressionBody Transform(CallExpression call)
         {
-            if (!_nameResolver.TryResolveFunctionName(lx.OperatorName, out var m))
-                throw new ArgumentException($"The function name `{lx.OperatorName}` was not recognized.");
+            if (!_nameResolver.TryResolveFunctionName(call.OperatorName, out var m))
+                throw new ArgumentException($"The function name `{call.OperatorName}` was not recognized.");
 
             var methodParameters = m.GetParameters();
             
             var parameterCount = methodParameters.Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
-            if (parameterCount != lx.Operands.Length)
-                throw new ArgumentException($"The function `{lx.OperatorName}` requires {parameterCount} arguments.");
+            if (parameterCount != call.Operands.Length)
+                throw new ArgumentException($"The function `{call.OperatorName}` requires {parameterCount} arguments.");
 
-            var operands = lx.Operands.Select(Transform).ToList();
+            var operands = new Queue<LX>(call.Operands.Select(Transform));
 
             // `and` and `or` short-circuit to save execution time; unlike the earlier Serilog.Filters.Expressions, nothing else does.
-            if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpAnd))
-                return CompileLogical(LX.AndAlso, operands[0], operands[1]);
+            if (Operators.SameOperator(call.OperatorName, Operators.RuntimeOpAnd))
+                return CompileLogical(LX.AndAlso, operands.Dequeue(), operands.Dequeue());
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.RuntimeOpOr))
-                return CompileLogical(LX.OrElse, operands[0], operands[1]);
+            if (Operators.SameOperator(call.OperatorName, Operators.RuntimeOpOr))
+                return CompileLogical(LX.OrElse, operands.Dequeue(), operands.Dequeue());
 
-            for (var i = 0; i < methodParameters.Length; ++i)
+            var boundParameters = new List<LX>(methodParameters.Length);
+            foreach (var pi in methodParameters)
             {
-                var pi = methodParameters[i];
-                if (pi.ParameterType == typeof(StringComparison))
-                    operands.Insert(i, LX.Constant(lx.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                if (pi.ParameterType == typeof(LogEventPropertyValue))
+                    boundParameters.Add(operands.Dequeue());
+                else if (pi.ParameterType == typeof(StringComparison))
+                    boundParameters.Add(LX.Constant(call.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
                 else if (pi.ParameterType == typeof(IFormatProvider))
-                    operands.Insert(i, LX.Constant(_formatProvider, typeof(IFormatProvider)));
+                    boundParameters.Add(LX.Constant(_formatProvider, typeof(IFormatProvider)));
+                else if (pi.ParameterType == typeof(LogEvent))
+                    boundParameters.Add(LX.Property(Context, EvaluationContextLogEventProperty));
+                else if (_nameResolver.TryBindFunctionParameter(pi, out var binding))
+                    boundParameters.Add(LX.Constant(binding, pi.ParameterType));
+                else
+                    throw new ArgumentException($"The method `{m.Name}` implementing function `{call.OperatorName}` has parameter `{pi.Name}` which could not be bound.");
             }
             
-            return LX.Call(m, operands);
+            return LX.Call(m, boundParameters);
         }
 
         static ExpressionBody CompileLogical(Func<ExpressionBody, ExpressionBody, ExpressionBody> apply, ExpressionBody lhs, ExpressionBody rhs)
@@ -138,8 +149,8 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override ExpressionBody Transform(AccessorExpression spx)
         {
-            var recv = Transform(spx.Receiver);
-            return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), recv, LX.Constant(spx.MemberName, typeof(string)));
+            var receiver = Transform(spx.Receiver);
+            return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), receiver, LX.Constant(spx.MemberName, typeof(string)));
         }
         
         protected override ExpressionBody Transform(ConstantExpression cx)

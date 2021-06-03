@@ -195,6 +195,7 @@ calling a function will be undefined if:
 | `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `Length(x)` | Returns the length of a string or array. |
 | `Now()` | Returns `DateTimeOffset.Now`. |
+| `Rest()` | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template or the event's message. |
 | `Round(n, m)` | Round the number `n` to `m` decimal places. |
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
