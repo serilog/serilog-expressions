@@ -23,10 +23,11 @@ namespace Sample
         static void TextFormattingExample1()
         {
             using var log = new LoggerConfiguration()
+                .Enrich.WithProperty("Application", "Sample")
                 .WriteTo.Console(new ExpressionTemplate(
                     "[{@t:HH:mm:ss} {@l:u3}" +
                     "{#if SourceContext is not null} ({Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}){#end}] " +
-                    "{@m} (first item is {coalesce(Items[0], '<empty>')})\n{@x}",
+                    "{@m} (first item is {coalesce(Items[0], '<empty>')}) {rest()}\n{@x}",
                     theme: TemplateTheme.Code))
                 .CreateLogger();
 

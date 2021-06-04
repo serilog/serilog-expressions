@@ -30,21 +30,21 @@ namespace Serilog.Expressions.Compilation.Text
             return Instance.Transform(expression);
         }
 
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(CallExpression call)
         {
-            if (lx.Operands.Length != 2)
-                return base.Transform(lx);
+            if (call.Operands.Length != 2)
+                return base.Transform(call);
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpLike))
-                return TryCompileLikeExpression(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]);
+            if (Operators.SameOperator(call.OperatorName, Operators.IntermediateOpLike))
+                return TryCompileLikeExpression(call.IgnoreCase, call.Operands[0], call.Operands[1]);
             
-            if (Operators.SameOperator(lx.OperatorName, Operators.IntermediateOpNotLike))
+            if (Operators.SameOperator(call.OperatorName, Operators.IntermediateOpNotLike))
                 return new CallExpression(
                     false,
                     Operators.RuntimeOpStrictNot,
-                    TryCompileLikeExpression(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]));
+                    TryCompileLikeExpression(call.IgnoreCase, call.Operands[0], call.Operands[1]));
 
-            return base.Transform(lx);
+            return base.Transform(call);
         }
 
         Expression TryCompileLikeExpression(bool ignoreCase, Expression corpus, Expression like)

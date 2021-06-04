@@ -41,7 +41,7 @@ namespace Serilog.Expressions.Compilation.Transformations
             };
         }
 
-        protected abstract TResult Transform(CallExpression lx);
+        protected abstract TResult Transform(CallExpression call);
         protected abstract TResult Transform(ConstantExpression cx);
         protected abstract TResult Transform(AmbientNameExpression px);
         protected abstract TResult Transform(LocalNameExpression nlx);

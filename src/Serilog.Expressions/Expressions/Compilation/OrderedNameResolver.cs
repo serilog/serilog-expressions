@@ -39,5 +39,17 @@ namespace Serilog.Expressions.Compilation
             implementation = null;
             return false;
         }
+
+        public override bool TryBindFunctionParameter(ParameterInfo parameter, [MaybeNullWhen(false)] out object boundValue)
+        {
+            foreach (var resolver in _orderedResolvers)
+            {
+                if (resolver.TryBindFunctionParameter(parameter, out boundValue))
+                    return true;
+            }
+
+            boundValue = null;
+            return false;
+        }
     }
 }

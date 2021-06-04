@@ -28,38 +28,38 @@ namespace Serilog.Expressions.Compilation.Variadics
             return Instance.Transform(expression);
         }
 
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(CallExpression call)
         {
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpSubstring) && lx.Operands.Length == 2)
+            if (Operators.SameOperator(call.OperatorName, Operators.OpSubstring) && call.Operands.Length == 2)
             {
-                var operands = lx.Operands
+                var operands = call.Operands
                     .Select(Transform)
                     .Concat(new[] {CallUndefined()})
                     .ToArray();
-                return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands);
+                return new CallExpression(call.IgnoreCase, call.OperatorName, operands);
             }
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpCoalesce))
+            if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce))
             {
-                if (lx.Operands.Length == 0)
+                if (call.Operands.Length == 0)
                     return CallUndefined();
-                if (lx.Operands.Length == 1)
-                    return Transform(lx.Operands.Single());
-                if (lx.Operands.Length > 2)
+                if (call.Operands.Length == 1)
+                    return Transform(call.Operands.Single());
+                if (call.Operands.Length > 2)
                 {
-                    var first = Transform(lx.Operands.First());
-                    return new CallExpression(lx.IgnoreCase, lx.OperatorName, first,
-                        Transform(new CallExpression(lx.IgnoreCase, lx.OperatorName, lx.Operands.Skip(1).ToArray())));
+                    var first = Transform(call.Operands.First());
+                    return new CallExpression(call.IgnoreCase, call.OperatorName, first,
+                        Transform(new CallExpression(call.IgnoreCase, call.OperatorName, call.Operands.Skip(1).ToArray())));
                 }
             }
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpToString) &&
-                lx.Operands.Length == 1)
+            if (Operators.SameOperator(call.OperatorName, Operators.OpToString) &&
+                call.Operands.Length == 1)
             {
-                return new CallExpression(lx.IgnoreCase, lx.OperatorName, lx.Operands[0], CallUndefined());
+                return new CallExpression(call.IgnoreCase, call.OperatorName, call.Operands[0], CallUndefined());
             }
 
-            return base.Transform(lx);
+            return base.Transform(call);
         }
 
         static CallExpression CallUndefined()

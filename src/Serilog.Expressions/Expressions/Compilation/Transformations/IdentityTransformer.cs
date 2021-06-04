@@ -25,11 +25,11 @@ namespace Serilog.Expressions.Compilation.Transformations
             return !ReferenceEquals(expr, result);
         }
         
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(CallExpression call)
         {
             var any = false;
             var operands = new List<Expression>();
-            foreach (var op in lx.Operands)
+            foreach (var op in call.Operands)
             {
                 if (TryTransform(op, out var result))
                     any = true;
@@ -37,9 +37,9 @@ namespace Serilog.Expressions.Compilation.Transformations
             }
 
             if (!any)
-                return lx;
+                return call;
             
-            return new CallExpression(lx.IgnoreCase, lx.OperatorName, operands.ToArray());
+            return new CallExpression(call.IgnoreCase, call.OperatorName, operands.ToArray());
         }
 
         protected override Expression Transform(ConstantExpression cx)
