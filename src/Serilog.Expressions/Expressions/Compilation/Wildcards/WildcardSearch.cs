@@ -76,14 +76,14 @@ namespace Serilog.Expressions.Compilation.Wildcards
             return null;
         }
 
-        protected override IndexerExpression? Transform(CallExpression lx)
+        protected override IndexerExpression? Transform(CallExpression call)
         {
             // If we hit a wildcard-compatible operation, then any wildcards within its operands "belong" to
             // it and can't be the result of this search.
-            if (Operators.WildcardComparators.Contains(lx.OperatorName))
+            if (Operators.WildcardComparators.Contains(call.OperatorName))
                 return null;
     
-            return lx.Operands.Select(Transform).FirstOrDefault(e => e != null);
+            return call.Operands.Select(Transform).FirstOrDefault(e => e != null);
         }
 
         protected override IndexerExpression? Transform(IndexOfMatchExpression mx)

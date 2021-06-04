@@ -30,22 +30,22 @@ namespace Serilog.Expressions.Compilation.Text
             return Instance.Transform(expression);
         }
 
-        protected override Expression Transform(CallExpression lx)
+        protected override Expression Transform(CallExpression call)
         {
-            if (lx.Operands.Length != 2)
-                return base.Transform(lx);
+            if (call.Operands.Length != 2)
+                return base.Transform(call);
 
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpIndexOfMatch))
-                return TryCompileIndexOfMatch(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]);
+            if (Operators.SameOperator(call.OperatorName, Operators.OpIndexOfMatch))
+                return TryCompileIndexOfMatch(call.IgnoreCase, call.Operands[0], call.Operands[1]);
             
-            if (Operators.SameOperator(lx.OperatorName, Operators.OpIsMatch))
+            if (Operators.SameOperator(call.OperatorName, Operators.OpIsMatch))
                 return new CallExpression(
                     false,
                     Operators.RuntimeOpNotEqual,
-                    TryCompileIndexOfMatch(lx.IgnoreCase, lx.Operands[0], lx.Operands[1]),
+                    TryCompileIndexOfMatch(call.IgnoreCase, call.Operands[0], call.Operands[1]),
                     new ConstantExpression(new ScalarValue(-1)));
 
-            return base.Transform(lx);
+            return base.Transform(call);
         }
 
         Expression TryCompileIndexOfMatch(bool ignoreCase, Expression corpus, Expression regex)

@@ -86,7 +86,8 @@ namespace Serilog.Templates
             result = new ExpressionTemplate(
                 TemplateCompiler.Compile(
                     planned,
-                    formatProvider, DefaultFunctionNameResolver.Build(nameResolver),
+                    formatProvider,
+                    TemplateFunctionNameResolver.Build(nameResolver, planned),
                     SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
             
             return true;
@@ -126,7 +127,7 @@ namespace Serilog.Templates
             _compiled = TemplateCompiler.Compile(
                 planned,
                 formatProvider,
-                DefaultFunctionNameResolver.Build(nameResolver),
+                TemplateFunctionNameResolver.Build(nameResolver, planned),
                 SelectTheme(theme, applyThemeWhenOutputIsRedirected));
         }
 
