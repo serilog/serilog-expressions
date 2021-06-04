@@ -29,9 +29,5 @@
   <ItemGroup>
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Templates\Runtime" />
-  </ItemGroup>
 
 </Project>
