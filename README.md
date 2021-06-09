@@ -352,7 +352,7 @@ convert the result to plain-old-.NET-types like `string`, `bool`, `Dictionary<K,
 User-defined functions can be plugged in by implementing static methods that:
 
  * Return `LogEventPropertyValue?`,
- * Have arguments of type `LogEventPropertyValue?`,
+ * Have arguments of type `LogEventPropertyValue?` or `LogEvent`,
  * If the `ci` modifier is supported, accept a `StringComparison`, and
  * If culture-specific formatting or comparisons are used, accepts an `IFormatProvider`.
  
