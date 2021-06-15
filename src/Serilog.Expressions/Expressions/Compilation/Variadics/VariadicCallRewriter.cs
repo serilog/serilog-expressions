@@ -18,7 +18,7 @@ using Serilog.Expressions.Compilation.Transformations;
 
 namespace Serilog.Expressions.Compilation.Variadics
 {
-    // Now a bit of a misnomer - handles variadic `coalesce()`, as well as optional arguments for other functions.
+    // Handles variadic `coalesce()` and `concat()`, as well as optional arguments for other functions.
     class VariadicCallRewriter : IdentityTransformer
     {
         static readonly VariadicCallRewriter Instance = new VariadicCallRewriter();
@@ -39,7 +39,8 @@ namespace Serilog.Expressions.Compilation.Variadics
                 return new CallExpression(call.IgnoreCase, call.OperatorName, operands);
             }
 
-            if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce))
+            if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce) ||
+                Operators.SameOperator(call.OperatorName, Operators.OpConcat))
             {
                 if (call.Operands.Length == 0)
                     return CallUndefined();
@@ -64,7 +65,7 @@ namespace Serilog.Expressions.Compilation.Variadics
 
         static CallExpression CallUndefined()
         {
-            return new CallExpression(false, Operators.OpUndefined);
+            return new(false, Operators.OpUndefined);
         }
     }
 }

@@ -208,6 +208,10 @@ ismatch('foo', '^o')                 ⇶ false
 indexofmatch('foo', 'x')             ⇶ -1
 substring('abcd', 1, 2)              ⇶ 'bc'
 substring('abcd', 1)                 ⇶ 'bcd'
+concat('a', 'b', 'c')                ⇶ 'abc'
+concat('a', 42, 'c')                 ⇶ undefined()
+concat('a', undefined())             ⇶ undefined()
+concat(undefined(), 'b')             ⇶ undefined()
 
 // Conditional
 if true then 1 else 2                ⇶ 1

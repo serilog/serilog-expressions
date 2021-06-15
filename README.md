@@ -185,6 +185,7 @@ calling a function will be undefined if:
 | Function | Description |
 | :--- | :--- |
 | `Coalesce(p0, p1, ..pN)` | Returns the first defined, non-null argument. |
+| `Concat(s0, s1, ..sN)` | Concatenate two or more strings; all strings must be defined and non-null. |
 | `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
 | `ElementAt(x, i)` | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`. |
 | `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
