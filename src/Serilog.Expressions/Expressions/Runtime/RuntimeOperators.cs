@@ -461,6 +461,16 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(str.Substring((int)si, (int)len));
         }
 
+        public static LogEventPropertyValue? Concat(LogEventPropertyValue? first, LogEventPropertyValue? second)
+        {
+            if (Coerce.String(first, out var f) && Coerce.String(second, out var s))
+            {
+                return new ScalarValue(f + s);
+            }
+
+            return null;
+        }
+
         // ReSharper disable once ReturnTypeCanBeNotNullable
         public static LogEventPropertyValue? IndexOfMatch(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
         {
