@@ -11,7 +11,7 @@ namespace Serilog.Expressions.Tests.Expressions.Runtime
         {
             Assert.False(Locals.TryGetValue(null, "A", out _));
         }
-        
+
         [Fact]
         public void ASetValueIsRetrieved()
         {
@@ -20,7 +20,7 @@ namespace Serilog.Expressions.Tests.Expressions.Runtime
             Assert.True(Locals.TryGetValue(locals, "A", out var actual));
             Assert.Same(expected, actual);
         }
-        
+
         [Fact]
         public void ASetValueIsRetrievedFromMany()
         {
@@ -30,7 +30,7 @@ namespace Serilog.Expressions.Tests.Expressions.Runtime
             Assert.True(Locals.TryGetValue(locals, "A", out var actual));
             Assert.Same(expected, actual);
         }
-        
+
         [Fact]
         public void TheTopmostValueIsRetrievedForAName()
         {

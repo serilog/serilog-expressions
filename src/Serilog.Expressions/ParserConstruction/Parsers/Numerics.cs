@@ -1,10 +1,10 @@
 ﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
-//  
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at  
+// You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0  
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,14 +26,14 @@ namespace Serilog.ParserConstruction.Parsers
     {
         static readonly string[] ExpectedDigit = { "digit" };
         static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
-        
+
         /// <summary>
         /// A string of digits, converted into a <see cref="uint"/>.
         /// </summary>
         public static TextParser<uint> NaturalUInt32 { get; } = input =>
         {
             var next = input.ConsumeChar();
-            
+
             if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
                 return Result.Empty<uint>(input, ExpectedDigit);
 
@@ -45,7 +45,7 @@ namespace Serilog.ParserConstruction.Parsers
                 remainder = next.Remainder;
                 next = remainder.ConsumeChar();
             } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
-            
+
             return Result.Value(val, input, remainder);
         };
 
@@ -55,10 +55,10 @@ namespace Serilog.ParserConstruction.Parsers
         public static TextParser<TextSpan> Integer { get; } = input =>
         {
             var next = input.ConsumeChar();
-            
+
             if (!next.HasValue)
                 return Result.Empty<TextSpan>(input, ExpectedSignOrDigit);
-            
+
             if (next.Value == '-' || next.Value == '+')
                 next = next.Remainder.ConsumeChar();
 

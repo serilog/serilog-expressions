@@ -67,7 +67,7 @@ namespace Serilog.Templates.Compilation
                 {
                     if (element == null)
                         continue; // Should have been invalid but Serilog didn't check and so this does occur in the wild.
-                    
+
                     if (first)
                         first = false;
                     else
@@ -76,13 +76,13 @@ namespace Serilog.Templates.Compilation
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element))
                         : ctx;
-                    
+
                     _body.Evaluate(local, output);
                 }
-                
+
                 return;
             }
-            
+
             if (enumerable is StructureValue structure)
             {
                 if (structure.Properties.Count == 0)
@@ -102,15 +102,15 @@ namespace Serilog.Templates.Compilation
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, new ScalarValue(member.Name)))
                         : ctx;
-                    
+
                     local = _valueName != null
                         ? new EvaluationContext(local.LogEvent, Locals.Set(local.Locals, _valueName, member.Value))
                         : local;
-                    
+
                     _body.Evaluate(local, output);
                 }
             }
-            
+
             if (enumerable is DictionaryValue dict)
             {
                 if (dict.Elements.Count == 0)
@@ -130,15 +130,15 @@ namespace Serilog.Templates.Compilation
                     var local = _keyOrElementName != null
                         ? new EvaluationContext(ctx.LogEvent, Locals.Set(ctx.Locals, _keyOrElementName, element.Key))
                         : ctx;
-                    
+
                     local = _valueName != null
                         ? new EvaluationContext(local.LogEvent, Locals.Set(local.Locals, _valueName, element.Value))
                         : local;
-                    
+
                     _body.Evaluate(local, output);
                 }
             }
-            
+
             // Unsupported; not much we can do.
         }
     }

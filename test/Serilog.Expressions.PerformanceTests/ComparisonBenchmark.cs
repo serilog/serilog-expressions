@@ -42,14 +42,14 @@ namespace Serilog.Expressions.PerformanceTests
         public void TrivialFilter()
         {
             _trivialFilter(_event);
-        }  
-        
+        }
+
         [Benchmark(Baseline = true)]
         public void HandwrittenFilter()
         {
             _handwrittenFilter(_event);
-        } 
-                
+        }
+
         [Benchmark]
         public void ExpressionFilter()
         {
@@ -57,4 +57,3 @@ namespace Serilog.Expressions.PerformanceTests
         }
     }
 }
-  

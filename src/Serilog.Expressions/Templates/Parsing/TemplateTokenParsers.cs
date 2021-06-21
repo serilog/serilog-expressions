@@ -132,10 +132,10 @@ namespace Serilog.Templates.Parsing
             block = element.Many().Select(elements => elements.Length == 1 ?
                 elements[0] :
                 new TemplateBlock(elements));
-            
+
             _template = block.AtEnd();
         }
-        
+
         public TokenListParserResult<ExpressionToken, Template> TryParse(
             TokenList<ExpressionToken> input)
         {

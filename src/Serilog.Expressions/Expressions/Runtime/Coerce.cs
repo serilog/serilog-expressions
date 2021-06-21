@@ -22,8 +22,8 @@ namespace Serilog.Expressions.Runtime
     static class Coerce
     {
         static readonly Type[] NumericTypes = { typeof(decimal),
-            typeof(int), typeof(long), typeof(double), 
-            typeof(float), typeof(uint), typeof(sbyte), 
+            typeof(int), typeof(long), typeof(double),
+            typeof(float), typeof(uint), typeof(sbyte),
             typeof(byte), typeof(short), typeof(ushort), typeof(ulong) };
 
         public static bool Numeric(LogEventPropertyValue? value, out decimal numeric)
@@ -67,7 +67,7 @@ namespace Serilog.Expressions.Runtime
                     str = s;
                     return true;
                 }
-                
+
                 if (sv.Value is Exception ex)
                 {
                     str = ex.ToString();

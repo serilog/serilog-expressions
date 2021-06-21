@@ -28,7 +28,7 @@ namespace Serilog.Expressions.Compilation.Properties
         {
             if (!Pattern.IsAmbientProperty(ax.Receiver, BuiltInProperty.Properties, true))
                 return base.Transform(ax);
-            
+
             return new AmbientNameExpression(ax.MemberName, false);
         }
 
@@ -37,7 +37,7 @@ namespace Serilog.Expressions.Compilation.Properties
             if (!Pattern.IsAmbientProperty(ix.Receiver, BuiltInProperty.Properties, true) ||
                 !Pattern.IsStringConstant(ix.Index, out var name))
                 return base.Transform(ix);
-            
+
             return new AmbientNameExpression(name, false);
         }
     }

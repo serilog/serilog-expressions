@@ -26,7 +26,7 @@ namespace Serilog.Expressions
         /// <summary>
         /// Backport .NET Standard 2.1 additions to maintain .NET Standard 2.0 compatibility.
         /// Returns a value indicating whether a specified string occurs within this string, using the specified comparison rules.
-        /// 
+        ///
         /// From;
         /// https://github.com/dotnet/runtime/issues/22198
         /// https://stackoverflow.com/questions/444798/case-insensitive-containsstring/444818#444818

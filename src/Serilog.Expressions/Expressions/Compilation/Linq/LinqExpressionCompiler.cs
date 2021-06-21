@@ -70,7 +70,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         static readonly MethodInfo IndexOfMatchMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.IndexOfMatch), BindingFlags.Static | BindingFlags.Public)!;
-        
+
         static readonly MethodInfo TryGetStructurePropertyValueMethod = typeof(Intrinsics)
             .GetMethod(nameof(Intrinsics.TryGetStructurePropertyValue), BindingFlags.Static | BindingFlags.Public)!;
 
@@ -84,13 +84,13 @@ namespace Serilog.Expressions.Compilation.Linq
             _nameResolver = nameResolver;
             _formatProvider = formatProvider;
         }
-        
+
         public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider,
             NameResolver nameResolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var compiler = new LinqExpressionCompiler(formatProvider, nameResolver);
-            var body = compiler.Transform(expression); 
+            var body = compiler.Transform(expression);
             return LX.Lambda<Evaluatable>(body, compiler.Context).Compile();
         }
 
@@ -98,7 +98,7 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             return ParameterReplacementVisitor.ReplaceParameters(lambda, Context);
         }
-        
+
         protected override ExpressionBody Transform(CallExpression call)
         {
             if (!_nameResolver.TryResolveFunctionName(call.OperatorName, out var m))
@@ -107,7 +107,7 @@ namespace Serilog.Expressions.Compilation.Linq
             var methodParameters = m.GetParameters()
                 .Select(info => (pi: info, optional: info.GetCustomAttribute<OptionalAttribute>() != null))
                 .ToList();
-            
+
             var allowedParameters = methodParameters.Where(info => info.pi.ParameterType == typeof(LogEventPropertyValue)).ToList();
             var requiredParameterCount = allowedParameters.Count(info => !info.optional);
 
@@ -149,7 +149,7 @@ namespace Serilog.Expressions.Compilation.Linq
                 else
                     throw new ArgumentException($"The method `{m.Name}` implementing function `{call.OperatorName}` has argument `{pi.Name}` which could not be bound.");
             }
-            
+
             return LX.Call(m, boundParameters);
         }
 
@@ -157,7 +157,7 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             static string DescribeArgument((string name, bool optional) p) =>
                 $"`{p.name}`" + (p.optional ? " (optional)" : "");
-            
+
             if (parameters.Count == 0)
                 return "accepts no arguments";
 
@@ -191,7 +191,7 @@ namespace Serilog.Expressions.Compilation.Linq
             var receiver = Transform(spx.Receiver);
             return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), receiver, LX.Constant(spx.MemberName, typeof(string)));
         }
-        
+
         protected override ExpressionBody Transform(ConstantExpression cx)
         {
             return LX.Constant(cx.Constant);
@@ -203,7 +203,7 @@ namespace Serilog.Expressions.Compilation.Linq
             {
                 var formatter = new CompiledMessageToken(_formatProvider, null, TemplateTheme.None);
                 var formatProvider = _formatProvider;
-                
+
                 return px.PropertyName switch
                 {
                     BuiltInProperty.Level => Splice(context => new ScalarValue(context.LogEvent.Level)),
@@ -249,7 +249,7 @@ namespace Serilog.Expressions.Compilation.Linq
                 throw new NotSupportedException("Unsupported lambda signature.");
 
             var lambda = LX.Lambda(delegateType, rewritten!, parameters.Select(px => px.Item2).ToArray());
-            
+
             // Unfortunately, right now, functions need to be threaded through in constant scalar values :-D
             return LX.New(typeof(ScalarValue).GetConstructor(new[] {typeof(object)})!,
                 LX.Convert(lambda, typeof(object)));
@@ -280,7 +280,7 @@ namespace Serilog.Expressions.Compilation.Linq
                 else
                     break;
             }
-            
+
             var arr = LX.NewArrayInit(typeof(LogEventPropertyValue), elements.ToArray());
             var collected = LX.Call(CollectSequenceElementsMethod, arr);
 
@@ -295,10 +295,10 @@ namespace Serilog.Expressions.Compilation.Linq
                     collected = LX.Call(ExtendSequenceValueWithSpreadMethod, collected, Transform(spread.Content));
                 }
             }
-            
+
             return LX.Call(ConstructSequenceValueMethod, collected);
         }
-        
+
         protected override ExpressionBody Transform(ObjectExpression ox)
         {
             var names = new List<string>();
@@ -326,7 +326,7 @@ namespace Serilog.Expressions.Compilation.Linq
                     break;
                 }
             }
-            
+
             var namesConstant = LX.Constant(names.ToArray(), typeof(string[]));
             var valuesArr = LX.NewArrayInit(typeof(LogEventPropertyValue), values.ToArray());
             var properties = LX.Call(CollectStructurePropertiesMethod, namesConstant, valuesArr);

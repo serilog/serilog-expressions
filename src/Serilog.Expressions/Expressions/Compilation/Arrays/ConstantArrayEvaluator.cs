@@ -22,7 +22,7 @@ namespace Serilog.Expressions.Compilation.Arrays
     class ConstantArrayEvaluator : IdentityTransformer
     {
         static readonly ConstantArrayEvaluator Instance = new ConstantArrayEvaluator();
-        
+
         public static Expression Evaluate(Expression expression)
         {
             return Instance.Transform(expression);

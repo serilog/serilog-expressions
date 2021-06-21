@@ -36,7 +36,7 @@ namespace Serilog.Expressions.Runtime
         {
             return null;
         }
-        
+
         public static LogEventPropertyValue? _Internal_Add(LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (Coerce.Numeric(left, out var l) &&
@@ -146,7 +146,7 @@ namespace Serilog.Expressions.Runtime
             // Undefined values propagate through comparisons
             if (left == null || right == null)
                 return null;
-            
+
             return ScalarBoolean(UnboxedEqualHelper(sc, left, right));
         }
 
@@ -155,15 +155,15 @@ namespace Serilog.Expressions.Runtime
         {
             if (left == null || right == null)
                 throw new ArgumentException("Undefined values should short-circuit.");
-            
+
             if (Coerce.Numeric(left, out var l) &&
                 Coerce.Numeric(right, out var r))
                 return l == r;
-            
+
             if (Coerce.String(left, out var ls) &&
                 Coerce.String(right, out var rs))
                 return ls.Equals(rs, sc);
-            
+
             if (left is ScalarValue sl &&
                 right is ScalarValue sr)
                 return sl.Value?.Equals(sr.Value) ?? sr.Value == null;
@@ -183,7 +183,7 @@ namespace Serilog.Expressions.Runtime
                 var lhs = new Dictionary<string, LogEventPropertyValue?>();
                 foreach (var property in tl.Properties)
                     lhs[property.Name] = property.Value;
-                
+
                 var rhs = new Dictionary<string, LogEventPropertyValue?>();
                 foreach (var property in tr.Properties)
                     rhs[property.Name] = property.Value;
@@ -200,7 +200,7 @@ namespace Serilog.Expressions.Runtime
         {
             if (item == null)
                 return null;
-            
+
             if (collection is SequenceValue arr)
             {
                 for (var i = 0; i < arr.Elements.Count; ++i)
@@ -220,12 +220,12 @@ namespace Serilog.Expressions.Runtime
         {
             return _Internal_StrictNot(_Internal_In(sc, item, collection));
         }
-        
+
         public static LogEventPropertyValue? _Internal_NotEqual(StringComparison sc, LogEventPropertyValue? left, LogEventPropertyValue? right)
         {
             if (left == null || right == null)
                 return null;
-            
+
             return ScalarBoolean(!UnboxedEqualHelper(sc, left, right));
         }
 
@@ -341,12 +341,12 @@ namespace Serilog.Expressions.Runtime
 
                 return arr.Elements.ElementAt(idx);
             }
-            
+
             if (items is StructureValue st && Coerce.String(index, out var s))
             {
                 return Intrinsics.TryGetStructurePropertyValue(sc, st, s);
             }
-            
+
             if (items is DictionaryValue dict && index is ScalarValue sv)
             {
                 // The lack of eager numeric type coercion means that here, `sv` may logically equal one
@@ -445,7 +445,7 @@ namespace Serilog.Expressions.Runtime
             if (!Coerce.String(@string, out var str) ||
                 !Coerce.Numeric(startIndex, out var si))
                 return null;
-            
+
             if (si < 0 || si >= str.Length || (int)si != si)
                 return null;
 
@@ -513,21 +513,21 @@ namespace Serilog.Expressions.Runtime
 
             return new ScalarValue(toString);
         }
-        
+
         public static LogEventPropertyValue? UtcDateTime(LogEventPropertyValue? dateTime)
         {
             if (dateTime is ScalarValue sv)
             {
                 if (sv.Value is DateTimeOffset dto)
                     return new ScalarValue(dto.UtcDateTime);
-                
+
                 if (sv.Value is DateTime dt)
                     return new ScalarValue(dt.ToUniversalTime());
             }
 
             return null;
         }
-        
+
         // ReSharper disable once UnusedMember.Global
         public static LogEventPropertyValue? Now()
         {

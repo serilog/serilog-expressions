@@ -36,7 +36,7 @@ namespace Serilog.Expressions.Compilation
             actual = WildcardComprehensionTransformer.Expand(actual);
             return actual;
         }
-        
+
         public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider,
             NameResolver nameResolver)
         {

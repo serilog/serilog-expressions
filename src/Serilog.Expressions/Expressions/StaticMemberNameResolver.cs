@@ -40,7 +40,7 @@ namespace Serilog.Expressions
                 .GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
         }
-        
+
         /// <inheritdoc />
         public override bool TryResolveFunctionName(string name, [MaybeNullWhen(false)] out MethodInfo implementation)
         {

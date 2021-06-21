@@ -18,12 +18,12 @@ namespace Serilog.Expressions.Tests
         public void ExpressionsAreCorrectlyEvaluated(string expr, string result)
         {
             var evt = Some.InformationEvent();
-            
+
             evt.AddPropertyIfAbsent(
                 new LogEventProperty("User", new StructureValue(new[]
                 {
                     new LogEventProperty("Id", new ScalarValue(42)),
-                    new LogEventProperty("Name", new ScalarValue("nblumhardt")), 
+                    new LogEventProperty("Name", new ScalarValue("nblumhardt")),
                 })));
 
             var frFr = CultureInfo.GetCultureInfoByIetfLanguageTag("fr-FR");

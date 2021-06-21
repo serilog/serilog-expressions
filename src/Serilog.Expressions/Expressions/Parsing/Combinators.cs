@@ -33,7 +33,7 @@ namespace Serilog.Expressions.Parsing
             if (modify == null) throw new ArgumentNullException(nameof(modify));
             if (apply == null)
                 throw new ArgumentNullException(nameof (apply));
-            
+
             return input =>
             {
                 var parseResult = operand(input);
@@ -47,7 +47,7 @@ namespace Serilog.Expressions.Parsing
                 while (operatorResult.HasValue || operatorResult.SubTokenErrorPosition.HasValue || remainder != operatorResult.Remainder)
                 {
                     // If operator read any input, but failed to read complete input, we return error
-                    if (!operatorResult.HasValue) 
+                    if (!operatorResult.HasValue)
                         return TokenListParserResult.CastEmpty<TKind, TOperator, TResult>(operatorResult);
 
                     var operandResult = operand(operatorResult.Remainder);
@@ -61,7 +61,7 @@ namespace Serilog.Expressions.Parsing
 
                     if (!modifierResult.HasValue)
                         return TokenListParserResult.CastEmpty<TKind, TModifier, TResult>(modifierResult);
-                    
+
                     result = apply(operatorResult.Value, result, operandResult.Value, modifierResult.Value);
 
                     operatorResult = @operator(remainder);

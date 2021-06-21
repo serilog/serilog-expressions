@@ -1,10 +1,10 @@
 ﻿// Copyright 2016 Datalust, Superpower Contributors, Sprache Contributors
-//  
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at  
+// You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0  
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -102,8 +102,8 @@ namespace Serilog.ParserConstruction.Display
 
                 //Paragraph Separator
                 case '\x2029': return "U+2029 paragraph separator";
-                
-                //Unicode C0 Control Codes (ASCII equivalent) 
+
+                //Unicode C0 Control Codes (ASCII equivalent)
                 case '\x0000': return "NUL"; //\0
                 case '\x0001': return "U+0001 start of heading";
                 case '\x0002': return "U+0002 start of text";
@@ -144,7 +144,7 @@ namespace Serilog.ParserConstruction.Display
         }
 
         public static string FormatLiteral(string literal)
-        {        
+        {
             return "`" + literal + "`";
         }
     }

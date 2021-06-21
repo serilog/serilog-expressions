@@ -30,10 +30,10 @@ namespace Serilog.Templates.Compilation
                 new StaticMemberNameResolver(typeof(RuntimeOperators)),
                 new UnreferencedPropertiesFunction(template)
             };
-            
+
             if (additionalNameResolver != null)
                 resolvers.Add(additionalNameResolver);
-            
+
             return new OrderedNameResolver(resolvers);
         }
     }

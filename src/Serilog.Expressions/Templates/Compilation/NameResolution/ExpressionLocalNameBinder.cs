@@ -34,12 +34,12 @@ namespace Serilog.Templates.Compilation.NameResolution
         {
             _localNames = localNames ?? throw new ArgumentNullException(nameof(localNames));
         }
-        
+
         protected override Expression Transform(AmbientNameExpression px)
         {
             if (!px.IsBuiltIn && _localNames.Contains(px.PropertyName))
                 return new LocalNameExpression(px.PropertyName);
-            
+
             return base.Transform(px);
         }
     }
