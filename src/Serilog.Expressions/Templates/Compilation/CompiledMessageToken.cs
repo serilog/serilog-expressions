@@ -47,7 +47,7 @@ namespace Serilog.Templates.Compilation
         public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var invisibleCharacterCount = 0;
-            
+
             if (_alignment == null)
             {
                 EvaluateUnaligned(ctx, output, ref invisibleCharacterCount);
@@ -59,7 +59,7 @@ namespace Serilog.Templates.Compilation
                 Padding.Apply(output, writer.ToString(), _alignment.Value.Widen(invisibleCharacterCount));
             }
         }
-        
+
         void EvaluateUnaligned(EvaluationContext ctx, TextWriter output, ref int invisibleCharacterCount)
         {
             foreach (var token in ctx.LogEvent.MessageTemplate.Tokens)
@@ -94,7 +94,7 @@ namespace Serilog.Templates.Compilation
                 output.Write(pt.ToString());
                 return;
             }
-            
+
             if (pt.Alignment is null)
             {
                 EvaluatePropertyUnaligned(value, output, pt.Format, ref invisibleCharacterCount);
@@ -103,9 +103,9 @@ namespace Serilog.Templates.Compilation
 
             var buffer = new StringWriter();
             var resultInvisibleCharacters = 0;
-            
+
             EvaluatePropertyUnaligned(value, buffer, pt.Format, ref resultInvisibleCharacters);
-            
+
             var result = buffer.ToString();
             invisibleCharacterCount += resultInvisibleCharacters;
 
@@ -122,7 +122,7 @@ namespace Serilog.Templates.Compilation
                 invisibleCharacterCount += _jsonFormatter.Format(propertyValue, output);
                 return;
             }
-            
+
             var value = scalar.Value;
 
             if (value == null)

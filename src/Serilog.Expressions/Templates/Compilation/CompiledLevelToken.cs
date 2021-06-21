@@ -44,7 +44,7 @@ namespace Serilog.Templates.Compilation
         public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var invisibleCharacterCount = 0;
-            
+
             if (_alignment == null)
             {
                 EvaluateUnaligned(ctx, output, ref invisibleCharacterCount);
@@ -56,13 +56,13 @@ namespace Serilog.Templates.Compilation
                 Padding.Apply(output, writer.ToString(), _alignment.Value.Widen(invisibleCharacterCount));
             }
         }
-        
+
         void EvaluateUnaligned(EvaluationContext ctx, TextWriter output, ref int invisibleCharacterCount)
         {
             var levelIndex = (int) ctx.LogEvent.Level;
             if (levelIndex < 0 || levelIndex >= _levelStyles.Length)
                 return;
-            
+
             using var _ = _levelStyles[levelIndex].Set(output, ref invisibleCharacterCount);
             output.Write(LevelRenderer.GetLevelMoniker(ctx.LogEvent.Level, _format));
         }

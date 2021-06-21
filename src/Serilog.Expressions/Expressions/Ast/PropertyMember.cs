@@ -26,7 +26,7 @@ namespace Serilog.Expressions.Ast
             Name = name;
             Value = value;
         }
-        
+
         public override string ToString()
         {
             return $"{new ScalarValue(Name)}: {Value}";

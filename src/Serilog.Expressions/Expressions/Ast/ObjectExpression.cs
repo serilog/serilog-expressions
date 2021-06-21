@@ -22,7 +22,7 @@ namespace Serilog.Expressions.Ast
         {
             Members = members;
         }
-     
+
         public Member[] Members { get; }
 
         public override string ToString()

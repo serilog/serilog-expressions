@@ -44,7 +44,7 @@ namespace Serilog.Templates.Compilation
         public override void Evaluate(EvaluationContext ctx, TextWriter output)
         {
             var invisibleCharacterCount = 0;
-            
+
             if (_alignment == null)
             {
                 EvaluateUnaligned(ctx, output, _formatProvider, ref invisibleCharacterCount);
@@ -56,20 +56,20 @@ namespace Serilog.Templates.Compilation
                 Padding.Apply(output, writer.ToString(), _alignment.Value.Widen(invisibleCharacterCount));
             }
         }
-        
+
         void EvaluateUnaligned(EvaluationContext ctx, TextWriter output, IFormatProvider? formatProvider, ref int invisibleCharacterCount)
         {
             var value = _expression(ctx);
             if (value == null)
                 return; // Undefined is empty
-            
+
             if (value is ScalarValue scalar)
             {
                 if (scalar.Value is null)
                     return; // Null is empty
 
                 using var style = _secondaryText.Set(output, ref invisibleCharacterCount);
-                
+
                 if (scalar.Value is IFormattable fmt)
                     output.Write(fmt.ToString(_format, formatProvider));
                 else

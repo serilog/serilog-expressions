@@ -24,7 +24,7 @@ namespace Serilog.Templates.Themes
         {
             _ansiStyle = ansiStyle;
         }
-        
+
         internal StyleReset Set(TextWriter output, ref int invisibleCharacterCount)
         {
             if (_ansiStyle != null)
@@ -35,7 +35,7 @@ namespace Serilog.Templates.Themes
 
                 return new StyleReset(output);
             }
-            
+
             return default;
         }
 

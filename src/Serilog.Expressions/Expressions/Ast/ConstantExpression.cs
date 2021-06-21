@@ -17,7 +17,7 @@ using System.Globalization;
 using Serilog.Events;
 
 namespace Serilog.Expressions.Ast
-{ 
+{
     class ConstantExpression : Expression
     {
         public ConstantExpression(LogEventPropertyValue constant)
@@ -26,7 +26,7 @@ namespace Serilog.Expressions.Ast
         }
 
         public LogEventPropertyValue Constant { get; }
-        
+
         public override string ToString()
         {
             if (Constant is ScalarValue sv)

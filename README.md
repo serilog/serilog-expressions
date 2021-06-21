@@ -18,7 +18,7 @@ type that's compatible with Serilog sinks accepting an
 
 ### Filtering example
 
-_Serilog.Expressions_ adds `ByExcluding()` and `ByIncludingOnly()` 
+_Serilog.Expressions_ adds `ByExcluding()` and `ByIncludingOnly()`
 overloads to the `Filter` configuration object that accept filter
 expressions:
 

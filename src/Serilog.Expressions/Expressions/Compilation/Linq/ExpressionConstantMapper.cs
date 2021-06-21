@@ -29,7 +29,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value != null && 
+            if (node.Value != null &&
                 node.Value is ScalarValue sv &&
                 _mapping.TryGetValue(sv.Value, out var substitute))
                 return substitute;

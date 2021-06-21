@@ -89,7 +89,7 @@ namespace Serilog.Expressions
             if (nameResolver == null) throw new ArgumentNullException(nameof(nameResolver));
             return TryCompileImpl(expression, formatProvider, nameResolver, out result, out error);
         }
-        
+
         static bool TryCompileImpl(string expression,
             IFormatProvider? formatProvider,
             NameResolver? nameResolver,

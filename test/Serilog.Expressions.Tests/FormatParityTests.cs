@@ -38,10 +38,10 @@ namespace Serilog.Expressions.Tests
                         var property = new LogEventProperty(
                             member.Name.Length > 0 && member.Name[0] == '@' ? "@" + member.Name : member.Name,
                             member.Value);
-                        
+
                         properties.Add(property);
                     }
-                    
+
                     return new StructureValue(properties, st.TypeTag);
                 }
             }
@@ -58,7 +58,7 @@ namespace Serilog.Expressions.Tests
             {
                 return null;
             }
-            
+
             var mt = new MessageTemplateParser().Parse(smt);
             var space = new StringWriter();
             mt.Render(stp.Properties.ToDictionary(p => p.Name, p => p.Value), space);
@@ -74,7 +74,7 @@ namespace Serilog.Expressions.Tests
             {
                 return null;
             }
-            
+
             var mt = new MessageTemplateParser().Parse(smt);
             var tokensWithFormat = mt.Tokens
                 .OfType<PropertyToken>()
@@ -96,22 +96,22 @@ namespace Serilog.Expressions.Tests
                 foreach (var format in propertyFormats)
                 {
                     var sw = new StringWriter();
-                    
+
                     format.Render(propertiesByName, sw);
 
                     values.Add(new StructureValue(new []
                     {
                         new LogEventProperty("Format", new ScalarValue(format.Format)),
-                        new LogEventProperty("Rendering", new ScalarValue(sw.ToString())), 
+                        new LogEventProperty("Rendering", new ScalarValue(sw.ToString())),
                     }));
                 }
-                
+
                 renderings.Add(new LogEventProperty(propertyFormats.Key, new SequenceValue(values)));
             }
-            
+
             return new StructureValue(renderings);
-        }        
-        
+        }
+
         readonly ITextFormatter
             _clef = new CompactJsonFormatter(),
             _renderedClef = new RenderedCompactJsonFormatter(),
@@ -134,7 +134,7 @@ namespace Serilog.Expressions.Tests
             formatter.Format(logEvent, space);
             return space.ToString();
         }
-        
+
         void AssertWriteParity(
             LogEventLevel level,
             Exception? exception,
@@ -149,15 +149,15 @@ namespace Serilog.Expressions.Tests
             {
                 log.Write(level, exception, messageTemplate, propertyValues);
             }
-                
+
             var clef = Render(_clef, sink.SingleEvent);
             var clefExpression = Render(_clefExpression, sink.SingleEvent);
             Assert.Equal(clef, clefExpression);
-            
+
             var renderedClef = Render(_renderedClef, sink.SingleEvent);
             var renderedClefExpression = Render(_renderedClefExpression, sink.SingleEvent);
-            Assert.Equal(renderedClef, renderedClefExpression);   
-            
+            Assert.Equal(renderedClef, renderedClefExpression);
+
             var renderedClassic = Render(_classic, sink.SingleEvent);
             var renderedClassicExpression = Render(_classicExpression, sink.SingleEvent);
             Assert.Equal(renderedClassic, renderedClassicExpression);

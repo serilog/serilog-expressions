@@ -22,7 +22,7 @@ namespace Serilog.Templates.Parsing
     {
         readonly TemplateTokenizer _tokenizer = new();
         readonly TemplateTokenParsers _templateTokenParsers = new();
-        
+
         public bool TryParse(
             string template,
             [MaybeNullWhen(false)] out Template parsed,
@@ -37,7 +37,7 @@ namespace Serilog.Templates.Parsing
                 parsed = null;
                 return false;
             }
-            
+
             var result = _templateTokenParsers.TryParse(tokenList.Value);
             if (!result.HasValue)
             {

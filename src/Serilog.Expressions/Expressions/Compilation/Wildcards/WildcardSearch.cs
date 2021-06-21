@@ -21,7 +21,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
     class WildcardSearch : SerilogExpressionTransformer<IndexerExpression?>
     {
         static readonly WildcardSearch Instance = new WildcardSearch();
-        
+
         public static IndexerExpression? FindWildcardIndexer(Expression fx)
         {
             return Instance.Transform(fx);
@@ -39,7 +39,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
         {
             return null;
         }
-        
+
         protected override IndexerExpression? Transform(AmbientNameExpression px)
         {
             return null;
@@ -82,7 +82,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
             // it and can't be the result of this search.
             if (Operators.WildcardComparators.Contains(call.OperatorName))
                 return null;
-    
+
             return call.Operands.Select(Transform).FirstOrDefault(e => e != null);
         }
 

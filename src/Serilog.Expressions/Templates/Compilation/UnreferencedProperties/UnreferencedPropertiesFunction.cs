@@ -39,7 +39,7 @@ namespace Serilog.Templates.Compilation.UnreferencedProperties
     class UnreferencedPropertiesFunction : NameResolver
     {
         const string FunctionName = "rest";
-        
+
         readonly HashSet<string> _referencedInTemplate;
 
         public UnreferencedPropertiesFunction(Template template)

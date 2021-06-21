@@ -42,7 +42,7 @@ namespace Serilog.Templates.Parsing
                 {
                     if (rem != start)
                         yield return Result.Value(ExpressionToken.Text, start, rem);
-                    
+
                     var peek = next.Remainder.ConsumeChar();
                     if (peek.HasValue && peek.Value == '{')
                     {
@@ -103,7 +103,7 @@ namespace Serilog.Templates.Parsing
 
             var toMatch = new Stack<ExpressionToken>();
             var unbalanced = false;
-            
+
             foreach (var token in _expressionTokenizer.LazyTokenize(span))
             {
                 if (unbalanced)
@@ -169,7 +169,7 @@ namespace Serilog.Templates.Parsing
                     {
                         yield return Result.Value(ExpressionToken.Format, formatStart, next.Location);
                     }
-                    
+
                     yield break;
                 }
             }

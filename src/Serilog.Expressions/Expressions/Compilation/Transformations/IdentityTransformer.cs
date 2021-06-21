@@ -24,7 +24,7 @@ namespace Serilog.Expressions.Compilation.Transformations
             result = Transform(expr);
             return !ReferenceEquals(expr, result);
         }
-        
+
         protected override Expression Transform(CallExpression call)
         {
             var any = false;
@@ -38,7 +38,7 @@ namespace Serilog.Expressions.Compilation.Transformations
 
             if (!any)
                 return call;
-            
+
             return new CallExpression(call.IgnoreCase, call.OperatorName, operands.ToArray());
         }
 
@@ -61,7 +61,7 @@ namespace Serilog.Expressions.Compilation.Transformations
         {
             if (!TryTransform(spx.Receiver, out var recv))
                 return spx;
-                
+
             return new AccessorExpression(recv, spx.MemberName);
         }
 
@@ -69,7 +69,7 @@ namespace Serilog.Expressions.Compilation.Transformations
         {
             if (!TryTransform(lmx.Body, out var body))
                 return lmx;
-            
+
             // By default we maintain the parameters available in the body
             return new LambdaExpression(lmx.Parameters, body);
         }
@@ -142,10 +142,10 @@ namespace Serilog.Expressions.Compilation.Transformations
         protected override Expression Transform(IndexerExpression ix)
         {
             var transformedRecv = TryTransform(ix.Receiver, out var recv);
-            
+
             if (!TryTransform(ix.Index, out var index) && !transformedRecv)
                 return ix;
-            
+
             return new IndexerExpression(recv, index);
         }
 
@@ -153,7 +153,7 @@ namespace Serilog.Expressions.Compilation.Transformations
         {
             if (!TryTransform(mx.Corpus, out var corpus))
                 return mx;
-            
+
             return new IndexOfMatchExpression(corpus, mx.Regex);
         }
     }

@@ -23,7 +23,7 @@ namespace Serilog.Templates.Compilation
         const string StackFrameLinePrefix = "   ";
 
         readonly Style _text, _secondaryText;
-        
+
         public CompiledExceptionToken(TemplateTheme theme)
         {
             _text = theme.GetStyle(TemplateThemeStyle.Text);

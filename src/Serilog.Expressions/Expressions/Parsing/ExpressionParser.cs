@@ -21,7 +21,7 @@ namespace Serilog.Expressions.Parsing
     class ExpressionParser
     {
         readonly ExpressionTokenizer _tokenizer = new ExpressionTokenizer();
-        
+
         public Expression Parse(string expression)
         {
             if (!TryParse(expression, out var root, out var error))
@@ -35,7 +35,7 @@ namespace Serilog.Expressions.Parsing
         {
             if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
 
-            var tokenList = _tokenizer.TryTokenize(filterExpression);       
+            var tokenList = _tokenizer.TryTokenize(filterExpression);
             if (!tokenList.HasValue)
             {
                 error = tokenList.ToString();
