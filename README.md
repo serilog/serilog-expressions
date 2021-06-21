@@ -147,7 +147,7 @@ The built-in properties mirror those available in the CLEF format.
 | Array | An array of values, in square brackets | `[1, 'two', null]` |
 | Object | A mapping of string keys to values; keys that are valid identifiers do not need to be quoted | `{a: 1, 'b c': 2, d}` |
 
-Array and object literals support the spread operator: `[1, 2, ..rest]`, `{a: 1, ..other}`. Specifying an undefined
+Array and object literals support the spread operator: `[1, 2, ..others]`, `{a: 1, ..others}`. Specifying an undefined
 property in an object literal will remove it from the result: `{..User, Email: Undefined()}`
 
 ### Operators and conditionals
@@ -184,7 +184,8 @@ calling a function will be undefined if:
 
 | Function | Description |
 | :--- | :--- |
-| `Coalesce(p0, p1, ..pN)` | Returns the first defined, non-null argument. |
+| `Coalesce(p0, p1, [..pN])` | Returns the first defined, non-null argument. |
+| `Concat(s0, s1, [..sN])` | Concatenate two or more strings. |
 | `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
 | `ElementAt(x, i)` | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`. |
 | `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
@@ -195,7 +196,7 @@ calling a function will be undefined if:
 | `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `Length(x)` | Returns the length of a string or array. |
 | `Now()` | Returns `DateTimeOffset.Now`. |
-| `Rest()` | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template or the event's message. |
+| `Rest([deep])` | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
 | `Round(n, m)` | Round the number `n` to `m` decimal places. |
 | `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
 | `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
@@ -352,7 +353,7 @@ convert the result to plain-old-.NET-types like `string`, `bool`, `Dictionary<K,
 User-defined functions can be plugged in by implementing static methods that:
 
  * Return `LogEventPropertyValue?`,
- * Have arguments of type `LogEventPropertyValue?`,
+ * Have arguments of type `LogEventPropertyValue?` or `LogEvent`,
  * If the `ci` modifier is supported, accept a `StringComparison`, and
  * If culture-specific formatting or comparisons are used, accepts an `IFormatProvider`.
  

@@ -29,6 +29,7 @@ namespace Serilog.Expressions
         // RuntimeOp* means runtime only.
 
         public const string OpCoalesce = "Coalesce";
+        public const string OpConcat = "Concat";
         public const string OpContains = "Contains";
         public const string OpElementAt = "ElementAt";
         public const string OpEndsWith = "EndsWith";

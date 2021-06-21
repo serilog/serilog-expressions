@@ -5,8 +5,6 @@ using Serilog.Expressions.Runtime;
 using Serilog.Expressions.Tests.Support;
 using Xunit;
 
-#nullable enable
-
 namespace Serilog.Expressions.Tests.Expressions
 {
     public class NameResolverTests
@@ -15,7 +13,7 @@ namespace Serilog.Expressions.Tests.Expressions
         {
             if (!Coerce.Numeric(number, out var num))
                 return null;
-            
+
             return new ScalarValue(num + 42);
         }
 
@@ -23,7 +21,7 @@ namespace Serilog.Expressions.Tests.Expressions
         {
             if (!Coerce.Numeric(index, out var i))
                 return null;
-            
+
             return new ScalarValue(word[(int)i].ToString());
         }
 
@@ -62,7 +60,7 @@ namespace Serilog.Expressions.Tests.Expressions
                 nameResolver: new StaticMemberNameResolver(typeof(NameResolverTests)));
             Assert.True(Coerce.IsTrue(expr(Some.InformationEvent())));
         }
-        
+
         [Fact]
         public void UserDefinedFunctionsCanReceiveUserProvidedParameters()
         {

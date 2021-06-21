@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
@@ -27,6 +29,7 @@ using Expression = Serilog.Expressions.Ast.Expression;
 using ParameterExpression = System.Linq.Expressions.ParameterExpression;
 using LX = System.Linq.Expressions.Expression;
 using ExpressionBody = System.Linq.Expressions.Expression;
+// ReSharper disable UseIndexFromEndExpression
 
 namespace Serilog.Expressions.Compilation.Linq
 {
@@ -101,11 +104,18 @@ namespace Serilog.Expressions.Compilation.Linq
             if (!_nameResolver.TryResolveFunctionName(call.OperatorName, out var m))
                 throw new ArgumentException($"The function name `{call.OperatorName}` was not recognized.");
 
-            var methodParameters = m.GetParameters();
+            var methodParameters = m.GetParameters()
+                .Select(info => (pi: info, optional: info.GetCustomAttribute<OptionalAttribute>() != null))
+                .ToList();
             
-            var parameterCount = methodParameters.Count(pi => pi.ParameterType == typeof(LogEventPropertyValue));
-            if (parameterCount != call.Operands.Length)
-                throw new ArgumentException($"The function `{call.OperatorName}` requires {parameterCount} arguments.");
+            var allowedParameters = methodParameters.Where(info => info.pi.ParameterType == typeof(LogEventPropertyValue)).ToList();
+            var requiredParameterCount = allowedParameters.Count(info => !info.optional);
+
+            if (call.Operands.Length < requiredParameterCount || call.Operands.Length > allowedParameters.Count)
+            {
+                var requirements = DescribeRequirements(allowedParameters.Select(info => (info.pi.Name!, info.optional)).ToList());
+                throw new ArgumentException($"The function `{call.OperatorName}` {requirements}.");
+            }
 
             var operands = new Queue<LX>(call.Operands.Select(Transform));
 
@@ -116,11 +126,15 @@ namespace Serilog.Expressions.Compilation.Linq
             if (Operators.SameOperator(call.OperatorName, Operators.RuntimeOpOr))
                 return CompileLogical(LX.OrElse, operands.Dequeue(), operands.Dequeue());
 
-            var boundParameters = new List<LX>(methodParameters.Length);
-            foreach (var pi in methodParameters)
+            var boundParameters = new List<LX>(methodParameters.Count);
+            foreach (var (pi, optional) in methodParameters)
             {
                 if (pi.ParameterType == typeof(LogEventPropertyValue))
-                    boundParameters.Add(operands.Dequeue());
+                {
+                    boundParameters.Add(operands.Count > 0
+                        ? operands.Dequeue()
+                        : LX.Constant(null, typeof(LogEventPropertyValue)));
+                }
                 else if (pi.ParameterType == typeof(StringComparison))
                     boundParameters.Add(LX.Constant(call.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
                 else if (pi.ParameterType == typeof(IFormatProvider))
@@ -129,11 +143,36 @@ namespace Serilog.Expressions.Compilation.Linq
                     boundParameters.Add(LX.Property(Context, EvaluationContextLogEventProperty));
                 else if (_nameResolver.TryBindFunctionParameter(pi, out var binding))
                     boundParameters.Add(LX.Constant(binding, pi.ParameterType));
+                else if (optional)
+                    boundParameters.Add(LX.Constant(
+                        pi.GetCustomAttribute<DefaultParameterValueAttribute>()?.Value, pi.ParameterType));
                 else
-                    throw new ArgumentException($"The method `{m.Name}` implementing function `{call.OperatorName}` has parameter `{pi.Name}` which could not be bound.");
+                    throw new ArgumentException($"The method `{m.Name}` implementing function `{call.OperatorName}` has argument `{pi.Name}` which could not be bound.");
             }
             
             return LX.Call(m, boundParameters);
+        }
+
+        static string DescribeRequirements(IReadOnlyList<(string name, bool optional)> parameters)
+        {
+            static string DescribeArgument((string name, bool optional) p) =>
+                $"`{p.name}`" + (p.optional ? " (optional)" : "");
+            
+            if (parameters.Count == 0)
+                return "accepts no arguments";
+
+            if (parameters.Count == 1)
+                return $"accepts one argument, {DescribeArgument(parameters[0])}";
+
+            if (parameters.Count == 2)
+                return $"accepts two arguments, {DescribeArgument(parameters[0])} and {DescribeArgument(parameters[1])}";
+
+            var result = new StringBuilder("accepts arguments");
+            for (var i = 0; i < parameters.Count - 1; ++i)
+                result.Append($" {DescribeArgument(parameters[i])},");
+
+            result.Append($" and {DescribeArgument(parameters[parameters.Count - 1])}");
+            return result.ToString();
         }
 
         static ExpressionBody CompileLogical(Func<ExpressionBody, ExpressionBody, ExpressionBody> apply, ExpressionBody lhs, ExpressionBody rhs)

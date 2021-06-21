@@ -27,3 +27,6 @@ A{#if false}B{#else if true}C{#end}                  ⇶ AC
 {#if true}A{#each a in [1]}B{a}{#end}C{#end}D        ⇶ AB1CD
 {#each a in []}{a}!{#else}none{#end}                 ⇶ none
 Culture-specific {42.34}                             ⇶ Culture-specific 42,34
+{rest()}                                             ⇶ {"Name":"nblumhardt"}
+{Name} {rest()}                                      ⇶ nblumhardt {}
+{rest(true)}                                         ⇶ {}

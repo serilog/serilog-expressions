@@ -17,7 +17,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Serilog.Events;
 using Serilog.Expressions;
-using Serilog.Expressions.Compilation;
 using Serilog.Formatting;
 using Serilog.Templates.Compilation;
 using Serilog.Templates.Compilation.NameResolution;
@@ -32,7 +31,7 @@ namespace Serilog.Templates
     public class ExpressionTemplate : ITextFormatter
     {
         readonly CompiledTemplate _compiled;
-        
+
         /// <summary>
         /// Construct an <see cref="ExpressionTemplate"/>.
         /// </summary>
@@ -89,10 +88,10 @@ namespace Serilog.Templates
                     formatProvider,
                     TemplateFunctionNameResolver.Build(nameResolver, planned),
                     SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
-            
+
             return true;
         }
-        
+
         ExpressionTemplate(CompiledTemplate compiled)
         {
             _compiled = compiled;
@@ -121,9 +120,9 @@ namespace Serilog.Templates
             var templateParser = new TemplateParser();
             if (!templateParser.TryParse(template, out var parsed, out var error))
                 throw new ArgumentException(error);
-            
+
             var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
-            
+
             _compiled = TemplateCompiler.Compile(
                 planned,
                 formatProvider,

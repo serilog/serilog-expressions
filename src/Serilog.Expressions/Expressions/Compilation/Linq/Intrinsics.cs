@@ -20,7 +20,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Serilog.Events;
 using Serilog.Expressions.Runtime;
-using Serilog.Formatting.Display;
 using Serilog.Parsing;
 using Serilog.Templates.Compilation;
 
@@ -32,7 +31,7 @@ namespace Serilog.Expressions.Compilation.Linq
     {
         static readonly LogEventPropertyValue NegativeOne = new ScalarValue(-1);
         static readonly LogEventPropertyValue Tombstone = new ScalarValue("😬 (if you see this you have found a bug.)");
-        
+
         public static List<LogEventPropertyValue?> CollectSequenceElements(LogEventPropertyValue?[] elements)
         {
             return elements.ToList();
@@ -53,7 +52,7 @@ namespace Serilog.Expressions.Compilation.Linq
             if (content is SequenceValue sequence)
                 foreach (var element in sequence.Elements)
                     elements.Add(element);
-            
+
             return elements;
         }
 
@@ -61,10 +60,10 @@ namespace Serilog.Expressions.Compilation.Linq
         {
             if (elements.Any(el => el == null))
                 return new SequenceValue(elements.Where(el => el != null));
-            
+
             return new SequenceValue(elements);
         }
-        
+
         public static List<LogEventProperty> CollectStructureProperties(string[] names, LogEventPropertyValue?[] values)
         {
             var properties = new List<LogEventProperty>();
@@ -85,7 +84,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
             return new StructureValue(properties);
         }
-        
+
         public static List<LogEventProperty> ExtendStructureValueWithSpread(
             List<LogEventProperty> properties,
             LogEventPropertyValue? content)
@@ -99,7 +98,7 @@ namespace Serilog.Expressions.Compilation.Linq
 
             return properties;
         }
-        
+
         public static List<LogEventProperty> ExtendStructureValueWithProperty(
             List<LogEventProperty> properties,
             string name,
@@ -129,7 +128,7 @@ namespace Serilog.Expressions.Compilation.Linq
                 return b;
             return false;
         }
-        
+
         public static LogEventPropertyValue? IndexOfMatch(LogEventPropertyValue value, Regex regex)
         {
             if (value is ScalarValue scalar &&
@@ -193,9 +192,9 @@ namespace Serilog.Expressions.Compilation.Linq
                 if (token is PropertyToken {Format: { }} pt)
                 {
                     elements ??= new List<LogEventPropertyValue>();
-                    
+
                     var space = new StringWriter();
-                  
+
                     pt.Render(logEvent.Properties, space, formatProvider);
                     elements.Add(new ScalarValue(space.ToString()));
                 }

@@ -3,29 +3,24 @@
   <PropertyGroup>
     <Description>An embeddable mini-language for filtering, enriching, and formatting Serilog
       events, ideal for use with JSON or XML configuration.</Description>
-    <VersionPrefix>3.1.0</VersionPrefix>
+    <VersionPrefix>3.2.0</VersionPrefix>
     <Authors>Serilog Contributors</Authors>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>Serilog</RootNamespace>
-    <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageTags>serilog</PackageTags>
     <PackageProjectUrl>https://github.com/serilog/serilog-expressions</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/serilog/serilog-expressions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Nullable" Version="1.3.0" Condition="$(TargetFramework) == 'netstandard2.0'" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
