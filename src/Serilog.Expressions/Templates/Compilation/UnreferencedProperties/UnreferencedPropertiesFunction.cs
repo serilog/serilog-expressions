@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using Serilog.Events;
 using Serilog.Expressions;
+using Serilog.Expressions.Runtime;
 using Serilog.Parsing;
 using Serilog.Templates.Ast;
 
@@ -74,11 +75,12 @@ namespace Serilog.Templates.Compilation.UnreferencedProperties
 
         // By convention, built-in functions accept and return nullable values.
         // ReSharper disable once ReturnTypeCanBeNotNullable
-        public static LogEventPropertyValue? Implementation(UnreferencedPropertiesFunction self, LogEvent logEvent)
+        public static LogEventPropertyValue? Implementation(UnreferencedPropertiesFunction self, LogEvent logEvent, LogEventPropertyValue? deep = null)
         {
+            var checkMessageTemplate = Coerce.IsTrue(deep);
             return new StructureValue(logEvent.Properties
-                .Where(kvp => !(self._referencedInTemplate.Contains(kvp.Key) ||
-                                TemplateContainsPropertyName(logEvent.MessageTemplate, kvp.Key)))
+                .Where(kvp => !self._referencedInTemplate.Contains(kvp.Key) &&
+                                (!checkMessageTemplate || !TemplateContainsPropertyName(logEvent.MessageTemplate, kvp.Key)))
                 .Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)));
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Serilog.Events;
 using Serilog.Parsing;
 using Serilog.Templates.Ast;
@@ -20,7 +21,7 @@ namespace Serilog.Expressions.Tests.Templates
         [Fact]
         public void UnreferencedPropertiesExcludeThoseInMessageAndTemplate()
         {
-            Assert.True(new TemplateParser().TryParse("{A + 1}{#if true}{B}{#end}", out var template, out _));
+            Assert.True(new TemplateParser().TryParse("{@m}{A + 1}{#if true}{B}{#end}", out var template, out _));
             
             var function = new UnreferencedPropertiesFunction(template!);
             
@@ -37,11 +38,16 @@ namespace Serilog.Expressions.Tests.Templates
                     new LogEventProperty("D", new ScalarValue(null)),
                 });
 
-            var result = UnreferencedPropertiesFunction.Implementation(function, evt);
+            var deep = UnreferencedPropertiesFunction.Implementation(function, evt, new ScalarValue(true));
             
-            var sv = Assert.IsType<StructureValue>(result);
+            var sv = Assert.IsType<StructureValue>(deep);
             var included = Assert.Single(sv.Properties);
             Assert.Equal("D", included!.Name);
+
+            var shallow = UnreferencedPropertiesFunction.Implementation(function, evt);
+            sv = Assert.IsType<StructureValue>(shallow);
+            Assert.Contains(sv.Properties, p => p.Name == "C");
+            Assert.Contains(sv.Properties, p => p.Name == "D");
         }
     }
 }

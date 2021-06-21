@@ -236,9 +236,9 @@ namespace Serilog.Expressions.Runtime
             return null;
         }
 
-        public static LogEventPropertyValue? Round(LogEventPropertyValue? value, LogEventPropertyValue? places)
+        public static LogEventPropertyValue? Round(LogEventPropertyValue? number, LogEventPropertyValue? places)
         {
-            if (!Coerce.Numeric(value, out var v) ||
+            if (!Coerce.Numeric(number, out var v) ||
                 !Coerce.Numeric(places, out var p) ||
                 p < 0 ||
                 p > 32) // Check my memory, here :D
@@ -266,57 +266,57 @@ namespace Serilog.Expressions.Runtime
                 null;
         }
 
-        public static LogEventPropertyValue? Contains(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
+        public static LogEventPropertyValue? Contains(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
         {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
+            if (!Coerce.String(@string, out var ctx) ||
+                !Coerce.String(substring, out var ptx))
                 return null;
 
             return ScalarBoolean(ctx.Contains(ptx, sc));
         }
 
-        public static LogEventPropertyValue? IndexOf(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
+        public static LogEventPropertyValue? IndexOf(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
         {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
+            if (!Coerce.String(@string, out var ctx) ||
+                !Coerce.String(substring, out var ptx))
                 return null;
 
             return new ScalarValue(ctx.IndexOf(ptx, sc));
         }
 
-        public static LogEventPropertyValue? LastIndexOf(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
+        public static LogEventPropertyValue? LastIndexOf(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
         {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
+            if (!Coerce.String(@string, out var ctx) ||
+                !Coerce.String(substring, out var ptx))
                 return null;
 
             return new ScalarValue(ctx.LastIndexOf(ptx, sc));
         }
 
-        public static LogEventPropertyValue? Length(LogEventPropertyValue? arg)
+        public static LogEventPropertyValue? Length(LogEventPropertyValue? value)
         {
-            if (Coerce.String(arg, out var s))
+            if (Coerce.String(value, out var s))
                 return new ScalarValue(s.Length);
 
-            if (arg is SequenceValue seq)
+            if (value is SequenceValue seq)
                 return new ScalarValue(seq.Elements.Count);
 
             return null;
         }
 
-        public static LogEventPropertyValue? StartsWith(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
+        public static LogEventPropertyValue? StartsWith(StringComparison sc, LogEventPropertyValue? value, LogEventPropertyValue? substring)
         {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
+            if (!Coerce.String(value, out var ctx) ||
+                !Coerce.String(substring, out var ptx))
                 return null;
 
             return ScalarBoolean(ctx.StartsWith(ptx, sc));
         }
 
-        public static LogEventPropertyValue? EndsWith(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? pattern)
+        public static LogEventPropertyValue? EndsWith(StringComparison sc, LogEventPropertyValue? value, LogEventPropertyValue? substring)
         {
-            if (!Coerce.String(corpus, out var ctx) ||
-                !Coerce.String(pattern, out var ptx))
+            if (!Coerce.String(value, out var ctx) ||
+                !Coerce.String(substring, out var ptx))
                 return null;
 
             return ScalarBoolean(ctx.EndsWith(ptx, sc));
@@ -432,17 +432,17 @@ namespace Serilog.Expressions.Runtime
         }
 
         // Ideally this will be compiled as a short-circuiting intrinsic
-        public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? v1, LogEventPropertyValue? v2)
+        public static LogEventPropertyValue? Coalesce(LogEventPropertyValue? value0, LogEventPropertyValue? value1)
         {
-            if (v1 is null or ScalarValue {Value: null})
-                return v2;
+            if (value0 is null or ScalarValue {Value: null})
+                return value1;
 
-            return v1;
+            return value0;
         }
 
-        public static LogEventPropertyValue? Substring(LogEventPropertyValue? sval, LogEventPropertyValue? startIndex, LogEventPropertyValue? length)
+        public static LogEventPropertyValue? Substring(LogEventPropertyValue? @string, LogEventPropertyValue? startIndex, LogEventPropertyValue? length = null)
         {
-            if (!Coerce.String(sval, out var str) ||
+            if (!Coerce.String(@string, out var str) ||
                 !Coerce.Numeric(startIndex, out var si))
                 return null;
             
@@ -461,9 +461,9 @@ namespace Serilog.Expressions.Runtime
             return new ScalarValue(str.Substring((int)si, (int)len));
         }
 
-        public static LogEventPropertyValue? Concat(LogEventPropertyValue? first, LogEventPropertyValue? second)
+        public static LogEventPropertyValue? Concat(LogEventPropertyValue? string0, LogEventPropertyValue? string1)
         {
-            if (Coerce.String(first, out var f) && Coerce.String(second, out var s))
+            if (Coerce.String(string0, out var f) && Coerce.String(string1, out var s))
             {
                 return new ScalarValue(f + s);
             }
@@ -492,7 +492,7 @@ namespace Serilog.Expressions.Runtime
             return Coerce.IsTrue(condition) ? consequent : alternative;
         }
 
-        public static LogEventPropertyValue? ToString(IFormatProvider? formatProvider, LogEventPropertyValue? value, LogEventPropertyValue? format)
+        public static LogEventPropertyValue? ToString(IFormatProvider? formatProvider, LogEventPropertyValue? value, LogEventPropertyValue? format = null)
         {
             if (value is not ScalarValue sv ||
                 sv.Value == null ||
