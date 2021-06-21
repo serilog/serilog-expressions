@@ -30,20 +30,11 @@ namespace Serilog.Expressions.Compilation.Variadics
 
         protected override Expression Transform(CallExpression call)
         {
-            if (Operators.SameOperator(call.OperatorName, Operators.OpSubstring) && call.Operands.Length == 2)
-            {
-                var operands = call.Operands
-                    .Select(Transform)
-                    .Concat(new[] {CallUndefined()})
-                    .ToArray();
-                return new CallExpression(call.IgnoreCase, call.OperatorName, operands);
-            }
-
             if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce) ||
                 Operators.SameOperator(call.OperatorName, Operators.OpConcat))
             {
                 if (call.Operands.Length == 0)
-                    return CallUndefined();
+                    return new CallExpression(false, Operators.OpUndefined);
                 if (call.Operands.Length == 1)
                     return Transform(call.Operands.Single());
                 if (call.Operands.Length > 2)
@@ -54,18 +45,7 @@ namespace Serilog.Expressions.Compilation.Variadics
                 }
             }
 
-            if (Operators.SameOperator(call.OperatorName, Operators.OpToString) &&
-                call.Operands.Length == 1)
-            {
-                return new CallExpression(call.IgnoreCase, call.OperatorName, call.Operands[0], CallUndefined());
-            }
-
             return base.Transform(call);
-        }
-
-        static CallExpression CallUndefined()
-        {
-            return new(false, Operators.OpUndefined);
         }
     }
 }

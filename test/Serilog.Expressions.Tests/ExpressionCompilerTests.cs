@@ -1,4 +1,5 @@
-﻿using Serilog.Events;
+﻿using System;
+using Serilog.Events;
 using System.Linq;
 using Serilog.Expressions.Tests.Support;
 using Xunit;
@@ -132,6 +133,19 @@ namespace Serilog.Expressions.Tests
                 Some.InformationEvent("{Numbers}", new []{1, 2, 3}),
                 Some.InformationEvent("{Numbers}", new [] { 1, 5, 3 }),
                 Some.InformationEvent());
+        }
+
+        [Theory]
+        [InlineData("now(1)", "The function `now` accepts no arguments.")]
+        [InlineData("length()", "The function `length` accepts one argument, `value`.")]
+        [InlineData("length(1, 2)", "The function `length` accepts one argument, `value`.")]
+        [InlineData("round()", "The function `round` accepts two arguments, `number` and `places`.")]
+        [InlineData("substring()", "The function `substring` accepts arguments `string`, `startIndex`, and `length` (optional).")]
+        public void ReportsArityMismatches(string call, string expectedError)
+        {
+            // These will eventually be reported gracefully by `TryCompile()`...
+            var ex = Assert.Throws<ArgumentException>(() => SerilogExpression.Compile(call));
+            Assert.Equal(expectedError, ex.Message);
         }
 
         static void AssertEvaluation(string expression, LogEvent match, params LogEvent[] noMatches)
