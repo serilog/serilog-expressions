@@ -98,7 +98,7 @@ Log.Logger = new LoggerConfiguration()
 Templates are based on .NET format strings, and support standard padding, alignment, and format specifiers.
 
 Along with standard properties for the event timestamp (`@t`), level (`@l`) and so on, "holes" in expression templates can include complex
-expressions over the first-class properties of the event, like `{SourceContex}` and `{Cart[0]}` in the example..
+expressions over the first-class properties of the event, like `{SourceContext}` and `{Cart[0]}` in the example..
 
 Templates support customizable color themes when used with the `Console` sink:
 
