@@ -55,7 +55,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
                     break;
                 }
             }
-            
+
             if (indexer == null || wildcardPath == null)
                 return base.Transform(lx); // N/A, or invalid
 
@@ -68,14 +68,14 @@ namespace Serilog.Expressions.Compilation.Wildcards
             var comparisonArgs = lx.Operands.ToArray();
             comparisonArgs[indexerOperand] = nestedComparand;
             var body = new CallExpression(lx.IgnoreCase, lx.OperatorName, comparisonArgs);
-            
+
             var lambda = new LambdaExpression(new[] { px }, body);
 
             var op = Operators.ToRuntimeWildcardOperator(wc);
             var call = new CallExpression(false, op, coll, lambda);
             return Transform(call);
         }
-        
+
         // Detects and transforms standalone `A[?]` fragments that are not part of a comparision; these
         // are effectively Boolean tests.
         protected override Expression Transform(IndexerExpression ix)

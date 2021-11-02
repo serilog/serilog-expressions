@@ -53,7 +53,7 @@ namespace Serilog.Templates.Compilation.NameResolution
         {
             if (locals.Count == 0)
                 return fx;
-            
+
             return new FormattedExpression(
                 ExpressionLocalNameBinder.BindLocalValueNames(fx.Expression, locals),
                 fx.Format,
@@ -77,7 +77,7 @@ namespace Serilog.Templates.Compilation.NameResolution
 
             foreach (var _ in rep.BindingNames)
                 locals.Pop();
-            
+
             return new Repetition(
                 rep.Enumerable,
                 rep.BindingNames,

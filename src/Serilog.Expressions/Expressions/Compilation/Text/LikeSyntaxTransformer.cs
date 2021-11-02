@@ -37,7 +37,7 @@ namespace Serilog.Expressions.Compilation.Text
 
             if (Operators.SameOperator(call.OperatorName, Operators.IntermediateOpLike))
                 return TryCompileLikeExpression(call.IgnoreCase, call.Operands[0], call.Operands[1]);
-            
+
             if (Operators.SameOperator(call.OperatorName, Operators.IntermediateOpNotLike))
                 return new CallExpression(
                     false,
@@ -61,17 +61,17 @@ namespace Serilog.Expressions.Compilation.Text
                 var indexof = new IndexOfMatchExpression(Transform(corpus), compiled);
                 return new CallExpression(ignoreCase, Operators.RuntimeOpNotEqual, indexof, new ConstantExpression(new ScalarValue(-1)));
             }
-            
+
             SelfLog.WriteLine($"Serilog.Expressions: `like` requires a constant string argument; found ${like}.");
             return new CallExpression(false, Operators.OpUndefined);
         }
-        
+
         static string LikeToRegex(string like)
         {
             var begin = "^";
             var regex = "";
             var end = "$";
-            
+
             for (var i = 0; i < like.Length; ++i)
             {
                 var ch = like[i];
@@ -87,13 +87,13 @@ namespace Serilog.Expressions.Compilation.Text
                     {
                         if (i == 0)
                             begin = "";
-                        
+
                         if (i == like.Length - 1)
                             end = "";
-                        
+
                         if (i == 0 && i == like.Length - 1)
                             regex += ".*";
-                        
+
                         if (i != 0 && i != like.Length - 1)
                             regex += "(?:.|\\r|\\n)*"; // ~= RegexOptions.Singleline
                     }

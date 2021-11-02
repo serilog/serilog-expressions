@@ -27,7 +27,7 @@ namespace Serilog.Expressions.Ast
         }
 
         public bool IgnoreCase { get; }
-        
+
         public string OperatorName { get; }
 
         public Expression[] Operands { get; }

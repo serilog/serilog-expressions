@@ -1,6 +1,6 @@
 # _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/vmcskdk2wjn1rpps/branch/dev?svg=true)](https://ci.appveyor.com/project/serilog/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
 
-An embeddable mini-language for filtering, enriching, and formatting Serilog 
+An embeddable mini-language for filtering, enriching, and formatting Serilog
 events, ideal for use with JSON or XML configuration.
 
 ## Getting started
@@ -11,14 +11,14 @@ Install the package from NuGet:
 dotnet add package Serilog.Expressions
 ```
 
-The package adds extension methods to Serilog's `Filter`, `WriteTo`, and 
+The package adds extension methods to Serilog's `Filter`, `WriteTo`, and
 `Enrich` configuration objects, along with an `ExpressionTemplate`
 type that's compatible with Serilog sinks accepting an
 `ITextFormatter`.
 
 ### Filtering example
 
-_Serilog.Expressions_ adds `ByExcluding()` and `ByIncludingOnly()` 
+_Serilog.Expressions_ adds `ByExcluding()` and `ByIncludingOnly()`
 overloads to the `Filter` configuration object that accept filter
 expressions:
 
@@ -38,8 +38,7 @@ in the package. To check expression syntax without throwing, see the
 
 #### An `appSettings.json` JSON configuration example
 
-In [`appSettings.json` 
-configuration](https://github.com/serilog/serilog-settings-configuration) 
+In [`appSettings.json` configuration](https://github.com/serilog/serilog-settings-configuration)
 this is written as:
 
 ```json
@@ -68,7 +67,7 @@ this is written as:
     <add key="serilog:using:Expressions" value="Serilog.Expressions" />
     <add key="serilog:filter:ByExcluding.expression" value="RequestPath like '/health%'" />
   </appSettings>
-``` 
+```
 
 ## Supported configuration APIs
 
@@ -91,15 +90,15 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new ExpressionTemplate(
         "[{@t:HH:mm:ss} {@l:u3} ({SourceContext})] {@m} (first item is {Cart[0]})\n{@x}"))
     .CreateLogger();
-    
+
 // Produces log events like:
 // [21:21:40 INF (Sample.Program)] Cart contains ["Tea","Coffee"] (first item is Tea)
 ```
 
 Templates are based on .NET format strings, and support standard padding, alignment, and format specifiers.
 
-Along with standard properties for the event timestamp (`@t`), level (`@l`) and so on, "holes" in expression templates can include complex 
-expressions over the first-class properties of the event, like `{SourceContex}` and `{Cart[0]}` in the example..
+Along with standard properties for the event timestamp (`@t`), level (`@l`) and so on, "holes" in expression templates can include complex
+expressions over the first-class properties of the event, like `{SourceContext}` and `{Cart[0]}` in the example..
 
 Templates support customizable color themes when used with the `Console` sink:
 
@@ -165,7 +164,7 @@ A typical set of operators is supported:
  * Indexers `a['b']` and `a[0]`
  * Wildcard indexing - `a[?]` any, and `a[*]` all
  * Conditional `if a then b else c` (all branches required; see also the section below on _conditional blocks_)
- 
+
 Comparision operators that act on text all accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 
 ```
@@ -176,7 +175,7 @@ User.Name like 'n%' ci
 
 Functions are called using typical `Identifier(args)` syntax.
 
-Except for the `IsDefined()` function, the result of 
+Except for the `IsDefined()` function, the result of
 calling a function will be undefined if:
 
  * any argument is undefined, or
@@ -223,10 +222,10 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new ExpressionTemplate(
         "[{@t:HH:mm:ss} {@l:u3}{#if SourceContext is not null} ({SourceContext}){#end}] {@m}\n{@x}"))
     .CreateLogger();
-    
+
 // Produces log events like:
 // [21:21:45 INF] Starting up
-// [21:21:46 INF (Sample.Program)] Firing engines   
+// [21:21:46 INF (Sample.Program)] Firing engines
 ```
 
 The block between the `{#if <expr>}` and `{#end}` directives will only appear in the output if `<expr>` is `true` - in the example, events with a `SourceContext` include this in parentheses, while those without, don't.
@@ -302,7 +301,7 @@ ElementAt(@p, 'someName') ci
 { {Timestamp: @t, Username: User.Name} }\n
 ```
 
-This output template shows the use of a space between the opening `{` of a hole, and the enclosed object literal with `Timestamp` and 
+This output template shows the use of a space between the opening `{` of a hole, and the enclosed object literal with `Timestamp` and
 `Username` fields. The object will be formatted as JSON. The trailing `\n` is a C# or JSON newline literal (don't escape this any further, as
 it's not part of the output template syntax).
 
@@ -336,8 +335,8 @@ else
 Compiled expression delegates return `LogEventPropertyValue` because this is the most
 convenient type to work with in many Serilog scenarios (enrichers, sinks, ...). To
 convert the result to plain-old-.NET-types like `string`, `bool`, `Dictionary<K,V>` and
- `Array`, use the functions in the `Serilog.Expressions.ExpressionResult` class:
- 
+`Array`, use the functions in the `Serilog.Expressions.ExpressionResult` class:
+
 ```csharp
     var result = compiled(someEvent);
 
@@ -356,12 +355,12 @@ User-defined functions can be plugged in by implementing static methods that:
  * Have arguments of type `LogEventPropertyValue?` or `LogEvent`,
  * If the `ci` modifier is supported, accept a `StringComparison`, and
  * If culture-specific formatting or comparisons are used, accepts an `IFormatProvider`.
- 
+
 For example:
 
 ```csharp
 public static class MyFunctions
-{    
+{
     public static LogEventPropertyValue? IsHello(
         StringComparison comparison,
         LogEventPropertyValue? maybeHello)
@@ -388,5 +387,5 @@ var expr = SerilogExpression.Compile("IsHello(User.Name)", new[] { myFunctions }
 
 ## Acknowledgements
 
-Includes the parser combinator implementation from [Superpower](https://github.com/datalust/superpower), copyright Datalust, 
+Includes the parser combinator implementation from [Superpower](https://github.com/datalust/superpower), copyright Datalust,
 Superpower Contributors, and Sprache Contributors; licensed under the Apache License, 2.0.

@@ -26,7 +26,7 @@ namespace Serilog.Templates.Themes
     class ThemedJsonValueFormatter : LogEventPropertyValueVisitor<TextWriter, int>
     {
         const string TypeTagPropertyName = "$type";
-        
+
         readonly Style _null, _bool, _num, _string, _scalar, _tertiary, _name;
 
         public ThemedJsonValueFormatter(TemplateTheme theme)
@@ -44,7 +44,7 @@ namespace Serilog.Templates.Themes
         {
             return Visit(output, value);
         }
-        
+
         protected override int VisitScalarValue(TextWriter state, ScalarValue scalar)
         {
             return FormatLiteralValue(scalar, state);
@@ -53,7 +53,7 @@ namespace Serilog.Templates.Themes
         protected override int VisitSequenceValue(TextWriter state, SequenceValue sequence)
         {
             var count = 0;
-            
+
             using (_tertiary.Set(state, ref count))
                 state.Write('[');
 
@@ -165,7 +165,7 @@ namespace Serilog.Templates.Themes
 
             return count;
         }
-        
+
         int FormatLiteralValue(ScalarValue scalar, TextWriter output)
         {
             var value = scalar.Value;

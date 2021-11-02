@@ -35,13 +35,13 @@ namespace Serilog.Templates.Compilation
                     level.Format, level.Alignment, theme),
                 FormattedExpression
                 {
-                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Exception }, 
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Exception },
                     Alignment: null,
                     Format: null
                 } => new CompiledExceptionToken(theme),
                 FormattedExpression
                 {
-                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Message }, 
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Message },
                     Format: null
                 } message => new CompiledMessageToken(formatProvider, message.Alignment, theme),
                 FormattedExpression expression => new CompiledFormattedExpression(

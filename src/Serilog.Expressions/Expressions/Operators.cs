@@ -107,7 +107,7 @@ namespace Serilog.Expressions
 
             return OperatorComparer.Equals(op1, op2);
         }
-        
+
         public static string ToRuntimeWildcardOperator(IndexerWildcard wildcard)
         {
             return wildcard switch

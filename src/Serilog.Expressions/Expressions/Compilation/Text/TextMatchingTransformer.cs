@@ -37,7 +37,7 @@ namespace Serilog.Expressions.Compilation.Text
 
             if (Operators.SameOperator(call.OperatorName, Operators.OpIndexOfMatch))
                 return TryCompileIndexOfMatch(call.IgnoreCase, call.Operands[0], call.Operands[1]);
-            
+
             if (Operators.SameOperator(call.OperatorName, Operators.OpIsMatch))
                 return new CallExpression(
                     false,
@@ -60,7 +60,7 @@ namespace Serilog.Expressions.Compilation.Text
                 var compiled = new Regex(s, opts, TimeSpan.FromMilliseconds(100));
                 return new IndexOfMatchExpression(Transform(corpus), compiled);
             }
-            
+
             SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found ${regex}.");
             return new CallExpression(false, Operators.OpUndefined);
         }

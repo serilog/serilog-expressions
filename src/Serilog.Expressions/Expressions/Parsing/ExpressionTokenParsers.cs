@@ -53,17 +53,17 @@ namespace Serilog.Expressions.Parsing
         static readonly TokenListParser<ExpressionToken, string> Neq = Token.EqualTo(ExpressionToken.NotEqual).Value(Operators.RuntimeOpNotEqual);
         static readonly TokenListParser<ExpressionToken, string> Negate = Token.EqualTo(ExpressionToken.Minus).Value(Operators.RuntimeOpNegate);
         static readonly TokenListParser<ExpressionToken, string> Not = Token.EqualTo(ExpressionToken.Not).Value(Operators.RuntimeOpNot);
-        
+
         static readonly TokenListParser<ExpressionToken, string> Like = Token.EqualTo(ExpressionToken.Like).Value(Operators.IntermediateOpLike);
 
         static readonly TokenListParser<ExpressionToken, string> NotLike =
             Token.EqualTo(ExpressionToken.Not)
                 .IgnoreThen(Token.EqualTo(ExpressionToken.Like))
                 .Value(Operators.IntermediateOpNotLike);
-        
+
         static readonly TokenListParser<ExpressionToken, string> In = Token.EqualTo(ExpressionToken.In).Value(Operators.RuntimeOpIn);
 
-        static readonly TokenListParser<ExpressionToken, string> NotIn = 
+        static readonly TokenListParser<ExpressionToken, string> NotIn =
             Token.EqualTo(ExpressionToken.Not)
                 .IgnoreThen(Token.EqualTo(ExpressionToken.In))
                 .Value(Operators.RuntimeOpNotIn);
@@ -96,7 +96,7 @@ namespace Serilog.Expressions.Parsing
                 .IgnoreThen(Parse.Ref(() => Expr!))
                 .Select(content => (Element)new SpreadElement(content))
                 .Or(Parse.Ref(() => Expr!).Select(item => (Element) new ItemElement(item)));
-        
+
         static readonly TokenListParser<ExpressionToken, Expression> ArrayLiteral =
         (from lbracket in Token.EqualTo(ExpressionToken.LBracket)
             from elements in ArrayElement.ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
@@ -134,7 +134,7 @@ namespace Serilog.Expressions.Parsing
                 from members in ObjectMember.ManyDelimitedBy(Token.EqualTo(ExpressionToken.Comma))
                 from rbrace in Token.EqualTo(ExpressionToken.RBrace)
                 select (Expression)new ObjectExpression(members)).Named("object");
-        
+
         static readonly TokenListParser<ExpressionToken, Expression> RootProperty =
             (from notFunction in Parse.Not(Token.EqualTo(ExpressionToken.Identifier).IgnoreThen(Token.EqualTo(ExpressionToken.LParen)))
                 from p in Token.EqualTo(ExpressionToken.BuiltInIdentifier).Select(b => (Expression) new AmbientNameExpression(b.ToStringValue().Substring(1), true))
@@ -166,7 +166,7 @@ namespace Serilog.Expressions.Parsing
             from ___ in Token.EqualTo(ExpressionToken.Else)
             from alternative in Parse.Ref(() => Expr!)
             select (Expression)new CallExpression(false, Operators.RuntimeOpIfThenElse, condition, consequent, alternative);
-        
+
         static readonly TokenListParser<ExpressionToken, Expression> Literal =
             String
                 .Or(Number)

@@ -60,7 +60,7 @@ namespace Serilog.Templates.Rendering
         {
             if (format == null)
                 return value.ToString();
-            
+
             if (format.Length != 2 && format.Length != 3)
                 return Casing.Format(value.ToString(), format);
 

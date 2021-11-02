@@ -22,7 +22,7 @@ namespace Serilog.Templates.Compilation.UnreferencedProperties
     class TemplateReferencedPropertiesFinder
     {
         readonly ExpressionReferencedPropertiesFinder _rpf = new();
-        
+
         public IEnumerable<string> FindReferencedProperties(Template template)
         {
             return template switch

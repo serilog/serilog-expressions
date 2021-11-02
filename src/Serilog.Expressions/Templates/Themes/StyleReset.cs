@@ -21,9 +21,9 @@ namespace Serilog.Templates.Themes
     {
         const string AnsiStyleResetSequence = "\x1b[0m";
         public const int ResetCharCount = 4;
-        
+
         readonly TextWriter? _output;
-        
+
         public StyleReset(TextWriter output)
         {
             _output = output;
