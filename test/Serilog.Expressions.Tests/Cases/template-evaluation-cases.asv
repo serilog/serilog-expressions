@@ -31,5 +31,9 @@ Culture-specific {42.34}                             ⇶ Culture-specific 42,34
 {Name} {rest()}                                      ⇶ nblumhardt {}
 {rest(true)}                                         ⇶ {}
 {Name}												 ⇶ nblumhardt
+{Name = 'nblumhardt'}								 ⇶ True
+{Name = 'jdoe'}										 ⇶ False
 {IsDefined(Name)}									 ⇶ True
 {IsDefined(NonExistantProperty)}					 ⇶ False
+{Has(Name)}											 ⇶ True
+{Has(NonExistantProperty)}							 ⇶ False
