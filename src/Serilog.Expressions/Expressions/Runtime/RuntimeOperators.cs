@@ -327,6 +327,15 @@ namespace Serilog.Expressions.Runtime
             return ScalarBoolean(value != null);
         }
 
+        /// <summary>
+        /// Used to backport anyone coming from Serilog.Filters.Expressions that used Has()
+        /// Before it was renamed to IsDefined()
+        /// </summary>
+        public static LogEventPropertyValue Has(LogEventPropertyValue? value)
+        {
+            return IsDefined(value);
+        }
+
         public static LogEventPropertyValue? ElementAt(StringComparison sc, LogEventPropertyValue? items, LogEventPropertyValue? index)
         {
             // ReSharper disable once ConvertIfStatementToSwitchStatement
