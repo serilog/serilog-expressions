@@ -191,7 +191,7 @@ calling a function will be undefined if:
 | `IndexOf(s, t)` | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `IndexOfMatch(s, p)` | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match. |
 | `IsMatch(s, p)` | Tests whether the regular expression `p` matches within the string `s`. |
-| `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
+| `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. If coming from Serilog.Filters.Expressions depercated package this was previously called Has() |
 | `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
 | `Length(x)` | Returns the length of a string or array. |
 | `Now()` | Returns `DateTimeOffset.Now`. |
