@@ -124,12 +124,12 @@ using object literals:
 The following properties are available in expressions:
 
  * **All first-class properties of the event** - no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
- * `@t` - the event's timestamp, as a `DateTimeOffset`
- * `@m` - the rendered message
- * `@mt` - the raw message template
- * `@l` - the event's level, as a `LogEventLevel`
- * `@x` - the exception associated with the event, if any, as an `Exception`
- * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
+ * `@t` or `@TimeStamp` - the event's timestamp, as a `DateTimeOffset`
+ * `@m` or `@Message` - the rendered message
+ * `@mt` or `@MessageTemplate` - the raw message template
+ * `@l` or `@Level` - the event's level, as a `LogEventLevel`
+ * `@x` @or `@Exception` - the exception associated with the event, if any, as an `Exception`
+ * `@p` or `@Properties` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
  * `@i` - event id; a 32-bit numeric hash of the event's message template
  * `@r` - renderings; if any tokens in the message template include .NET-specific formatting, an array of rendered values for each such token
 
