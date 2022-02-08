@@ -25,5 +25,15 @@ namespace Serilog.Expressions
         public const string Properties = "p";
         public const string Renderings = "r";
         public const string EventId = "i";
+
+        // These were the friendlier names that was available in
+        // Serilog.Filters.Expressions
+        public const string ExceptionExplicit = "Exception";
+        public const string LevelExplicit = "Level";
+        public const string TimestampExplicit = "Timestamp";
+        public const string MessageExplicit = "Message";
+        public const string MessageTemplateExplicit = "MessageTemplate";
+        public const string PropertiesExplicit = "Properties";
+        
     }
 }
