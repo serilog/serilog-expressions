@@ -1,9 +1,17 @@
 Hello, {'world'}!                        ⇶ Hello, world!
 {@l}                                     ⇶ Information
 {@l:u3}                                  ⇶ INF
+{@Level}								 ⇶ Information
+{@Level:u4}								 ⇶ INFO
+{@Level:w3}								 ⇶ inf
 Items are {[1, 2]}                       ⇶ Items are [1,2]
 Members are { {a: 1, 'b c': 2} }         ⇶ Members are {"a":1,"b c":2}
 {@p}                                     ⇶ {"Name":"nblumhardt"}
+{@p['Name']}                             ⇶ nblumhardt
+{@Properties}							 ⇶ {"Name":"nblumhardt"}
+{@Properties['Name']}					 ⇶ nblumhardt
+{@mt}									 ⇶ Hello, {Name}!
+{@MessageTemplate}						 ⇶ Hello, {Name}!
 Hello, {'my } brackety { {}} friends'}!  ⇶ Hello, my } brackety { {}} friends!
 Text only                                ⇶ Text only
 {{ Escaped {{ left {{                    ⇶ { Escaped { left {
@@ -13,6 +21,7 @@ Aligned {42,4}!                          ⇶ Aligned   42!
 Left {42,-4}!                            ⇶ Left 42  !
 Under width {42,0}!                      ⇶ Under width 42!
 {@m}                                     ⇶ Hello, nblumhardt!
+{@Message}								 ⇶ Hello, nblumhardt!
 Hello, {#if true}world{#end}!            ⇶ Hello, world!
 Hello, {#if true}w{42}d{#end}!           ⇶ Hello, w42d!
 Hello, {#if 1 = 1}world{#else}there{#end}!           ⇶ Hello, world!
