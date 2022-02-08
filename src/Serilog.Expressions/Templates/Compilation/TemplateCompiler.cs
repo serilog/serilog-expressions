@@ -33,6 +33,9 @@ namespace Serilog.Templates.Compilation
                 LiteralText text => new CompiledLiteralText(text.Text, theme),
                 FormattedExpression { Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Level} } level => new CompiledLevelToken(
                     level.Format, level.Alignment, theme),
+                FormattedExpression { Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.LevelExplicit } } level => new CompiledLevelToken(
+                   level.Format, level.Alignment, theme),
+
                 FormattedExpression
                 {
                     Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Exception },
@@ -41,9 +44,22 @@ namespace Serilog.Templates.Compilation
                 } => new CompiledExceptionToken(theme),
                 FormattedExpression
                 {
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.ExceptionExplicit },
+                    Alignment: null,
+                    Format: null
+                } => new CompiledExceptionToken(theme),
+
+                FormattedExpression
+                {
                     Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Message },
                     Format: null
                 } message => new CompiledMessageToken(formatProvider, message.Alignment, theme),
+                FormattedExpression
+                {
+                    Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.MessageExplicit },
+                    Format: null
+                } message => new CompiledMessageToken(formatProvider, message.Alignment, theme),
+
                 FormattedExpression expression => new CompiledFormattedExpression(
                     ExpressionCompiler.Compile(expression.Expression, formatProvider, nameResolver), expression.Format, expression.Alignment, formatProvider, theme),
                 TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, formatProvider, nameResolver, theme)).ToArray()),
