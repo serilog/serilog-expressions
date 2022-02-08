@@ -207,14 +207,29 @@ namespace Serilog.Expressions.Compilation.Linq
                 return px.PropertyName switch
                 {
                     BuiltInProperty.Level => Splice(context => new ScalarValue(context.LogEvent.Level)),
+                    BuiltInProperty.LevelExplicit => Splice(context => new ScalarValue(context.LogEvent.Level)),
+
                     BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(formatter, context))),
+                    BuiltInProperty.MessageExplicit => Splice(context => new ScalarValue(Intrinsics.RenderMessage(formatter, context))),
+
                     BuiltInProperty.Exception => Splice(context =>
                         context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),
+                    BuiltInProperty.ExceptionExplicit => Splice(context =>
+                        context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),
+
                     BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.LogEvent.Timestamp)),
+                    BuiltInProperty.TimestampExplicit => Splice(context => new ScalarValue(context.LogEvent.Timestamp)),
+
                     BuiltInProperty.MessageTemplate => Splice(context => new ScalarValue(context.LogEvent.MessageTemplate.Text)),
+                    BuiltInProperty.MessageTemplateExplicit => Splice(context => new ScalarValue(context.LogEvent.MessageTemplate.Text)),
+
                     BuiltInProperty.Properties => Splice(context =>
                         new StructureValue(context.LogEvent.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
                             null)),
+                    BuiltInProperty.PropertiesExplicit => Splice(context =>
+                        new StructureValue(context.LogEvent.Properties.Select(kvp => new LogEventProperty(kvp.Key, kvp.Value)),
+                            null)),
+
                     BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context.LogEvent, formatProvider)),
                     BuiltInProperty.EventId => Splice(context =>
                         new ScalarValue(EventIdHash.Compute(context.LogEvent.MessageTemplate.Text))),
