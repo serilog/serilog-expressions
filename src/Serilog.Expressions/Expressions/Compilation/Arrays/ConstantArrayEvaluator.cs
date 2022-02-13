@@ -23,7 +23,7 @@ namespace Serilog.Expressions.Compilation.Arrays
     {
         static readonly ConstantArrayEvaluator Instance = new ConstantArrayEvaluator();
 
-        public static Expression Evaluate(Expression expression)
+        public static Expression Rewrite(Expression expression)
         {
             return Instance.Transform(expression);
         }

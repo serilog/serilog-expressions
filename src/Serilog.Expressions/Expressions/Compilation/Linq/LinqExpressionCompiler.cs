@@ -218,6 +218,8 @@ namespace Serilog.Expressions.Compilation.Linq
                     BuiltInProperty.Renderings => Splice(context => Intrinsics.GetRenderings(context.LogEvent, formatProvider)),
                     BuiltInProperty.EventId => Splice(context =>
                         new ScalarValue(EventIdHash.Compute(context.LogEvent.MessageTemplate.Text))),
+                    var alias when _nameResolver.TryResolveBuiltInPropertyName(alias, out var target) =>
+                        Transform(new AmbientNameExpression(target, true)),
                     _ => LX.Constant(null, typeof(LogEventPropertyValue))
                 };
             }

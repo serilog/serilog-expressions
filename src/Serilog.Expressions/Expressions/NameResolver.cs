@@ -53,5 +53,20 @@ namespace Serilog.Expressions
             boundValue = null;
             return false;
         }
+
+        /// <summary>
+        /// Map an unrecognized built-in property name to a recognised one.
+        /// </summary>
+        /// <remarks>Intended predominantly to support migration from <em>Serilog.Filters.Expressions</em>.</remarks>
+        /// <param name="alias">The unrecognized name, for example, <code>"Message"</code>; the <code>@</code> prefix is
+        /// not included.</param>
+        /// <param name="target">If the name could be resolved, the target property name, without any prefix; for
+        /// example, <code>"m"</code>.</param>
+        /// <returns>True if the alias was mapped to a built-in property; otherwise, false.</returns>
+        public virtual bool TryResolveBuiltInPropertyName(string alias, [NotNullWhen(true)] out string? target)
+        {
+            target = null;
+            return false;
+        }
     }
 }
