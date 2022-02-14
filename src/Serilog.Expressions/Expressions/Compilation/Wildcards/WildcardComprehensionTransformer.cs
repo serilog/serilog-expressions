@@ -22,7 +22,7 @@ namespace Serilog.Expressions.Compilation.Wildcards
     {
         int _nextParameter;
 
-        public static Expression Expand(Expression root)
+        public static Expression Rewrite(Expression root)
         {
             var wc = new WildcardComprehensionTransformer();
             return wc.Transform(root);

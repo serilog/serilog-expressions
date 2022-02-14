@@ -9,6 +9,7 @@ namespace Serilog.Expressions.Tests.Expressions
 {
     public class NameResolverTests
     {
+        // ReSharper disable once UnusedMember.Global
         public static LogEventPropertyValue? Magic(LogEventPropertyValue? number)
         {
             if (!Coerce.Numeric(number, out var num))
@@ -17,6 +18,7 @@ namespace Serilog.Expressions.Tests.Expressions
             return new ScalarValue(num + 42);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static LogEventPropertyValue? SecretWordAt(string word, LogEventPropertyValue? index)
         {
             if (!Coerce.Numeric(index, out var i))
@@ -52,6 +54,21 @@ namespace Serilog.Expressions.Tests.Expressions
             }
         }
 
+        class LegacyLevelPropertyNameResolver: NameResolver
+        {
+            public override bool TryResolveBuiltInPropertyName(string alias, [NotNullWhen(true)] out string? target)
+            {
+                if (alias == "Level")
+                {
+                    target = "l";
+                    return true;
+                }
+
+                target = null;
+                return false;
+            }
+        }
+
         [Fact]
         public void UserDefinedFunctionsAreCallableInExpressions()
         {
@@ -67,6 +84,15 @@ namespace Serilog.Expressions.Tests.Expressions
             var expr = SerilogExpression.Compile(
                 "SecretWordAt(1) = 'e'",
                 nameResolver: new SecretWordResolver(new StaticMemberNameResolver(typeof(NameResolverTests)), "hello"));
+            Assert.True(Coerce.IsTrue(expr(Some.InformationEvent())));
+        }
+
+        [Fact]
+        public void BuiltInPropertiesCanBeAliased()
+        {
+            var expr = SerilogExpression.Compile(
+                "@Level = 'Information'",
+                nameResolver: new LegacyLevelPropertyNameResolver());
             Assert.True(Coerce.IsTrue(expr(Some.InformationEvent())));
         }
     }
