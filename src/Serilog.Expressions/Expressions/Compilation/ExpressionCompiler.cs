@@ -32,13 +32,12 @@ namespace Serilog.Expressions.Compilation
             actual = TextMatchingTransformer.Rewrite(actual);
             actual = LikeSyntaxTransformer.Rewrite(actual);
             actual = PropertiesObjectAccessorTransformer.Rewrite(actual);
-            actual = ConstantArrayEvaluator.Evaluate(actual);
-            actual = WildcardComprehensionTransformer.Expand(actual);
+            actual = ConstantArrayEvaluator.Rewrite(actual);
+            actual = WildcardComprehensionTransformer.Rewrite(actual);
             return actual;
         }
 
-        public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider,
-            NameResolver nameResolver)
+        public static Evaluatable Compile(Expression expression, IFormatProvider? formatProvider, NameResolver nameResolver)
         {
             var actual = Translate(expression);
             return LinqExpressionCompiler.Compile(actual, formatProvider, nameResolver);

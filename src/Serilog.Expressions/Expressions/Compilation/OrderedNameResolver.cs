@@ -51,5 +51,17 @@ namespace Serilog.Expressions.Compilation
             boundValue = null;
             return false;
         }
+
+        public override bool TryResolveBuiltInPropertyName(string alias, [NotNullWhen(true)] out string? target)
+        {
+            foreach (var resolver in _orderedResolvers)
+            {
+                if (resolver.TryResolveBuiltInPropertyName(alias, out target))
+                    return true;
+            }
+
+            target = null;
+            return false;
+        }
     }
 }
