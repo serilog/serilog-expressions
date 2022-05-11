@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
+using Serilog.Templates.Rendering;
 
 // ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global, InconsistentNaming, ReturnTypeCanBeNotNullable
 
@@ -501,15 +502,12 @@ namespace Serilog.Expressions.Runtime
                 return null;
             }
 
-            string? toString;
-            if (sv.Value is IFormattable formattable)
+            var toString = sv.Value switch
             {
-                toString = formattable.ToString(fmt, formatProvider);
-            }
-            else
-            {
-                toString = sv.Value.ToString();
-            }
+                LogEventLevel level => LevelRenderer.GetLevelMoniker(level, fmt),
+                IFormattable formattable => formattable.ToString(fmt, formatProvider),
+                _ => sv.Value.ToString()
+            };
 
             return new ScalarValue(toString);
         }
