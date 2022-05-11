@@ -1,6 +1,7 @@
 Hello, {'world'}!                        ⇶ Hello, world!
 {@l}                                     ⇶ Information
 {@l:u3}                                  ⇶ INF
+{ {level: ToString(@l, 'u3')} }          ⇶ {"level":"INF"}
 Items are {[1, 2]}                       ⇶ Items are [1,2]
 Members are { {a: 1, 'b c': 2} }         ⇶ Members are {"a":1,"b c":2}
 {@p}                                     ⇶ {"Name":"nblumhardt"}
