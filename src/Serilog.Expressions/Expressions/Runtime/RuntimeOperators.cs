@@ -374,6 +374,11 @@ namespace Serilog.Expressions.Runtime
                 return ScalarBoolean(structure.Properties.Any(e => Coerce.IsTrue(pred(e.Value))));
             }
 
+            if (items is DictionaryValue dictionary)
+            {
+                return ScalarBoolean(dictionary.Elements.Any(e => Coerce.IsTrue(pred(e.Value))));
+            }
+
             return null;
         }
 
@@ -390,6 +395,11 @@ namespace Serilog.Expressions.Runtime
             if (items is StructureValue structure)
             {
                 return ScalarBoolean(structure.Properties.All(e => Coerce.IsTrue(pred(e.Value))));
+            }
+            
+            if (items is DictionaryValue dictionary)
+            {
+                return ScalarBoolean(dictionary.Elements.All(e => Coerce.IsTrue(pred(e.Value))));
             }
 
             return null;

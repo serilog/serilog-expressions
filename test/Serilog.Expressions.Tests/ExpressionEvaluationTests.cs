@@ -27,8 +27,9 @@ namespace Serilog.Expressions.Tests
                 })));
 
             var frFr = CultureInfo.GetCultureInfoByIetfLanguageTag("fr-FR");
-            var actual = SerilogExpression.Compile(expr, formatProvider: frFr)(evt);
-            var expected = SerilogExpression.Compile(result)(evt);
+            var testHelpers = new TestHelperNameResolver();
+            var actual = SerilogExpression.Compile(expr, formatProvider: frFr, testHelpers)(evt);
+            var expected = SerilogExpression.Compile(result, nameResolver: testHelpers)(evt);
 
             if (expected is null)
             {
