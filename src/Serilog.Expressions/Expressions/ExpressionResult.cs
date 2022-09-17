@@ -15,24 +15,23 @@
 using Serilog.Events;
 using Serilog.Expressions.Runtime;
 
-namespace Serilog.Expressions
+namespace Serilog.Expressions;
+
+/// <summary>
+/// Helper functions for working with the results of evaluating expressions.
+/// </summary>
+public static class ExpressionResult
 {
     /// <summary>
-    /// Helper functions for working with the results of evaluating expressions.
+    /// Test whether <paramref name="value"/> is <c langword="true">true</c>.
     /// </summary>
-    public static class ExpressionResult
+    /// <param name="value">The value to test, which may be <c langword="null">null</c>
+    /// if the result of evaluating an expression was undefined.</param>
+    /// <returns>Returns <c langword="true">true</c> if and only if the
+    /// <paramref name="value"/> is a scalar Boolean with the
+    /// value <c langword="true">true</c>. Returns <c langword="false">false</c>, otherwise.</returns>
+    public static bool IsTrue(LogEventPropertyValue? value)
     {
-        /// <summary>
-        /// Test whether <paramref name="value"/> is <c langword="true">true</c>.
-        /// </summary>
-        /// <param name="value">The value to test, which may be <c langword="null">null</c>
-        /// if the result of evaluating an expression was undefined.</param>
-        /// <returns>Returns <c langword="true">true</c> if and only if the
-        /// <paramref name="value"/> is a scalar Boolean with the
-        /// value <c langword="true">true</c>. Returns <c langword="false">false</c>, otherwise.</returns>
-        public static bool IsTrue(LogEventPropertyValue? value)
-        {
-            return Coerce.IsTrue(value);
-        }
+        return Coerce.IsTrue(value);
     }
 }

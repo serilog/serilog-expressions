@@ -12,40 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
 
-namespace Serilog.Expressions.Compilation.Variadics
+namespace Serilog.Expressions.Compilation.Variadics;
+
+// Handles variadic `coalesce()` and `concat()`, as well as optional arguments for other functions.
+class VariadicCallRewriter : IdentityTransformer
 {
-    // Handles variadic `coalesce()` and `concat()`, as well as optional arguments for other functions.
-    class VariadicCallRewriter : IdentityTransformer
+    static readonly VariadicCallRewriter Instance = new();
+
+    public static Expression Rewrite(Expression expression)
     {
-        static readonly VariadicCallRewriter Instance = new VariadicCallRewriter();
+        return Instance.Transform(expression);
+    }
 
-        public static Expression Rewrite(Expression expression)
+    protected override Expression Transform(CallExpression call)
+    {
+        if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce) ||
+            Operators.SameOperator(call.OperatorName, Operators.OpConcat))
         {
-            return Instance.Transform(expression);
-        }
-
-        protected override Expression Transform(CallExpression call)
-        {
-            if (Operators.SameOperator(call.OperatorName, Operators.OpCoalesce) ||
-                Operators.SameOperator(call.OperatorName, Operators.OpConcat))
+            if (call.Operands.Length == 0)
+                return new CallExpression(false, Operators.OpUndefined);
+            if (call.Operands.Length == 1)
+                return Transform(call.Operands.Single());
+            if (call.Operands.Length > 2)
             {
-                if (call.Operands.Length == 0)
-                    return new CallExpression(false, Operators.OpUndefined);
-                if (call.Operands.Length == 1)
-                    return Transform(call.Operands.Single());
-                if (call.Operands.Length > 2)
-                {
-                    var first = Transform(call.Operands.First());
-                    return new CallExpression(call.IgnoreCase, call.OperatorName, first,
-                        Transform(new CallExpression(call.IgnoreCase, call.OperatorName, call.Operands.Skip(1).ToArray())));
-                }
+                var first = Transform(call.Operands.First());
+                return new CallExpression(call.IgnoreCase, call.OperatorName, first,
+                    Transform(new CallExpression(call.IgnoreCase, call.OperatorName, call.Operands.Skip(1).ToArray())));
             }
-
-            return base.Transform(call);
         }
+
+        return base.Transform(call);
     }
 }

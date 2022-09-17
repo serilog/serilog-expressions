@@ -12,19 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Expressions.Parsing;
 
-namespace Serilog.Expressions.Parsing
+readonly struct ExpressionKeyword
 {
-    readonly struct ExpressionKeyword
-    {
-        public string Text { get; }
-        public ExpressionToken Token { get; }
+    public string Text { get; }
+    public ExpressionToken Token { get; }
 
-        public ExpressionKeyword(string text, ExpressionToken token)
-        {
-            Text = text ?? throw new ArgumentNullException(nameof(text));
-            Token = token;
-        }
+    public ExpressionKeyword(string text, ExpressionToken token)
+    {
+        Text = text ?? throw new ArgumentNullException(nameof(text));
+        Token = token;
     }
 }

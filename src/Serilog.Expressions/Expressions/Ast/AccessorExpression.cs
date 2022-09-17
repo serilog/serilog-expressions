@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class AccessorExpression : Expression
 {
-    class AccessorExpression : Expression
+    public AccessorExpression(Expression receiver, string memberName)
     {
-        public AccessorExpression(Expression receiver, string memberName)
-        {
-            MemberName = memberName ?? throw new ArgumentNullException(nameof(memberName));
-            Receiver = receiver;
-        }
+        MemberName = memberName ?? throw new ArgumentNullException(nameof(memberName));
+        Receiver = receiver;
+    }
 
-        public string MemberName { get; }
+    public string MemberName { get; }
 
-        public Expression Receiver { get; }
+    public Expression Receiver { get; }
 
-        public override string ToString()
-        {
-            if (SerilogExpression.IsValidIdentifier(MemberName))
-                return Receiver + "." + MemberName;
+    public override string ToString()
+    {
+        if (SerilogExpression.IsValidIdentifier(MemberName))
+            return Receiver + "." + MemberName;
 
-            return $"{Receiver}['{SerilogExpression.EscapeStringContent(MemberName)}']";
-        }
+        return $"{Receiver}['{SerilogExpression.EscapeStringContent(MemberName)}']";
     }
 }

@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class SpreadMember : Member
 {
-    class SpreadMember : Member
+    public Expression Content { get; }
+
+    public SpreadMember(Expression content)
     {
-        public Expression Content { get; }
+        Content = content;
+    }
 
-        public SpreadMember(Expression content)
-        {
-            Content = content;
-        }
-
-        public override string ToString()
-        {
-            return $"..{Content}";
-        }
+    public override string ToString()
+    {
+        return $"..{Content}";
     }
 }

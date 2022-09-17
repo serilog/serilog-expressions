@@ -15,46 +15,45 @@
 using System.Diagnostics.CodeAnalysis;
 using Serilog.Events;
 
-namespace Serilog.Expressions.Runtime
+namespace Serilog.Expressions.Runtime;
+
+/// <summary>
+/// Named local variables. We just look them up by name. The structure is a
+/// linked list with a null terminator: most of the time expressions won't have any
+/// locals, and when they do, they'll only have one or two at a given point.
+/// </summary>
+class Locals
 {
-    /// <summary>
-    /// Named local variables. We just look them up by name. The structure is a
-    /// linked list with a null terminator: most of the time expressions won't have any
-    /// locals, and when they do, they'll only have one or two at a given point.
-    /// </summary>
-    class Locals
+    readonly Locals? _others;
+    readonly string _name;
+    readonly LogEventPropertyValue _value;
+
+    Locals(Locals? others, string name, LogEventPropertyValue value)
     {
-        readonly Locals? _others;
-        readonly string _name;
-        readonly LogEventPropertyValue _value;
+        _others = others;
+        _name = name;
+        _value = value;
+    }
 
-        Locals(Locals? others, string name, LogEventPropertyValue value)
-        {
-            _others = others;
-            _name = name;
-            _value = value;
-        }
+    public static Locals Set(Locals? others, string name, LogEventPropertyValue value)
+    {
+        return new(others, name, value);
+    }
 
-        public static Locals Set(Locals? others, string name, LogEventPropertyValue value)
+    public static bool TryGetValue(Locals? locals, string name, [MaybeNullWhen(false)] out LogEventPropertyValue value)
+    {
+        while (locals != null)
         {
-            return new Locals(others, name, value);
-        }
-
-        public static bool TryGetValue(Locals? locals, string name, [MaybeNullWhen(false)] out LogEventPropertyValue value)
-        {
-            while (locals != null)
+            if (name == locals._name)
             {
-                if (name == locals._name)
-                {
-                    value = locals._value;
-                    return true;
-                }
-
-                locals = locals._others;
+                value = locals._value;
+                return true;
             }
 
-            value = null;
-            return false;
+            locals = locals._others;
         }
+
+        value = null;
+        return false;
     }
 }

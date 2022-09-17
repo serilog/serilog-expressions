@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class ParameterExpression : Expression
 {
-    class ParameterExpression : Expression
+    public ParameterExpression(string parameterName)
     {
-        public ParameterExpression(string parameterName)
-        {
-            ParameterName = parameterName;
-        }
+        ParameterName = parameterName;
+    }
 
-        public string ParameterName { get; }
+    public string ParameterName { get; }
 
-        public override string ToString()
-        {
-            return "$$" + ParameterName;
-        }
+    public override string ToString()
+    {
+        return "$$" + ParameterName;
     }
 }

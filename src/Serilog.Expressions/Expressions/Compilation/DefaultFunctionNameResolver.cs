@@ -14,16 +14,15 @@
 
 using Serilog.Expressions.Runtime;
 
-namespace Serilog.Expressions.Compilation
+namespace Serilog.Expressions.Compilation;
+
+static class DefaultFunctionNameResolver
 {
-    static class DefaultFunctionNameResolver
+    public static NameResolver Build(NameResolver? additionalNameResolver)
     {
-        public static NameResolver Build(NameResolver? additionalNameResolver)
-        {
-            var defaultResolver = new StaticMemberNameResolver(typeof(RuntimeOperators));
-            return additionalNameResolver == null
-                ? (NameResolver) defaultResolver
-                : new OrderedNameResolver(new[] {defaultResolver, additionalNameResolver });
-        }
+        var defaultResolver = new StaticMemberNameResolver(typeof(RuntimeOperators));
+        return additionalNameResolver == null
+            ? (NameResolver) defaultResolver
+            : new OrderedNameResolver(new[] {defaultResolver, additionalNameResolver });
     }
 }

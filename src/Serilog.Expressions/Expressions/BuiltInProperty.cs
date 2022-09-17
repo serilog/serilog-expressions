@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions
+namespace Serilog.Expressions;
+
+// See https://github.com/serilog/serilog-formatting-compact#reified-properties
+static class BuiltInProperty
 {
-    // See https://github.com/serilog/serilog-formatting-compact#reified-properties
-    static class BuiltInProperty
-    {
-        public const string Exception = "x";
-        public const string Level = "l";
-        public const string Timestamp = "t";
-        public const string Message = "m";
-        public const string MessageTemplate = "mt";
-        public const string Properties = "p";
-        public const string Renderings = "r";
-        public const string EventId = "i";
-    }
+    public const string Exception = "x";
+    public const string Level = "l";
+    public const string Timestamp = "t";
+    public const string Message = "m";
+    public const string MessageTemplate = "mt";
+    public const string Properties = "p";
+    public const string Renderings = "r";
+    public const string EventId = "i";
 }

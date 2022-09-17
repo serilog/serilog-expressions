@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Templates.Ast;
 
-namespace Serilog.Templates.Ast
+class TemplateBlock : Template
 {
-    class TemplateBlock : Template
-    {
-        public Template[] Elements { get; }
+    public Template[] Elements { get; }
 
-        public TemplateBlock(Template[] elements)
-        {
-            Elements = elements ?? throw new ArgumentNullException(nameof(elements));
-        }
+    public TemplateBlock(Template[] elements)
+    {
+        Elements = elements ?? throw new ArgumentNullException(nameof(elements));
     }
 }

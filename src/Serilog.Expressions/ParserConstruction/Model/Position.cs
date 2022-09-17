@@ -12,79 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.ParserConstruction.Model
+namespace Serilog.ParserConstruction.Model;
+
+/// <summary>
+/// A position within a stream of character input.
+/// </summary>
+readonly struct Position
 {
     /// <summary>
-    /// A position within a stream of character input.
+    /// The zero-based absolute index of the position.
     /// </summary>
-    readonly struct Position
+    public int Absolute { get; }
+
+    /// <summary>
+    /// The one-based line number.
+    /// </summary>
+    public int Line { get; }
+
+    /// <summary>
+    /// The one-based column number.
+    /// </summary>
+    public int Column { get; }
+
+    /// <summary>
+    /// Construct a position.
+    /// </summary>
+    /// <param name="absolute">The absolute position.</param>
+    /// <param name="line">The line number.</param>
+    /// <param name="column">The column number.</param>
+    Position(int absolute, int line, int column)
     {
-        /// <summary>
-        /// The zero-based absolute index of the position.
-        /// </summary>
-        public int Absolute { get; }
-
-        /// <summary>
-        /// The one-based line number.
-        /// </summary>
-        public int Line { get; }
-
-        /// <summary>
-        /// The one-based column number.
-        /// </summary>
-        public int Column { get; }
-
-        /// <summary>
-        /// Construct a position.
-        /// </summary>
-        /// <param name="absolute">The absolute position.</param>
-        /// <param name="line">The line number.</param>
-        /// <param name="column">The column number.</param>
-        Position(int absolute, int line, int column)
-        {
 #if CHECKED
             if (absolute < 0) throw new ArgumentOutOfRangeException(nameof(line), "Absolute positions start at 0.");
             if (line < 1) throw new ArgumentOutOfRangeException(nameof(line), "Line numbering starts at 1.");
             if (column < 1) throw new ArgumentOutOfRangeException(nameof(column), "Column numbering starts at 1.");
 #endif
-            Absolute = absolute;
-            Line = line;
-            Column = column;
-        }
+        Absolute = absolute;
+        Line = line;
+        Column = column;
+    }
 
-        /// <summary>
-        /// The position corresponding to the zero index.
-        /// </summary>
-        public static Position Zero { get; } = new Position(0, 1, 1);
+    /// <summary>
+    /// The position corresponding to the zero index.
+    /// </summary>
+    public static Position Zero { get; } = new(0, 1, 1);
 
-        /// <summary>
-        /// A position with no value.
-        /// </summary>
-        public static Position Empty => default;
+    /// <summary>
+    /// A position with no value.
+    /// </summary>
+    public static Position Empty => default;
 
-        /// <summary>
-        /// True if the position has a value.
-        /// </summary>
-        public bool HasValue => Line > 0;
+    /// <summary>
+    /// True if the position has a value.
+    /// </summary>
+    public bool HasValue => Line > 0;
 
-        /// <summary>
-        /// Advance over <paramref name="overChar"/>, advancing line and column numbers
-        /// as appropriate.
-        /// </summary>
-        /// <param name="overChar">The character being advanced over.</param>
-        /// <returns>The updated position.</returns>
-        public Position Advance(char overChar)
-        {
-            if (overChar == '\n')
-                return new Position(Absolute + 1, Line + 1, 1);
+    /// <summary>
+    /// Advance over <paramref name="overChar"/>, advancing line and column numbers
+    /// as appropriate.
+    /// </summary>
+    /// <param name="overChar">The character being advanced over.</param>
+    /// <returns>The updated position.</returns>
+    public Position Advance(char overChar)
+    {
+        if (overChar == '\n')
+            return new(Absolute + 1, Line + 1, 1);
 
-            return new Position(Absolute + 1, Line, Column + 1);
-        }
+        return new(Absolute + 1, Line, Column + 1);
+    }
 
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"{Absolute} (line {Line}, column {Column})";
-        }
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return $"{Absolute} (line {Line}, column {Column})";
     }
 }

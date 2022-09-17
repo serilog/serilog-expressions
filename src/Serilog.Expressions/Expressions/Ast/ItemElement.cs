@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class ItemElement : Element
 {
-    class ItemElement : Element
+    public Expression Value { get; }
+
+    public ItemElement(Expression value)
     {
-        public Expression Value { get; }
+        Value = value;
+    }
 
-        public ItemElement(Expression value)
-        {
-            Value = value;
-        }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+    public override string ToString()
+    {
+        return Value.ToString();
     }
 }
