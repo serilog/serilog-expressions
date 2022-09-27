@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
 using Serilog.Expressions;
 
-namespace Serilog.Templates.Compilation
+namespace Serilog.Templates.Compilation;
+
+class CompiledConditional : CompiledTemplate
 {
-    class CompiledConditional : CompiledTemplate
+    readonly Evaluatable _condition;
+    readonly CompiledTemplate _consequent;
+    readonly CompiledTemplate? _alternative;
+
+    public CompiledConditional(Evaluatable condition, CompiledTemplate consequent, CompiledTemplate? alternative)
     {
-        readonly Evaluatable _condition;
-        readonly CompiledTemplate _consequent;
-        readonly CompiledTemplate? _alternative;
+        _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+        _consequent = consequent ?? throw new ArgumentNullException(nameof(consequent));
+        _alternative = alternative;
+    }
 
-        public CompiledConditional(Evaluatable condition, CompiledTemplate consequent, CompiledTemplate? alternative)
-        {
-            _condition = condition ?? throw new ArgumentNullException(nameof(condition));
-            _consequent = consequent ?? throw new ArgumentNullException(nameof(consequent));
-            _alternative = alternative;
-        }
-
-        public override void Evaluate(EvaluationContext ctx, TextWriter output)
-        {
-            if (ExpressionResult.IsTrue(_condition.Invoke(ctx)))
-                _consequent.Evaluate(ctx, output);
-            else
-                _alternative?.Evaluate(ctx, output);
-        }
+    public override void Evaluate(EvaluationContext ctx, TextWriter output)
+    {
+        if (ExpressionResult.IsTrue(_condition.Invoke(ctx)))
+            _consequent.Evaluate(ctx, output);
+        else
+            _alternative?.Evaluate(ctx, output);
     }
 }

@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.ParserConstruction.Model;
 
-namespace Serilog.ParserConstruction
+namespace Serilog.ParserConstruction;
+
+/// <summary>
+/// Helper methods for working with parsers.
+/// </summary>
+static class ParserExtensions
 {
     /// <summary>
-    /// Helper methods for working with parsers.
+    /// Tries to parse the input without throwing an exception upon failure.
     /// </summary>
-    static class ParserExtensions
+    /// <typeparam name="TKind">The type of tokens consumed by the parser.</typeparam>
+    /// <typeparam name="T">The type of the result.</typeparam>
+    /// <param name="parser">The parser.</param>
+    /// <param name="input">The input.</param>
+    /// <returns>The result of the parser</returns>
+    /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
+    public static TokenListParserResult<TKind, T> TryParse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
     {
-        /// <summary>
-        /// Tries to parse the input without throwing an exception upon failure.
-        /// </summary>
-        /// <typeparam name="TKind">The type of tokens consumed by the parser.</typeparam>
-        /// <typeparam name="T">The type of the result.</typeparam>
-        /// <param name="parser">The parser.</param>
-        /// <param name="input">The input.</param>
-        /// <returns>The result of the parser</returns>
-        /// <exception cref="ArgumentNullException">The parser or input is null.</exception>
-        public static TokenListParserResult<TKind, T> TryParse<TKind, T>(this TokenListParser<TKind, T> parser, TokenList<TKind> input)
-        {
-            if (parser == null) throw new ArgumentNullException(nameof(parser));
+        if (parser == null) throw new ArgumentNullException(nameof(parser));
 
-            return parser(input);
-        }
+        return parser(input);
     }
 }

@@ -17,14 +17,13 @@ using BenchmarkDotNet.Running;
 using Serilog.Expressions.PerformanceTests;
 using Xunit;
 
-namespace Serilog.PerformanceTests
+namespace Serilog.PerformanceTests;
+
+public class Harness
 {
-    public class Harness
+    [Fact]
+    public void ComparisonBenchmark()
     {
-        [Fact]
-        public void ComparisonBenchmark()
-        {
-            BenchmarkRunner.Run<ComparisonBenchmark>();
-        }
+        BenchmarkRunner.Run<ComparisonBenchmark>();
     }
 }

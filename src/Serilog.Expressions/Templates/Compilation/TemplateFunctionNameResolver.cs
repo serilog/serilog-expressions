@@ -12,29 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Serilog.Expressions;
 using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Runtime;
 using Serilog.Templates.Ast;
 using Serilog.Templates.Compilation.UnreferencedProperties;
 
-namespace Serilog.Templates.Compilation
+namespace Serilog.Templates.Compilation;
+
+static class TemplateFunctionNameResolver
 {
-    static class TemplateFunctionNameResolver
+    public static NameResolver Build(NameResolver? additionalNameResolver, Template template)
     {
-        public static NameResolver Build(NameResolver? additionalNameResolver, Template template)
+        var resolvers = new List<NameResolver>
         {
-            var resolvers = new List<NameResolver>
-            {
-                new StaticMemberNameResolver(typeof(RuntimeOperators)),
-                new UnreferencedPropertiesFunction(template)
-            };
+            new StaticMemberNameResolver(typeof(RuntimeOperators)),
+            new UnreferencedPropertiesFunction(template)
+        };
 
-            if (additionalNameResolver != null)
-                resolvers.Add(additionalNameResolver);
+        if (additionalNameResolver != null)
+            resolvers.Add(additionalNameResolver);
 
-            return new OrderedNameResolver(resolvers);
-        }
+        return new OrderedNameResolver(resolvers);
     }
 }

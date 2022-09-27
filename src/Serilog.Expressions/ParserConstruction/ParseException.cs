@@ -12,39 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.ParserConstruction.Model;
 
 // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedAutoPropertyAccessor.Global
 
-namespace Serilog.ParserConstruction
+namespace Serilog.ParserConstruction;
+
+/// <summary>
+/// Represents an error that occurs during parsing.
+/// </summary>
+class ParseException : Exception
 {
     /// <summary>
-    /// Represents an error that occurs during parsing.
+    /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
     /// </summary>
-    class ParseException : Exception
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="errorPosition">The position of the error in the input text.</param>
+    public ParseException(string message, Position errorPosition) : this(message, errorPosition, null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
+    /// </summary>
+    /// <param name="message">The message that describes the error.</param>
+    /// <param name="errorPosition">The position of the error in the input text.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception.</param>
+    public ParseException(string message, Position errorPosition, Exception? innerException) : base(message, innerException)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
-        /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        /// <param name="errorPosition">The position of the error in the input text.</param>
-        public ParseException(string message, Position errorPosition) : this(message, errorPosition, null) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseException" /> class with a specified error message.
-        /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        /// <param name="errorPosition">The position of the error in the input text.</param>
-        /// <param name="innerException">The exception that is the cause of the current exception.</param>
-        public ParseException(string message, Position errorPosition, Exception? innerException) : base(message, innerException)
-        {
-            ErrorPosition = errorPosition;
-        }
-
-        /// <summary>
-        /// The position of the error in the input text, or <see cref="Position.Empty"/> if no position is specified.
-        /// </summary>
-        public Position ErrorPosition { get; }
+        ErrorPosition = errorPosition;
     }
+
+    /// <summary>
+    /// The position of the error in the input text, or <see cref="Position.Empty"/> if no position is specified.
+    /// </summary>
+    public Position ErrorPosition { get; }
 }

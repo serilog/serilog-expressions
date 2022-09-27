@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class ObjectExpression : Expression
 {
-    class ObjectExpression : Expression
+    public ObjectExpression(Member[] members)
     {
-        public ObjectExpression(Member[] members)
-        {
-            Members = members;
-        }
+        Members = members;
+    }
 
-        public Member[] Members { get; }
+    public Member[] Members { get; }
 
-        public override string ToString()
-        {
-            return "{" + string.Join(", ", Members.Select(m => m.ToString())) + "}";
-        }
+    public override string ToString()
+    {
+        return "{" + string.Join(", ", Members.Select(m => m.ToString())) + "}";
     }
 }
-

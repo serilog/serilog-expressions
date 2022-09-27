@@ -12,68 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Serilog.Templates.Themes;
 
-namespace Serilog.Templates.Themes
+/// <summary>
+/// A template theme using the ANSI terminal escape sequences.
+/// </summary>
+public class TemplateTheme
 {
     /// <summary>
-    /// A template theme using the ANSI terminal escape sequences.
+    /// A 256-color theme along the lines of Visual Studio Code.
     /// </summary>
-    public class TemplateTheme
+    public static TemplateTheme Code { get; } = TemplateThemes.Code;
+
+    /// <summary>
+    /// A theme using only gray, black and white.
+    /// </summary>
+    public static TemplateTheme Grayscale { get; } = TemplateThemes.Grayscale;
+
+    /// <summary>
+    /// A theme in the style of the original <i>Serilog.Sinks.Literate</i>.
+    /// </summary>
+    public static TemplateTheme Literate { get; } = TemplateThemes.Literate;
+
+    internal static TemplateTheme None { get; } = new(new Dictionary<TemplateThemeStyle, string>());
+
+    readonly Dictionary<TemplateThemeStyle, Style> _styles;
+
+    /// <summary>
+    /// Construct a theme given a set of styles.
+    /// </summary>
+    /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
+    /// sequences implementing the styles.</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
+    public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
     {
-        /// <summary>
-        /// A 256-color theme along the lines of Visual Studio Code.
-        /// </summary>
-        public static TemplateTheme Code { get; } = TemplateThemes.Code;
+        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+        _styles = ansiStyles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
+    }
 
-        /// <summary>
-        /// A theme using only gray, black and white.
-        /// </summary>
-        public static TemplateTheme Grayscale { get; } = TemplateThemes.Grayscale;
+    /// <summary>
+    /// Construct a theme given a set of styles.
+    /// </summary>
+    /// <param name="baseTheme">A base template theme, which will supply styles not overridden in <paramref name="ansiStyles"/>.</param>
+    /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
+    /// sequences implementing the styles.</param>
+    /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
+    public TemplateTheme(TemplateTheme baseTheme, IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
+    {
+        if (baseTheme == null) throw new ArgumentNullException(nameof(baseTheme));
+        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+        _styles = new(baseTheme._styles);
+        foreach (var kv in ansiStyles)
+            _styles[kv.Key] = new(kv.Value);
+    }
 
-        /// <summary>
-        /// A theme in the style of the original <i>Serilog.Sinks.Literate</i>.
-        /// </summary>
-        public static TemplateTheme Literate { get; } = TemplateThemes.Literate;
-
-        internal static TemplateTheme None { get; } = new TemplateTheme(new Dictionary<TemplateThemeStyle, string>());
-
-        readonly Dictionary<TemplateThemeStyle, Style> _styles;
-
-        /// <summary>
-        /// Construct a theme given a set of styles.
-        /// </summary>
-        /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
-        /// sequences implementing the styles.</param>
-        /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
-        public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
-        {
-            if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
-            _styles = ansiStyles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
-        }
-
-        /// <summary>
-        /// Construct a theme given a set of styles.
-        /// </summary>
-        /// <param name="baseTheme">A base template theme, which will supply styles not overridden in <paramref name="ansiStyles"/>.</param>
-        /// <param name="ansiStyles">Styles to apply within the theme. The dictionary maps style names to ANSI
-        /// sequences implementing the styles.</param>
-        /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
-        public TemplateTheme(TemplateTheme baseTheme, IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
-        {
-            if (baseTheme == null) throw new ArgumentNullException(nameof(baseTheme));
-            if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
-            _styles = new Dictionary<TemplateThemeStyle, Style>(baseTheme._styles);
-            foreach (var kv in ansiStyles)
-                _styles[kv.Key] = new Style(kv.Value);
-        }
-
-        internal Style GetStyle(TemplateThemeStyle templateThemeStyle)
-        {
-            _styles.TryGetValue(templateThemeStyle, out var style);
-            return style;
-        }
+    internal Style GetStyle(TemplateThemeStyle templateThemeStyle)
+    {
+        _styles.TryGetValue(templateThemeStyle, out var style);
+        return style;
     }
 }

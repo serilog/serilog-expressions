@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class IndexerExpression : Expression
 {
-    class IndexerExpression : Expression
+    public Expression Receiver { get; }
+    public Expression Index { get; }
+
+    public IndexerExpression(Expression receiver, Expression index)
     {
-        public Expression Receiver { get; }
-        public Expression Index { get; }
+        Receiver = receiver;
+        Index = index;
+    }
 
-        public IndexerExpression(Expression receiver, Expression index)
-        {
-            Receiver = receiver;
-            Index = index;
-        }
-
-        public override string ToString()
-        {
-            return $"{Receiver}[{Index}]";
-        }
+    public override string ToString()
+    {
+        return $"{Receiver}[{Index}]";
     }
 }

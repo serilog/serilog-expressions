@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.Events;
 using Serilog.Expressions.Runtime;
 
-namespace Serilog.Expressions
-{
-    readonly struct EvaluationContext
-    {
-        public LogEvent LogEvent { get; }
-        public Locals? Locals { get; }
+namespace Serilog.Expressions;
 
-        public EvaluationContext(LogEvent logEvent, Locals? locals = null)
-        {
-            LogEvent = logEvent ?? throw new ArgumentNullException(nameof(logEvent));
-            Locals = locals;
-        }
+readonly struct EvaluationContext
+{
+    public LogEvent LogEvent { get; }
+    public Locals? Locals { get; }
+
+    public EvaluationContext(LogEvent logEvent, Locals? locals = null)
+    {
+        LogEvent = logEvent ?? throw new ArgumentNullException(nameof(logEvent));
+        Locals = locals;
     }
 }

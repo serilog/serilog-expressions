@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using Serilog.Expressions;
 
-namespace Serilog.Templates.Compilation
+namespace Serilog.Templates.Compilation;
+
+abstract class CompiledTemplate
 {
-    abstract class CompiledTemplate
-    {
-        public abstract void Evaluate(EvaluationContext ctx, TextWriter output);
-    }
+    public abstract void Evaluate(EvaluationContext ctx, TextWriter output);
 }

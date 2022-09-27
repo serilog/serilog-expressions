@@ -12,78 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Serilog.Templates.Ast;
 
 // ReSharper disable MemberCanBeMadeStatic.Local, SuggestBaseTypeForParameter
 
-namespace Serilog.Templates.Compilation.NameResolution
+namespace Serilog.Templates.Compilation.NameResolution;
+
+class TemplateLocalNameBinder
 {
-    class TemplateLocalNameBinder
+    public static Template BindLocalValueNames(Template template)
     {
-        public static Template BindLocalValueNames(Template template)
+        var binder = new TemplateLocalNameBinder();
+        return binder.Transform(template, new());
+    }
+
+    Template Transform(Template template, Stack<string> locals)
+    {
+        return template switch
         {
-            var binder = new TemplateLocalNameBinder();
-            return binder.Transform(template, new Stack<string>());
-        }
+            TemplateBlock block => Transform(block, locals),
+            LiteralText text => text,
+            FormattedExpression fx => Transform(fx, locals),
+            Conditional cond => Transform(cond, locals),
+            Repetition rep => Transform(rep, locals),
+            _ => throw new NotSupportedException("Unsupported template type.")
+        };
+    }
 
-        Template Transform(Template template, Stack<string> locals)
-        {
-            return template switch
-            {
-                TemplateBlock block => Transform(block, locals),
-                LiteralText text => text,
-                FormattedExpression fx => Transform(fx, locals),
-                Conditional cond => Transform(cond, locals),
-                Repetition rep => Transform(rep, locals),
-                _ => throw new NotSupportedException("Unsupported template type.")
-            };
-        }
+    Template Transform(TemplateBlock block, Stack<string> locals)
+    {
+        return new TemplateBlock(block.Elements
+            .Select(e => Transform(e, locals))
+            .ToArray());
+    }
 
-        Template Transform(TemplateBlock block, Stack<string> locals)
-        {
-            return new TemplateBlock(block.Elements
-                .Select(e => Transform(e, locals))
-                .ToArray());
-        }
+    Template Transform(FormattedExpression fx, Stack<string> locals)
+    {
+        if (locals.Count == 0)
+            return fx;
 
-        Template Transform(FormattedExpression fx, Stack<string> locals)
-        {
-            if (locals.Count == 0)
-                return fx;
+        return new FormattedExpression(
+            ExpressionLocalNameBinder.BindLocalValueNames(fx.Expression, locals),
+            fx.Format,
+            fx.Alignment);
+    }
 
-            return new FormattedExpression(
-                ExpressionLocalNameBinder.BindLocalValueNames(fx.Expression, locals),
-                fx.Format,
-                fx.Alignment);
-        }
+    Template Transform(Conditional cond, Stack<string> locals)
+    {
+        return new Conditional(
+            ExpressionLocalNameBinder.BindLocalValueNames(cond.Condition, locals),
+            Transform(cond.Consequent, locals),
+            cond.Alternative != null ? Transform(cond.Alternative, locals) : null);
+    }
 
-        Template Transform(Conditional cond, Stack<string> locals)
-        {
-            return new Conditional(
-                ExpressionLocalNameBinder.BindLocalValueNames(cond.Condition, locals),
-                Transform(cond.Consequent, locals),
-                cond.Alternative != null ? Transform(cond.Alternative, locals) : null);
-        }
+    Template Transform(Repetition rep, Stack<string> locals)
+    {
+        foreach (var name in rep.BindingNames)
+            locals.Push(name);
 
-        Template Transform(Repetition rep, Stack<string> locals)
-        {
-            foreach (var name in rep.BindingNames)
-                locals.Push(name);
+        var body = Transform(rep.Body, locals);
 
-            var body = Transform(rep.Body, locals);
+        foreach (var _ in rep.BindingNames)
+            locals.Pop();
 
-            foreach (var _ in rep.BindingNames)
-                locals.Pop();
-
-            return new Repetition(
-                rep.Enumerable,
-                rep.BindingNames,
-                body,
-                rep.Delimiter != null ? Transform(rep.Delimiter, locals) : null,
-                rep.Alternative != null ? Transform(rep.Alternative, locals) : null);
-        }
+        return new Repetition(
+            rep.Enumerable,
+            rep.BindingNames,
+            body,
+            rep.Delimiter != null ? Transform(rep.Delimiter, locals) : null,
+            rep.Alternative != null ? Transform(rep.Alternative, locals) : null);
     }
 }

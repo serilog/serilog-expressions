@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.Expressions.Ast;
 using Serilog.Parsing;
 
-namespace Serilog.Templates.Ast
-{
-    class FormattedExpression : Template
-    {
-        public Expression Expression { get; }
-        public string? Format { get; }
-        public Alignment? Alignment { get; }
+namespace Serilog.Templates.Ast;
 
-        public FormattedExpression(Expression expression, string? format, Alignment? alignment)
-        {
-            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            Format = format;
-            Alignment = alignment;
-        }
+class FormattedExpression : Template
+{
+    public Expression Expression { get; }
+    public string? Format { get; }
+    public Alignment? Alignment { get; }
+
+    public FormattedExpression(Expression expression, string? format, Alignment? alignment)
+    {
+        Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+        Format = format;
+        Alignment = alignment;
     }
 }

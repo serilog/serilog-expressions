@@ -12,25 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class LambdaExpression : Expression
 {
-    class LambdaExpression : Expression
+    public LambdaExpression(ParameterExpression[] parameters, Expression body)
     {
-        public LambdaExpression(ParameterExpression[] parameters, Expression body)
-        {
-            Parameters = parameters;
-            Body = body;
-        }
+        Parameters = parameters;
+        Body = body;
+    }
 
-        public ParameterExpression[] Parameters { get; }
+    public ParameterExpression[] Parameters { get; }
 
-        public Expression Body { get; }
+    public Expression Body { get; }
 
-        public override string ToString()
-        {
-            return "|" + string.Join(", ", Parameters.Select(p => p.ToString())) + "| {" + Body + "}";
-        }
+    public override string ToString()
+    {
+        return "|" + string.Join(", ", Parameters.Select(p => p.ToString())) + "| {" + Body + "}";
     }
 }

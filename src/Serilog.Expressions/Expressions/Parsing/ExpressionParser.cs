@@ -12,48 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Parsing
+namespace Serilog.Expressions.Parsing;
+
+class ExpressionParser
 {
-    class ExpressionParser
+    readonly ExpressionTokenizer _tokenizer = new();
+
+    public Expression Parse(string expression)
     {
-        readonly ExpressionTokenizer _tokenizer = new ExpressionTokenizer();
+        if (!TryParse(expression, out var root, out var error))
+            throw new ArgumentException(error);
 
-        public Expression Parse(string expression)
+        return root;
+    }
+
+    public bool TryParse(string filterExpression,
+        [MaybeNullWhen(false)] out Expression root, [MaybeNullWhen(true)] out string error)
+    {
+        if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
+
+        var tokenList = _tokenizer.TryTokenize(filterExpression);
+        if (!tokenList.HasValue)
         {
-            if (!TryParse(expression, out var root, out var error))
-                throw new ArgumentException(error);
-
-            return root;
+            error = tokenList.ToString();
+            root = null;
+            return false;
         }
 
-        public bool TryParse(string filterExpression,
-            [MaybeNullWhen(false)] out Expression root, [MaybeNullWhen(true)] out string error)
+        var result = ExpressionTokenParsers.TryParse(tokenList.Value);
+        if (!result.HasValue)
         {
-            if (filterExpression == null) throw new ArgumentNullException(nameof(filterExpression));
-
-            var tokenList = _tokenizer.TryTokenize(filterExpression);
-            if (!tokenList.HasValue)
-            {
-                error = tokenList.ToString();
-                root = null;
-                return false;
-            }
-
-            var result = ExpressionTokenParsers.TryParse(tokenList.Value);
-            if (!result.HasValue)
-            {
-                error = result.ToString();
-                root = null;
-                return false;
-            }
-
-            root = result.Value;
-            error = null;
-            return true;
+            error = result.ToString();
+            root = null;
+            return false;
         }
+
+        root = result.Value;
+        error = null;
+        return true;
     }
 }

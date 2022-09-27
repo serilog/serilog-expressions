@@ -12,25 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
 using Serilog.Expressions;
 
-namespace Serilog.Templates.Compilation
+namespace Serilog.Templates.Compilation;
+
+class CompiledTemplateBlock : CompiledTemplate
 {
-    class CompiledTemplateBlock : CompiledTemplate
+    readonly CompiledTemplate[] _elements;
+
+    public CompiledTemplateBlock(CompiledTemplate[] elements)
     {
-        readonly CompiledTemplate[] _elements;
+        _elements = elements ?? throw new ArgumentNullException(nameof(elements));
+    }
 
-        public CompiledTemplateBlock(CompiledTemplate[] elements)
-        {
-            _elements = elements ?? throw new ArgumentNullException(nameof(elements));
-        }
-
-        public override void Evaluate(EvaluationContext ctx, TextWriter output)
-        {
-            foreach (var element in _elements)
-                element.Evaluate(ctx, output);
-        }
+    public override void Evaluate(EvaluationContext ctx, TextWriter output)
+    {
+        foreach (var element in _elements)
+            element.Evaluate(ctx, output);
     }
 }
