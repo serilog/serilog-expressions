@@ -12,149 +12,147 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Compilation.Transformations
+namespace Serilog.Expressions.Compilation.Transformations;
+
+class IdentityTransformer : SerilogExpressionTransformer<Expression>
 {
-    class IdentityTransformer : SerilogExpressionTransformer<Expression>
+    bool TryTransform(Expression expr, out Expression result)
     {
-        bool TryTransform(Expression expr, out Expression result)
+        result = Transform(expr);
+        return !ReferenceEquals(expr, result);
+    }
+
+    protected override Expression Transform(CallExpression call)
+    {
+        var any = false;
+        var operands = new List<Expression>();
+        foreach (var op in call.Operands)
         {
-            result = Transform(expr);
-            return !ReferenceEquals(expr, result);
+            if (TryTransform(op, out var result))
+                any = true;
+            operands.Add(result);
         }
 
-        protected override Expression Transform(CallExpression call)
+        if (!any)
+            return call;
+
+        return new CallExpression(call.IgnoreCase, call.OperatorName, operands.ToArray());
+    }
+
+    protected override Expression Transform(ConstantExpression cx)
+    {
+        return cx;
+    }
+
+    protected override Expression Transform(AmbientNameExpression px)
+    {
+        return px;
+    }
+
+    protected override Expression Transform(LocalNameExpression nlx)
+    {
+        return nlx;
+    }
+
+    protected override Expression Transform(AccessorExpression spx)
+    {
+        if (!TryTransform(spx.Receiver, out var recv))
+            return spx;
+
+        return new AccessorExpression(recv, spx.MemberName);
+    }
+
+    protected override Expression Transform(LambdaExpression lmx)
+    {
+        if (!TryTransform(lmx.Body, out var body))
+            return lmx;
+
+        // By default we maintain the parameters available in the body
+        return new LambdaExpression(lmx.Parameters, body);
+    }
+
+    // Only touches uses of the parameters, not decls
+    protected override Expression Transform(ParameterExpression prx)
+    {
+        return prx;
+    }
+
+    protected override Expression Transform(IndexerWildcardExpression wx)
+    {
+        return wx;
+    }
+
+    protected override Expression Transform(ArrayExpression ax)
+    {
+        var any = false;
+        var elements = new List<Element>();
+        foreach (var el in ax.Elements)
         {
-            var any = false;
-            var operands = new List<Expression>();
-            foreach (var op in call.Operands)
+            if (el is ItemElement item)
             {
-                if (TryTransform(op, out var result))
+                if (TryTransform(item.Value, out var result))
                     any = true;
-                operands.Add(result);
+                elements.Add(new ItemElement(result));
             }
-
-            if (!any)
-                return call;
-
-            return new CallExpression(call.IgnoreCase, call.OperatorName, operands.ToArray());
-        }
-
-        protected override Expression Transform(ConstantExpression cx)
-        {
-            return cx;
-        }
-
-        protected override Expression Transform(AmbientNameExpression px)
-        {
-            return px;
-        }
-
-        protected override Expression Transform(LocalNameExpression nlx)
-        {
-            return nlx;
-        }
-
-        protected override Expression Transform(AccessorExpression spx)
-        {
-            if (!TryTransform(spx.Receiver, out var recv))
-                return spx;
-
-            return new AccessorExpression(recv, spx.MemberName);
-        }
-
-        protected override Expression Transform(LambdaExpression lmx)
-        {
-            if (!TryTransform(lmx.Body, out var body))
-                return lmx;
-
-            // By default we maintain the parameters available in the body
-            return new LambdaExpression(lmx.Parameters, body);
-        }
-
-        // Only touches uses of the parameters, not decls
-        protected override Expression Transform(ParameterExpression prx)
-        {
-            return prx;
-        }
-
-        protected override Expression Transform(IndexerWildcardExpression wx)
-        {
-            return wx;
-        }
-
-        protected override Expression Transform(ArrayExpression ax)
-        {
-            var any = false;
-            var elements = new List<Element>();
-            foreach (var el in ax.Elements)
+            else
             {
-                if (el is ItemElement item)
-                {
-                    if (TryTransform(item.Value, out var result))
-                        any = true;
-                    elements.Add(new ItemElement(result));
-                }
-                else
-                {
-                    var spread = (SpreadElement) el;
-                    if (TryTransform(spread.Content, out var result))
-                        any = true;
-                    elements.Add(new SpreadElement(result));
-                }
+                var spread = (SpreadElement) el;
+                if (TryTransform(spread.Content, out var result))
+                    any = true;
+                elements.Add(new SpreadElement(result));
             }
-
-            if (!any)
-                return ax;
-
-            return new ArrayExpression(elements.ToArray());
         }
 
-        protected override Expression Transform(ObjectExpression ox)
+        if (!any)
+            return ax;
+
+        return new ArrayExpression(elements.ToArray());
+    }
+
+    protected override Expression Transform(ObjectExpression ox)
+    {
+        var any = false;
+        var members = new List<Member>();
+        foreach (var m in ox.Members)
         {
-            var any = false;
-            var members = new List<Member>();
-            foreach (var m in ox.Members)
+            if (m is PropertyMember p)
             {
-                if (m is PropertyMember p)
-                {
-                    if (TryTransform(p.Value, out var result))
-                        any = true;
-                    members.Add(new PropertyMember(p.Name, result));
-                }
-                else
-                {
-                    var s = (SpreadMember) m;
-                    if (TryTransform(s.Content, out var result))
-                        any = true;
-                    members.Add(new SpreadMember(result));
-                }
+                if (TryTransform(p.Value, out var result))
+                    any = true;
+                members.Add(new PropertyMember(p.Name, result));
             }
-
-            if (!any)
-                return ox;
-
-            return new ObjectExpression(members.ToArray());
+            else
+            {
+                var s = (SpreadMember) m;
+                if (TryTransform(s.Content, out var result))
+                    any = true;
+                members.Add(new SpreadMember(result));
+            }
         }
 
-        protected override Expression Transform(IndexerExpression ix)
-        {
-            var transformedRecv = TryTransform(ix.Receiver, out var recv);
+        if (!any)
+            return ox;
 
-            if (!TryTransform(ix.Index, out var index) && !transformedRecv)
-                return ix;
+        return new ObjectExpression(members.ToArray());
+    }
 
-            return new IndexerExpression(recv, index);
-        }
+    protected override Expression Transform(IndexerExpression ix)
+    {
+        var transformedRecv = TryTransform(ix.Receiver, out var recv);
 
-        protected override Expression Transform(IndexOfMatchExpression mx)
-        {
-            if (!TryTransform(mx.Corpus, out var corpus))
-                return mx;
+        if (!TryTransform(ix.Index, out var index) && !transformedRecv)
+            return ix;
 
-            return new IndexOfMatchExpression(corpus, mx.Regex);
-        }
+        return new IndexerExpression(recv, index);
+    }
+
+    protected override Expression Transform(IndexOfMatchExpression mx)
+    {
+        if (!TryTransform(mx.Corpus, out var corpus))
+            return mx;
+
+        return new IndexOfMatchExpression(corpus, mx.Regex);
     }
 }

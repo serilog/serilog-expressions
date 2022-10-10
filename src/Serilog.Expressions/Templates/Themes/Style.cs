@@ -12,36 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
+namespace Serilog.Templates.Themes;
 
-namespace Serilog.Templates.Themes
+readonly struct Style
 {
-    readonly struct Style
+    readonly string? _ansiStyle;
+
+    public Style(string ansiStyle)
     {
-        readonly string? _ansiStyle;
+        _ansiStyle = ansiStyle;
+    }
 
-        public Style(string ansiStyle)
+    internal StyleReset Set(TextWriter output, ref int invisibleCharacterCount)
+    {
+        if (_ansiStyle != null)
         {
-            _ansiStyle = ansiStyle;
+            output.Write(_ansiStyle);
+            invisibleCharacterCount += _ansiStyle.Length;
+            invisibleCharacterCount += StyleReset.ResetCharCount;
+
+            return new(output);
         }
 
-        internal StyleReset Set(TextWriter output, ref int invisibleCharacterCount)
-        {
-            if (_ansiStyle != null)
-            {
-                output.Write(_ansiStyle);
-                invisibleCharacterCount += _ansiStyle.Length;
-                invisibleCharacterCount += StyleReset.ResetCharCount;
+        return default;
+    }
 
-                return new StyleReset(output);
-            }
-
-            return default;
-        }
-
-        public string? GetAnsiStyle()
-        {
-            return _ansiStyle;
-        }
+    public string? GetAnsiStyle()
+    {
+        return _ansiStyle;
     }
 }

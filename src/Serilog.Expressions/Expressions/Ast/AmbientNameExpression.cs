@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class AmbientNameExpression : Expression
 {
-    class AmbientNameExpression : Expression
+    readonly bool _requiresEscape;
+
+    public AmbientNameExpression(string name, bool isBuiltIn)
     {
-        readonly bool _requiresEscape;
+        PropertyName = name ?? throw new ArgumentNullException(nameof(name));
+        IsBuiltIn = isBuiltIn;
+        _requiresEscape = !SerilogExpression.IsValidIdentifier(name);
+    }
 
-        public AmbientNameExpression(string name, bool isBuiltIn)
-        {
-            PropertyName = name ?? throw new ArgumentNullException(nameof(name));
-            IsBuiltIn = isBuiltIn;
-            _requiresEscape = !SerilogExpression.IsValidIdentifier(name);
-        }
+    public string PropertyName { get; }
 
-        public string PropertyName { get; }
+    public bool IsBuiltIn { get; }
 
-        public bool IsBuiltIn { get; }
+    public override string ToString()
+    {
+        if (_requiresEscape)
+            return $"@Properties['{SerilogExpression.EscapeStringContent(PropertyName)}']";
 
-        public override string ToString()
-        {
-            if (_requiresEscape)
-                return $"@Properties['{SerilogExpression.EscapeStringContent(PropertyName)}']";
-
-            return (IsBuiltIn ? "@" : "") + PropertyName;
-        }
+        return (IsBuiltIn ? "@" : "") + PropertyName;
     }
 }

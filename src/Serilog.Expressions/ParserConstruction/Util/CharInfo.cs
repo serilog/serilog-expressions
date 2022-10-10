@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.ParserConstruction.Util
+namespace Serilog.ParserConstruction.Util;
+
+static class CharInfo
 {
-    static class CharInfo
+    public static bool IsLatinDigit(char ch)
     {
-        public static bool IsLatinDigit(char ch)
-        {
-            return ch >= '0' && ch <= '9';
-        }
+        return ch >= '0' && ch <= '9';
     }
 }

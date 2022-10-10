@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Templates.Ast;
 
-namespace Serilog.Templates.Ast
+class LiteralText : Template
 {
-    class LiteralText : Template
-    {
-        public string Text { get; }
+    public string Text { get; }
 
-        public LiteralText(string text)
-        {
-            Text = text ?? throw new ArgumentNullException(nameof(text));
-        }
+    public LiteralText(string text)
+    {
+        Text = text ?? throw new ArgumentNullException(nameof(text));
     }
 }

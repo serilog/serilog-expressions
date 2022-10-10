@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.ParserConstruction.Model
+namespace Serilog.ParserConstruction.Model;
+
+/// <summary>
+/// A structure with no information.
+/// </summary>
+struct Unit
 {
     /// <summary>
-    /// A structure with no information.
+    /// The singleton value of the struct, with no value.
     /// </summary>
-    struct Unit
-    {
-        /// <summary>
-        /// The singleton value of the struct, with no value.
-        /// </summary>
-        public static Unit Value => default;
-    }
+    public static Unit Value => default;
 }

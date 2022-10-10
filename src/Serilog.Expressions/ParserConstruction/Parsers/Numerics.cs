@@ -15,64 +15,63 @@
 using Serilog.ParserConstruction.Model;
 using Serilog.ParserConstruction.Util;
 
-namespace Serilog.ParserConstruction.Parsers
+namespace Serilog.ParserConstruction.Parsers;
+
+/// <summary>
+/// Parsers for numeric patterns.
+/// </summary>
+//* Fairly large amount of duplication/repetition here, due to the lack
+//* of generics over numbers in C#.
+static class Numerics
 {
+    static readonly string[] ExpectedDigit = { "digit" };
+    static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
+
     /// <summary>
-    /// Parsers for numeric patterns.
+    /// A string of digits, converted into a <see cref="uint"/>.
     /// </summary>
-    //* Fairly large amount of duplication/repetition here, due to the lack
-    //* of generics over numbers in C#.
-    static class Numerics
+    public static TextParser<uint> NaturalUInt32 { get; } = input =>
     {
-        static readonly string[] ExpectedDigit = { "digit" };
-        static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
+        var next = input.ConsumeChar();
 
-        /// <summary>
-        /// A string of digits, converted into a <see cref="uint"/>.
-        /// </summary>
-        public static TextParser<uint> NaturalUInt32 { get; } = input =>
+        if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+            return Result.Empty<uint>(input, ExpectedDigit);
+
+        TextSpan remainder;
+        var val = 0u;
+        do
         {
-            var next = input.ConsumeChar();
+            val = 10 * val + (uint)(next.Value - '0');
+            remainder = next.Remainder;
+            next = remainder.ConsumeChar();
+        } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<uint>(input, ExpectedDigit);
+        return Result.Value(val, input, remainder);
+    };
 
-            TextSpan remainder;
-            var val = 0u;
-            do
-            {
-                val = 10 * val + (uint)(next.Value - '0');
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
+    /// <summary>
+    /// A string of digits with an optional +/- sign.
+    /// </summary>
+    public static TextParser<TextSpan> Integer { get; } = input =>
+    {
+        var next = input.ConsumeChar();
 
-            return Result.Value(val, input, remainder);
-        };
+        if (!next.HasValue)
+            return Result.Empty<TextSpan>(input, ExpectedSignOrDigit);
 
-        /// <summary>
-        /// A string of digits with an optional +/- sign.
-        /// </summary>
-        public static TextParser<TextSpan> Integer { get; } = input =>
+        if (next.Value is '-' or '+')
+            next = next.Remainder.ConsumeChar();
+
+        if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
+            return Result.Empty<TextSpan>(input, ExpectedDigit);
+
+        TextSpan remainder;
+        do
         {
-            var next = input.ConsumeChar();
+            remainder = next.Remainder;
+            next = remainder.ConsumeChar();
+        } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
 
-            if (!next.HasValue)
-                return Result.Empty<TextSpan>(input, ExpectedSignOrDigit);
-
-            if (next.Value == '-' || next.Value == '+')
-                next = next.Remainder.ConsumeChar();
-
-            if (!next.HasValue || !CharInfo.IsLatinDigit(next.Value))
-                return Result.Empty<TextSpan>(input, ExpectedDigit);
-
-            TextSpan remainder;
-            do
-            {
-                remainder = next.Remainder;
-                next = remainder.ConsumeChar();
-            } while (next.HasValue && CharInfo.IsLatinDigit(next.Value));
-
-            return Result.Value(input.Until(remainder), input, remainder);
-        };
-    }
+        return Result.Value(input.Until(remainder), input, remainder);
+    };
 }

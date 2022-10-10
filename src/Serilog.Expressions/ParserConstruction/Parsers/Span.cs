@@ -12,45 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.ParserConstruction.Display;
 using Serilog.ParserConstruction.Model;
 
-namespace Serilog.ParserConstruction.Parsers
+namespace Serilog.ParserConstruction.Parsers;
+
+/// <summary>
+/// Parsers for spans of characters.
+/// </summary>
+static class Span
 {
     /// <summary>
-    /// Parsers for spans of characters.
+    /// Match a span equal to <paramref name="text"/>.
     /// </summary>
-    static class Span
+    /// <param name="text">The text to match.</param>
+    /// <returns>The matched text.</returns>
+    public static TextParser<TextSpan> EqualTo(string text)
     {
-        /// <summary>
-        /// Match a span equal to <paramref name="text"/>.
-        /// </summary>
-        /// <param name="text">The text to match.</param>
-        /// <returns>The matched text.</returns>
-        public static TextParser<TextSpan> EqualTo(string text)
+        if (text == null) throw new ArgumentNullException(nameof(text));
+
+        var expectations = new[] { Presentation.FormatLiteral(text) };
+        return input =>
         {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-
-            var expectations = new[] { Presentation.FormatLiteral(text) };
-            return input =>
+            var remainder = input;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < text.Length; ++i)
             {
-                var remainder = input;
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < text.Length; ++i)
+                var ch = remainder.ConsumeChar();
+                if (!ch.HasValue || ch.Value != text[i])
                 {
-                    var ch = remainder.ConsumeChar();
-                    if (!ch.HasValue || ch.Value != text[i])
-                    {
-                        if (ch.Location == input)
-                            return Result.Empty<TextSpan>(ch.Location, expectations);
+                    if (ch.Location == input)
+                        return Result.Empty<TextSpan>(ch.Location, expectations);
 
-                        return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
-                    }
-                    remainder = ch.Remainder;
+                    return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
                 }
-                return Result.Value(input.Until(remainder), input, remainder);
-            };
-        }
+                remainder = ch.Remainder;
+            }
+            return Result.Value(input.Until(remainder), input, remainder);
+        };
     }
 }

@@ -12,58 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.ParserConstruction.Model
+namespace Serilog.ParserConstruction.Model;
+
+/// <summary>
+/// A token.
+/// </summary>
+/// <typeparam name="TKind">The type of the token's kind.</typeparam>
+readonly struct Token<TKind>
 {
     /// <summary>
-    /// A token.
+    /// The kind of the token.
     /// </summary>
-    /// <typeparam name="TKind">The type of the token's kind.</typeparam>
-    readonly struct Token<TKind>
+    public TKind Kind { get; }
+
+    /// <summary>
+    /// The string span containing the value of the token.
+    /// </summary>
+    public TextSpan Span { get; }
+
+    /// <summary>
+    /// Get the string value of the token.
+    /// </summary>
+    /// <returns>The token as a string.</returns>
+    public string ToStringValue() => Span.ToStringValue();
+
+    /// <summary>
+    /// The position of the token within the source string.
+    /// </summary>
+    public Position Position => Span.Position;
+
+    /// <summary>
+    /// True if the token has a value.
+    /// </summary>
+    bool HasValue => Span != TextSpan.None;
+
+    /// <summary>
+    /// Construct a token.
+    /// </summary>
+    /// <param name="kind">The kind of the token.</param>
+    /// <param name="span">The span holding the token's value.</param>
+    public Token(TKind kind, TextSpan span)
     {
-        /// <summary>
-        /// The kind of the token.
-        /// </summary>
-        public TKind Kind { get; }
+        Kind = kind;
+        Span = span;
+    }
 
-        /// <summary>
-        /// The string span containing the value of the token.
-        /// </summary>
-        public TextSpan Span { get; }
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        if (!HasValue)
+            return "(empty token)";
 
-        /// <summary>
-        /// Get the string value of the token.
-        /// </summary>
-        /// <returns>The token as a string.</returns>
-        public string ToStringValue() => Span.ToStringValue();
-
-        /// <summary>
-        /// The position of the token within the source string.
-        /// </summary>
-        public Position Position => Span.Position;
-
-        /// <summary>
-        /// True if the token has a value.
-        /// </summary>
-        bool HasValue => Span != TextSpan.None;
-
-        /// <summary>
-        /// Construct a token.
-        /// </summary>
-        /// <param name="kind">The kind of the token.</param>
-        /// <param name="span">The span holding the token's value.</param>
-        public Token(TKind kind, TextSpan span)
-        {
-            Kind = kind;
-            Span = span;
-        }
-
-        /// <inheritdoc/>
-        public override string ToString()
-        {
-            if (!HasValue)
-                return "(empty token)";
-
-            return $"{Kind}@{Position}: {Span}";
-        }
+        return $"{Kind}@{Position}: {Span}";
     }
 }

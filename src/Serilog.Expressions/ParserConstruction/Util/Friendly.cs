@@ -12,42 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace Serilog.ParserConstruction.Util;
 
-namespace Serilog.ParserConstruction.Util
+static class Friendly
 {
-    static class Friendly
+    public static string List(IEnumerable<string> items)
     {
-        public static string List(IEnumerable<string> items)
+        if (items == null) throw new ArgumentNullException(nameof(items));
+
+        // Keep the order stable
+        var seen = new HashSet<string>();
+        var unique = new List<string>();
+        foreach (var item in items)
         {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-
-            // Keep the order stable
-            var seen = new HashSet<string>();
-            var unique = new List<string>();
-            foreach (var item in items)
-            {
-                if (seen.Contains(item)) continue;
-                seen.Add(item);
-                unique.Add(item);
-            }
-
-            if (unique.Count == 0)
-                throw new ArgumentException("Friendly list formatting requires at least one element.", nameof(items));
-
-            if (unique.Count == 1)
-                return unique.Single();
-
-            return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
+            if (seen.Contains(item)) continue;
+            seen.Add(item);
+            unique.Add(item);
         }
 
-        public static string Clip(string value, int maxLength)
-        {
-            if (value.Length > maxLength)
-                return value.Substring(0, maxLength - 3) + "...";
-            return value;
-        }
+        if (unique.Count == 0)
+            throw new ArgumentException("Friendly list formatting requires at least one element.", nameof(items));
+
+        if (unique.Count == 1)
+            return unique.Single();
+
+        return $"{string.Join(", ", unique.Take(unique.Count - 1))} or {unique.Last()}";
+    }
+
+    public static string Clip(string value, int maxLength)
+    {
+        if (value.Length > maxLength)
+            return value.Substring(0, maxLength - 3) + "...";
+        return value;
     }
 }

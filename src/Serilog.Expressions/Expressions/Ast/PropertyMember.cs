@@ -14,22 +14,21 @@
 
 using Serilog.Events;
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class PropertyMember : Member
 {
-    class PropertyMember : Member
+    public string Name { get; }
+    public Expression Value { get; }
+
+    public PropertyMember(string name, Expression value)
     {
-        public string Name { get; }
-        public Expression Value { get; }
+        Name = name;
+        Value = value;
+    }
 
-        public PropertyMember(string name, Expression value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public override string ToString()
-        {
-            return $"{new ScalarValue(Name)}: {Value}";
-        }
+    public override string ToString()
+    {
+        return $"{new ScalarValue(Name)}: {Value}";
     }
 }

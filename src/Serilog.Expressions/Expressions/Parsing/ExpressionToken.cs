@@ -14,156 +14,155 @@
 
 using Serilog.ParserConstruction.Display;
 
-namespace Serilog.Expressions.Parsing
+namespace Serilog.Expressions.Parsing;
+
+enum ExpressionToken
 {
-    enum ExpressionToken
-    {
-        None,
+    None,
 
-        Identifier,
+    Identifier,
 
-        [Token(Description = "built-in identifier")]
-        BuiltInIdentifier,
+    [Token(Description = "built-in identifier")]
+    BuiltInIdentifier,
 
-        String,
+    String,
 
-        Number,
+    Number,
 
-        [Token(Description = "hexadecimal number")]
-        HexNumber,
+    [Token(Description = "hexadecimal number")]
+    HexNumber,
 
-        [Token(Example = ",")]
-        Comma,
+    [Token(Example = ",")]
+    Comma,
 
-        [Token(Example = ".")]
-        Period,
+    [Token(Example = ".")]
+    Period,
 
-        [Token(Example = "..")]
-        Spread,
+    [Token(Example = "..")]
+    Spread,
 
-        [Token(Example = "[")]
-        LBracket,
+    [Token(Example = "[")]
+    LBracket,
 
-        [Token(Example = "]")]
-        RBracket,
+    [Token(Example = "]")]
+    RBracket,
 
-        [Token(Example = "(")]
-        LParen,
+    [Token(Example = "(")]
+    LParen,
 
-        [Token(Example = ")")]
-        RParen,
+    [Token(Example = ")")]
+    RParen,
 
-        [Token(Example = "{")]
-        LBrace,
+    [Token(Example = "{")]
+    LBrace,
 
-        [Token(Example = "}")]
-        RBrace,
+    [Token(Example = "}")]
+    RBrace,
 
-        [Token(Example = ":")]
-        Colon,
+    [Token(Example = ":")]
+    Colon,
 
-        [Token(Example = "?")]
-        QuestionMark,
+    [Token(Example = "?")]
+    QuestionMark,
 
-        [Token(Category = "operator", Example = "+")]
-        Plus,
+    [Token(Category = "operator", Example = "+")]
+    Plus,
 
-        [Token(Category = "operator", Example = "-")]
-        Minus,
+    [Token(Category = "operator", Example = "-")]
+    Minus,
 
-        [Token(Example = "*")]
-        Asterisk,
+    [Token(Example = "*")]
+    Asterisk,
 
-        [Token(Category = "operator", Example = "/")]
-        ForwardSlash,
+    [Token(Category = "operator", Example = "/")]
+    ForwardSlash,
 
-        [Token(Category = "operator", Example = "%")]
-        Percent,
+    [Token(Category = "operator", Example = "%")]
+    Percent,
 
-        [Token(Category = "operator", Example = "^")]
-        Caret,
+    [Token(Category = "operator", Example = "^")]
+    Caret,
 
-        [Token(Category = "operator", Example = "<")]
-        LessThan,
+    [Token(Category = "operator", Example = "<")]
+    LessThan,
 
-        [Token(Category = "operator", Example = "<=")]
-        LessThanOrEqual,
+    [Token(Category = "operator", Example = "<=")]
+    LessThanOrEqual,
 
-        [Token(Category = "operator", Example = ">")]
-        GreaterThan,
+    [Token(Category = "operator", Example = ">")]
+    GreaterThan,
 
-        [Token(Category = "operator", Example = ">=")]
-        GreaterThanOrEqual,
+    [Token(Category = "operator", Example = ">=")]
+    GreaterThanOrEqual,
 
-        [Token(Category = "operator", Example = "=")]
-        Equal,
+    [Token(Category = "operator", Example = "=")]
+    Equal,
 
-        [Token(Category = "operator", Example = "<>")]
-        NotEqual,
+    [Token(Category = "operator", Example = "<>")]
+    NotEqual,
 
-        [Token(Category = "keyword", Example = "and")]
-        And,
+    [Token(Category = "keyword", Example = "and")]
+    And,
 
-        [Token(Category = "keyword", Example = "in")]
-        In,
+    [Token(Category = "keyword", Example = "in")]
+    In,
 
-        [Token(Category = "keyword", Example = "is")]
-        Is,
+    [Token(Category = "keyword", Example = "is")]
+    Is,
 
-        [Token(Category = "keyword", Example = "like")]
-        Like,
+    [Token(Category = "keyword", Example = "like")]
+    Like,
 
-        [Token(Category = "keyword", Example = "not")]
-        Not,
+    [Token(Category = "keyword", Example = "not")]
+    Not,
 
-        [Token(Category = "keyword", Example = "or")]
-        Or,
+    [Token(Category = "keyword", Example = "or")]
+    Or,
 
-        [Token(Category = "keyword", Example = "true")]
-        True,
+    [Token(Category = "keyword", Example = "true")]
+    True,
 
-        [Token(Category = "keyword", Example = "false")]
-        False,
+    [Token(Category = "keyword", Example = "false")]
+    False,
 
-        [Token(Category = "keyword", Example = "null")]
-        Null,
+    [Token(Category = "keyword", Example = "null")]
+    Null,
 
-        [Token(Category = "keyword", Example = "if")]
-        If,
+    [Token(Category = "keyword", Example = "if")]
+    If,
 
-        [Token(Category = "keyword", Example = "then")]
-        Then,
+    [Token(Category = "keyword", Example = "then")]
+    Then,
 
-        [Token(Category = "keyword", Example = "else")]
-        Else,
+    [Token(Category = "keyword", Example = "else")]
+    Else,
 
-        [Token(Category = "keyword", Example = "ci")]
-        CI,
+    [Token(Category = "keyword", Example = "ci")]
+    CI,
 
-        // Template syntax
+    // Template syntax
 
-        [Token(Description = "text")]
-        Text,
+    [Token(Description = "text")]
+    Text,
 
-        [Token(Example = "{{")]
-        DoubleLBrace,
+    [Token(Example = "{{")]
+    DoubleLBrace,
 
-        [Token(Example = "}}")]
-        DoubleRBrace,
+    [Token(Example = "}}")]
+    DoubleRBrace,
 
-        [Token(Example = "{#")]
-        LBraceHash,
+    [Token(Example = "{#")]
+    LBraceHash,
 
-        [Token(Description = "format specifier")]
-        Format,
+    [Token(Description = "format specifier")]
+    Format,
 
-        [Token(Category = "keyword", Example = "end")]
-        End,
+    [Token(Category = "keyword", Example = "end")]
+    End,
 
-        [Token(Category = "keyword", Example = "each")]
-        Each,
+    [Token(Category = "keyword", Example = "each")]
+    Each,
 
-        [Token(Category = "keyword", Example = "delimit")]
-        Delimit,
-    }
+    [Token(Category = "keyword", Example = "delimit")]
+    Delimit,
 }

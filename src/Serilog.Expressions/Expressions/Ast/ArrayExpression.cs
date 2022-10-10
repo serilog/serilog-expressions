@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class ArrayExpression : Expression
 {
-    class ArrayExpression : Expression
+    public ArrayExpression(Element[] elements)
     {
-        public ArrayExpression(Element[] elements)
-        {
-            Elements = elements ?? throw new ArgumentNullException(nameof(elements));
-        }
+        Elements = elements ?? throw new ArgumentNullException(nameof(elements));
+    }
 
-        public Element[] Elements { get; }
+    public Element[] Elements { get; }
 
-        public override string ToString()
-        {
-            return "[" + string.Join(", ", Elements.Select(o => o.ToString())) + "]";
-        }
+    public override string ToString()
+    {
+        return "[" + string.Join(", ", Elements.Select(o => o.ToString())) + "]";
     }
 }

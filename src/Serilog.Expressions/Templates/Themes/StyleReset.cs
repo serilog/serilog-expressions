@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
+namespace Serilog.Templates.Themes;
 
-namespace Serilog.Templates.Themes
+readonly struct StyleReset : IDisposable
 {
-    readonly struct StyleReset : IDisposable
+    const string AnsiStyleResetSequence = "\x1b[0m";
+    public const int ResetCharCount = 4;
+
+    readonly TextWriter? _output;
+
+    public StyleReset(TextWriter output)
     {
-        const string AnsiStyleResetSequence = "\x1b[0m";
-        public const int ResetCharCount = 4;
+        _output = output;
+    }
 
-        readonly TextWriter? _output;
-
-        public StyleReset(TextWriter output)
-        {
-            _output = output;
-        }
-
-        public void Dispose()
-        {
-            _output?.Write(AnsiStyleResetSequence);
-        }
+    public void Dispose()
+    {
+        _output?.Write(AnsiStyleResetSequence);
     }
 }

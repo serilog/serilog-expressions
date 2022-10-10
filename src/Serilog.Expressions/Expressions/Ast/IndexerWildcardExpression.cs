@@ -12,30 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Serilog.Expressions.Ast;
 
-namespace Serilog.Expressions.Ast
+class IndexerWildcardExpression : Expression
 {
-    class IndexerWildcardExpression : Expression
+    public IndexerWildcardExpression(IndexerWildcard wildcard)
     {
-        public IndexerWildcardExpression(IndexerWildcard wildcard)
-        {
-            Wildcard = wildcard;
-        }
+        Wildcard = wildcard;
+    }
 
-        public IndexerWildcard Wildcard { get; }
+    public IndexerWildcard Wildcard { get; }
 
-        public override string ToString()
+    public override string ToString()
+    {
+        switch (Wildcard)
         {
-            switch (Wildcard)
-            {
-                case IndexerWildcard.Any:
-                    return "?";
-                case IndexerWildcard.All:
-                    return "*";
-                default:
-                    throw new NotSupportedException("Unrecognized wildcard " + Wildcard);
-            }
+            case IndexerWildcard.Any:
+                return "?";
+            case IndexerWildcard.All:
+                return "*";
+            default:
+                throw new NotSupportedException("Unrecognized wildcard " + Wildcard);
         }
     }
 }

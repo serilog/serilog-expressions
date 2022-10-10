@@ -12,32 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global, ClassNeverInstantiated.Global
 
-namespace Serilog.ParserConstruction.Display
+namespace Serilog.ParserConstruction.Display;
+
+/// <summary>
+/// Applied to enum members representing tokens to control how they are rendered.
+/// </summary>
+[AttributeUsage(AttributeTargets.Field|AttributeTargets.Class)]
+class TokenAttribute : Attribute
 {
     /// <summary>
-    /// Applied to enum members representing tokens to control how they are rendered.
+    /// The category of the token, e.g. "keyword" or "identifier".
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field|AttributeTargets.Class)]
-    class TokenAttribute : Attribute
-    {
-        /// <summary>
-        /// The category of the token, e.g. "keyword" or "identifier".
-        /// </summary>
-        public string? Category { get; set; }
+    public string? Category { get; set; }
 
-        /// <summary>
-        /// For tokens that correspond to exact text, e.g. punctuation, the canonical
-        /// example of how the token looks.
-        /// </summary>
-        public string? Example { get; set; }
+    /// <summary>
+    /// For tokens that correspond to exact text, e.g. punctuation, the canonical
+    /// example of how the token looks.
+    /// </summary>
+    public string? Example { get; set; }
 
-        /// <summary>
-        /// A description of the token, for example "regular expression".
-        /// </summary>
-        public string? Description { get; set; }
-    }
+    /// <summary>
+    /// A description of the token, for example "regular expression".
+    /// </summary>
+    public string? Description { get; set; }
 }

@@ -12,41 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Globalization;
 using Serilog.Events;
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+class ConstantExpression : Expression
 {
-    class ConstantExpression : Expression
+    public ConstantExpression(LogEventPropertyValue constant)
     {
-        public ConstantExpression(LogEventPropertyValue constant)
-        {
-            Constant = constant ?? throw new ArgumentNullException(nameof(constant));
-        }
+        Constant = constant ?? throw new ArgumentNullException(nameof(constant));
+    }
 
-        public LogEventPropertyValue Constant { get; }
+    public LogEventPropertyValue Constant { get; }
 
-        public override string ToString()
+    public override string ToString()
+    {
+        if (Constant is ScalarValue sv)
         {
-            if (Constant is ScalarValue sv)
+            switch (sv.Value)
             {
-                switch (sv.Value)
-                {
-                    case string s:
-                        return "'" + s.Replace("'", "''") + "'";
-                    case true:
-                        return "true";
-                    case false:
-                        return "false";
-                    case IFormattable formattable:
-                        return formattable.ToString(null, CultureInfo.InvariantCulture);
-                    default:
-                        return (sv.Value ?? "null").ToString() ?? "<ToString() returned null>";
-                }
+                case string s:
+                    return "'" + s.Replace("'", "''") + "'";
+                case true:
+                    return "true";
+                case false:
+                    return "false";
+                case IFormattable formattable:
+                    return formattable.ToString(null, CultureInfo.InvariantCulture);
+                default:
+                    return (sv.Value ?? "null").ToString() ?? "<ToString() returned null>";
             }
-
-            return Constant.ToString();
         }
+
+        return Constant.ToString();
     }
 }

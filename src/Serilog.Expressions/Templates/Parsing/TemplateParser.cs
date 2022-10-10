@@ -12,43 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Serilog.Templates.Ast;
 
-namespace Serilog.Templates.Parsing
+namespace Serilog.Templates.Parsing;
+
+class TemplateParser
 {
-    class TemplateParser
+    readonly TemplateTokenizer _tokenizer = new();
+    readonly TemplateTokenParsers _templateTokenParsers = new();
+
+    public bool TryParse(
+        string template,
+        [MaybeNullWhen(false)] out Template parsed,
+        [MaybeNullWhen(true)] out string error)
     {
-        readonly TemplateTokenizer _tokenizer = new();
-        readonly TemplateTokenParsers _templateTokenParsers = new();
+        if (template == null) throw new ArgumentNullException(nameof(template));
 
-        public bool TryParse(
-            string template,
-            [MaybeNullWhen(false)] out Template parsed,
-            [MaybeNullWhen(true)] out string error)
+        var tokenList = _tokenizer.TryTokenize(template);
+        if (!tokenList.HasValue)
         {
-            if (template == null) throw new ArgumentNullException(nameof(template));
-
-            var tokenList = _tokenizer.TryTokenize(template);
-            if (!tokenList.HasValue)
-            {
-                error = tokenList.ToString();
-                parsed = null;
-                return false;
-            }
-
-            var result = _templateTokenParsers.TryParse(tokenList.Value);
-            if (!result.HasValue)
-            {
-                error = result.ToString();
-                parsed = null;
-                return false;
-            }
-
-            parsed = result.Value;
-            error = null;
-            return true;
+            error = tokenList.ToString();
+            parsed = null;
+            return false;
         }
+
+        var result = _templateTokenParsers.TryParse(tokenList.Value);
+        if (!result.HasValue)
+        {
+            error = result.ToString();
+            parsed = null;
+            return false;
+        }
+
+        parsed = result.Value;
+        error = null;
+        return true;
     }
 }

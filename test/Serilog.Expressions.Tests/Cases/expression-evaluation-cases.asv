@@ -197,6 +197,18 @@ User.Name                            ⇶ 'nblumhardt'
 // Wildcards
 [1,2,3][?] > 2                       ⇶ true
 [1,2,3][*] > 2                       ⇶ false
+{k:'test'}[?] = 'test'               ⇶ true
+{k:'test'}[?] like 'test'            ⇶ true
+{k:'test'}[?] like 'TEST'            ⇶ false
+{k:'test'}[?] like 'TEST' ci         ⇶ true
+{k:'test'}[?] like '%TES%' ci        ⇶ true
+{k:'test'}[?] = 'none'               ⇶ false
+test_dict({k:'test'})[?] = 'test'               ⇶ true
+test_dict({k:'test'})[?] like 'test'            ⇶ true
+test_dict({k:'test'})[?] like 'TEST'            ⇶ false
+test_dict({k:'test'})[?] like 'TEST' ci         ⇶ true
+test_dict({k:'test'})[?] like '%TES%' ci        ⇶ true
+test_dict({k:'test'})[?] = 'none'               ⇶ false
 
 // Text and regex
 ismatch('foo', 'f')                  ⇶ true

@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Expressions.Ast
+namespace Serilog.Expressions.Ast;
+
+abstract class Expression
 {
-    abstract class Expression
-    {
-        // Used only as an enabler for testing and debugging.
-        public abstract override string ToString();
-    }
+    // Used only as an enabler for testing and debugging.
+    public abstract override string ToString();
 }

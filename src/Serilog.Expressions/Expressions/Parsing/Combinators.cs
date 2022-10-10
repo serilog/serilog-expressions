@@ -12,63 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Serilog.ParserConstruction;
 using Serilog.ParserConstruction.Model;
 
-namespace Serilog.Expressions.Parsing
+namespace Serilog.Expressions.Parsing;
+
+static class Combinators
 {
-    static class Combinators
+    public static TokenListParser<TKind, TResult> ChainModified<TKind, TResult, TOperator, TModifier>(
+        TokenListParser<TKind, TOperator> @operator,
+        TokenListParser<TKind, TResult> operand,
+        TokenListParser<TKind, TModifier> modify,
+        Func<TOperator, TResult, TResult, TModifier, TResult> apply)
     {
-        public static TokenListParser<TKind, TResult> ChainModified<TKind, TResult, TOperator, TModifier>(
-            TokenListParser<TKind, TOperator> @operator,
-            TokenListParser<TKind, TResult> operand,
-            TokenListParser<TKind, TModifier> modify,
-            Func<TOperator, TResult, TResult, TModifier, TResult> apply)
+        if (@operator == null)
+            throw new ArgumentNullException(nameof (@operator));
+        if (operand == null)
+            throw new ArgumentNullException(nameof (operand));
+        if (modify == null) throw new ArgumentNullException(nameof(modify));
+        if (apply == null)
+            throw new ArgumentNullException(nameof (apply));
+
+        return input =>
         {
-            if (@operator == null)
-                throw new ArgumentNullException(nameof (@operator));
-            if (operand == null)
-                throw new ArgumentNullException(nameof (operand));
-            if (modify == null) throw new ArgumentNullException(nameof(modify));
-            if (apply == null)
-                throw new ArgumentNullException(nameof (apply));
+            var parseResult = operand(input);
+            if (!parseResult.HasValue )
+                return parseResult;
 
-            return input =>
+            var result = parseResult.Value;
+            var remainder = parseResult.Remainder;
+
+            var operatorResult = @operator(remainder);
+            while (operatorResult.HasValue || operatorResult.SubTokenErrorPosition.HasValue || remainder != operatorResult.Remainder)
             {
-                var parseResult = operand(input);
-                if (!parseResult.HasValue )
-                    return parseResult;
+                // If operator read any input, but failed to read complete input, we return error
+                if (!operatorResult.HasValue)
+                    return TokenListParserResult.CastEmpty<TKind, TOperator, TResult>(operatorResult);
 
-                var result = parseResult.Value;
-                var remainder = parseResult.Remainder;
+                var operandResult = operand(operatorResult.Remainder);
+                remainder = operandResult.Remainder;
 
-                var operatorResult = @operator(remainder);
-                while (operatorResult.HasValue || operatorResult.SubTokenErrorPosition.HasValue || remainder != operatorResult.Remainder)
-                {
-                    // If operator read any input, but failed to read complete input, we return error
-                    if (!operatorResult.HasValue)
-                        return TokenListParserResult.CastEmpty<TKind, TOperator, TResult>(operatorResult);
+                if (!operandResult.HasValue)
+                    return operandResult;
 
-                    var operandResult = operand(operatorResult.Remainder);
-                    remainder = operandResult.Remainder;
+                var modifierResult = modify(remainder);
+                remainder = modifierResult.Remainder;
 
-                    if (!operandResult.HasValue)
-                        return operandResult;
+                if (!modifierResult.HasValue)
+                    return TokenListParserResult.CastEmpty<TKind, TModifier, TResult>(modifierResult);
 
-                    var modifierResult = modify(remainder);
-                    remainder = modifierResult.Remainder;
+                result = apply(operatorResult.Value, result, operandResult.Value, modifierResult.Value);
 
-                    if (!modifierResult.HasValue)
-                        return TokenListParserResult.CastEmpty<TKind, TModifier, TResult>(modifierResult);
+                operatorResult = @operator(remainder);
+            }
 
-                    result = apply(operatorResult.Value, result, operandResult.Value, modifierResult.Value);
-
-                    operatorResult = @operator(remainder);
-                }
-
-                return TokenListParserResult.Value(result, input, remainder);
-            };
-        }
+            return TokenListParserResult.Value(result, input, remainder);
+        };
     }
 }
