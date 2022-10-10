@@ -279,7 +279,7 @@ Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)
 
 This expression takes advantage of `LastIndexOf()` returning -1 when no `.` character appears in `SourceContext`, to yield a `startIndex` of 0 in that case.
 
-**Write not-referenced context properties, only if there any:**
+**Write not-referenced context properties (only if there are any):**
 
 ```
 {#if rest(true) <> {}} <Context: {rest(true)}>{#end}
