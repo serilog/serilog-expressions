@@ -49,7 +49,7 @@ this is written as:
       {
         "Name": "ByExcluding",
         "Args": {
-          "Expression": "RequestPath like '/health%'"
+          "expression": "RequestPath like '/health%'"
         }
       }
     ]
