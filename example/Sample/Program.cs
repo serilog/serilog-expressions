@@ -16,6 +16,7 @@ public class Program
         JsonFormattingExample();
         PipelineComponentExample();
         TextFormattingExample2();
+        ValueRendererExample1();
     }
 
     static void TextFormattingExample1()
@@ -106,5 +107,28 @@ public class Program
             .Information("HTTP {Method} {Path} responded {StatusCode} in {Elapsed:0.000} ms", "GET", "/api/hello", 200, 1.23);
 
         program.Warning("We've reached the end of the line");
+    }
+
+    static void ValueRendererExample1()
+    {
+        using var log = new LoggerConfiguration()
+            .Enrich.WithProperty("Application", "Sample")
+            .WriteTo.Console(new ExpressionTemplate(
+                "[{@t:HH:mm:ss} {@l:u3}" +
+                "{#if SourceContext is not null} ({Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}){#end}] " +
+                "{@m} (first item is {coalesce(Items[0], '<empty>')}) {rest()}\n{@x}",
+                theme: TemplateTheme.Code, valueRenderer: new ThemedDefaultPropertyValueRenderer(TemplateTheme.Code)))
+            .CreateLogger();
+
+        log.Information("Running {Example}", nameof(ValueRendererExample1));
+
+        log.ForContext<Program>()
+            .Information("Cart contains {@Items}", new[] { "Tea", "Coffee" });
+
+        log.ForContext<Program>()
+            .Information("Cart contains {@Items}", new { Items = new[] { "Tea", "Coffee" }, Data = new Dictionary<string, object> { ["price"] = 69, ["weight"] = 1.5, ["color"] = "green", ["is-full"] = false } });
+
+        log.ForContext<Program>()
+            .Information("Cart contains {@Items}", new[] { "Apricots" });
     }
 }

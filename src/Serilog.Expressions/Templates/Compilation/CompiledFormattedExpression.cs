@@ -22,21 +22,21 @@ namespace Serilog.Templates.Compilation;
 
 class CompiledFormattedExpression : CompiledTemplate
 {
-    readonly ThemedJsonValueFormatter _jsonFormatter;
+    readonly IPropertyValueRenderer _valueRenderer;
     readonly Evaluatable _expression;
     readonly string? _format;
     readonly Alignment? _alignment;
     readonly IFormatProvider? _formatProvider;
     readonly Style _secondaryText;
 
-    public CompiledFormattedExpression(Evaluatable expression, string? format, Alignment? alignment, IFormatProvider? formatProvider, TemplateTheme theme)
+    public CompiledFormattedExpression(Evaluatable expression, string? format, Alignment? alignment, IFormatProvider? formatProvider, TemplateTheme theme, IPropertyValueRenderer valueRenderer)
     {
         _expression = expression ?? throw new ArgumentNullException(nameof(expression));
         _format = format;
         _alignment = alignment;
         _formatProvider = formatProvider;
         _secondaryText = theme.GetStyle(TemplateThemeStyle.SecondaryText);
-        _jsonFormatter = new(theme);
+        _valueRenderer = valueRenderer;
     }
 
     public override void Evaluate(EvaluationContext ctx, TextWriter output)
@@ -75,7 +75,7 @@ class CompiledFormattedExpression : CompiledTemplate
         }
         else
         {
-            invisibleCharacterCount += _jsonFormatter.Format(value, output);
+            invisibleCharacterCount += _valueRenderer.Render(value, output, _format, formatProvider);
         }
     }
 }

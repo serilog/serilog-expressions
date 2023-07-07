@@ -16,18 +16,19 @@ using System.Globalization;
 using Serilog.Data;
 using Serilog.Events;
 using Serilog.Formatting.Json;
+using Serilog.Templates.Rendering;
 
 // ReSharper disable ForCanBeConvertedToForeach
 
 namespace Serilog.Templates.Themes;
 
-class ThemedJsonValueFormatter : LogEventPropertyValueVisitor<TextWriter, int>
+class ThemedJsonPropertyValueRenderer : LogEventPropertyValueVisitor<TextWriter, int>, IPropertyValueRenderer
 {
     const string TypeTagPropertyName = "$type";
 
     readonly Style _null, _bool, _num, _string, _scalar, _tertiary, _name;
 
-    public ThemedJsonValueFormatter(TemplateTheme theme)
+    public ThemedJsonPropertyValueRenderer(TemplateTheme theme)
     {
         _null = theme.GetStyle(TemplateThemeStyle.Null);
         _bool = theme.GetStyle(TemplateThemeStyle.Boolean);
@@ -38,7 +39,7 @@ class ThemedJsonValueFormatter : LogEventPropertyValueVisitor<TextWriter, int>
         _name = theme.GetStyle(TemplateThemeStyle.Name);
     }
 
-    public int Format(LogEventPropertyValue value, TextWriter output)
+    public int Render(LogEventPropertyValue value, TextWriter output, string? format = null, IFormatProvider? formatProvider = null)
     {
         return Visit(output, value);
     }

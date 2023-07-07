@@ -20,6 +20,7 @@ using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
 using Serilog.Templates.Compilation;
+using Serilog.Templates.Rendering;
 using Serilog.Templates.Themes;
 using ConstantExpression = Serilog.Expressions.Ast.ConstantExpression;
 using Expression = Serilog.Expressions.Ast.Expression;
@@ -198,7 +199,7 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     {
         if (px.IsBuiltIn)
         {
-            var formatter = new CompiledMessageToken(_formatProvider, null, TemplateTheme.None);
+            var formatter = new CompiledMessageToken(_formatProvider, null, TemplateTheme.None, new DefaultPropertyValueRenderer());
             var formatProvider = _formatProvider;
 
             return px.PropertyName switch

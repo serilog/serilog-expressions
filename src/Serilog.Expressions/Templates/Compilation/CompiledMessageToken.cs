@@ -25,9 +25,9 @@ class CompiledMessageToken : CompiledTemplate
     readonly IFormatProvider? _formatProvider;
     readonly Alignment? _alignment;
     readonly Style _text, _invalid, _null, _bool, _string, _num, _scalar;
-    readonly ThemedJsonValueFormatter _jsonFormatter;
+    readonly IPropertyValueRenderer _valueRenderer;
 
-    public CompiledMessageToken(IFormatProvider? formatProvider, Alignment? alignment, TemplateTheme theme)
+    public CompiledMessageToken(IFormatProvider? formatProvider, Alignment? alignment, TemplateTheme theme, IPropertyValueRenderer valueRenderer)
     {
         _formatProvider = formatProvider;
         _alignment = alignment;
@@ -38,7 +38,7 @@ class CompiledMessageToken : CompiledTemplate
         _string = theme.GetStyle(TemplateThemeStyle.String);
         _scalar = theme.GetStyle(TemplateThemeStyle.Scalar);
         _invalid = theme.GetStyle(TemplateThemeStyle.Invalid);
-        _jsonFormatter = new(theme);
+        _valueRenderer = valueRenderer;
     }
 
     public override void Evaluate(EvaluationContext ctx, TextWriter output)
@@ -116,7 +116,7 @@ class CompiledMessageToken : CompiledTemplate
     {
         if (propertyValue is not ScalarValue scalar)
         {
-            invisibleCharacterCount += _jsonFormatter.Format(propertyValue, output);
+            invisibleCharacterCount += _valueRenderer.Render(propertyValue, output, format, _formatProvider);
             return;
         }
 

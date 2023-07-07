@@ -19,6 +19,7 @@ using Serilog.Formatting;
 using Serilog.Templates.Compilation;
 using Serilog.Templates.Compilation.NameResolution;
 using Serilog.Templates.Parsing;
+using Serilog.Templates.Rendering;
 using Serilog.Templates.Themes;
 
 namespace Serilog.Templates;
@@ -43,7 +44,7 @@ public class ExpressionTemplate : ITextFormatter
         [MaybeNullWhen(true)] out string error)
     {
         if (template == null) throw new ArgumentNullException(nameof(template));
-        return TryParse(template, null, null, null, false, out result, out error);
+        return TryParse(template, null, null, null, null, false, out result, out error);
     }
 
     /// <summary>
@@ -57,6 +58,7 @@ public class ExpressionTemplate : ITextFormatter
     /// <param name="error">A description of the error, if unsuccessful.</param>
     /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
     /// with which to resolve function names that appear in the template.</param>
+    /// <param name="valueRenderer">TODO</param>
     /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
     /// <see cref="System.Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
     /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
@@ -65,6 +67,7 @@ public class ExpressionTemplate : ITextFormatter
         IFormatProvider? formatProvider,
         NameResolver? nameResolver,
         TemplateTheme? theme,
+        IPropertyValueRenderer? valueRenderer,
         bool applyThemeWhenOutputIsRedirected,
         [MaybeNullWhen(false)] out ExpressionTemplate result,
         [MaybeNullWhen(true)] out string error)
@@ -80,12 +83,15 @@ public class ExpressionTemplate : ITextFormatter
 
         var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
 
+        var selectedTheme = SelectTheme(theme, applyThemeWhenOutputIsRedirected);
+        valueRenderer ??= new ThemedJsonPropertyValueRenderer(selectedTheme);
+
         result = new(
             TemplateCompiler.Compile(
                 planned,
                 formatProvider,
                 TemplateFunctionNameResolver.Build(nameResolver, planned),
-                SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
+                selectedTheme, valueRenderer));
 
         return true;
     }
@@ -104,6 +110,7 @@ public class ExpressionTemplate : ITextFormatter
     /// <param name="nameResolver">Optionally, a <see cref="NameResolver"/>
     /// with which to resolve function names that appear in the template.</param>
     /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
+    /// <param name="valueRenderer">TODO</param>
     /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
     /// <see cref="Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
     public ExpressionTemplate(
@@ -111,6 +118,7 @@ public class ExpressionTemplate : ITextFormatter
         IFormatProvider? formatProvider = null,
         NameResolver? nameResolver = null,
         TemplateTheme? theme = null,
+        IPropertyValueRenderer? valueRenderer = null,
         bool applyThemeWhenOutputIsRedirected = false)
     {
         if (template == null) throw new ArgumentNullException(nameof(template));
@@ -121,11 +129,14 @@ public class ExpressionTemplate : ITextFormatter
 
         var planned = TemplateLocalNameBinder.BindLocalValueNames(parsed);
 
+        var selectedTheme = SelectTheme(theme, applyThemeWhenOutputIsRedirected);
+        valueRenderer ??= new ThemedJsonPropertyValueRenderer(selectedTheme);
+
         _compiled = TemplateCompiler.Compile(
             planned,
             formatProvider,
             TemplateFunctionNameResolver.Build(nameResolver, planned),
-            SelectTheme(theme, applyThemeWhenOutputIsRedirected));
+            selectedTheme, valueRenderer);
     }
 
     static TemplateTheme SelectTheme(TemplateTheme? supplied, bool applyThemeWhenOutputIsRedirected)
