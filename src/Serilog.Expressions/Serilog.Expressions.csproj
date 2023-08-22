@@ -25,4 +25,5 @@
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
+
 </Project>
