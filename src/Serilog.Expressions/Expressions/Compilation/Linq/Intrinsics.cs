@@ -55,9 +55,9 @@ static class Intrinsics
     public static LogEventPropertyValue ConstructSequenceValue(List<LogEventPropertyValue?> elements)
     {
         if (elements.Any(el => el == null))
-            return new SequenceValue(elements.Where(el => el != null));
+            return new SequenceValue(elements.Where(el => el != null)!);
 
-        return new SequenceValue(elements);
+        return new SequenceValue(elements!);
     }
 
     public static List<LogEventProperty> CollectStructureProperties(string[] names, LogEventPropertyValue?[] values)
