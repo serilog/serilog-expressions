@@ -19,6 +19,10 @@ namespace Serilog.Templates.Encoding
         {
             _expression = expression;
             _encoder = encoder;
+            
+            // `expression` can't be passed through, because it may include calls to the `unsafe()` function (nested in arbitrary subexpressions) that
+            // need to be evaluated first. So, instead, we evaluate `expression` and unwrap the result of `unsafe`, placing the result in a local variable
+            // that the formatting expression we construct here can read from.
             _inner = new CompiledFormattedExpression(GetSubstituteLocalValue, format, alignment, formatProvider, theme);
         }
 
