@@ -24,6 +24,12 @@ false                                ⇶ false
 {a: 1, ..{b: 2}, b: undefined()}     ⇶ {a: 1}
 {a: 1, ..{a: undefined()}}           ⇶ {a: 1}
 {..{a: 1}, ..{b: 2, c: 3}}           ⇶ {a: 1, b: 2, c: 3}
+{a: 1}['a']                          ⇶ 1
+{a: 1}['A']                          ⇶ undefined()
+{a: 1}.a                             ⇶ 1
+{a: 1}.A                             ⇶ undefined()
+ElementAt({a: 1}, 'A')               ⇶ undefined()
+ElementAt({a: 1}, 'A') ci            ⇶ 1
 
 // Strings
 ''                                   ⇶ ''
