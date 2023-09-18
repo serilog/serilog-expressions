@@ -186,9 +186,8 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     protected override ExpressionBody Transform(AccessorExpression spx)
     {
         var receiver = Transform(spx.Receiver);
-        return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), receiver, LX.Constant(spx.MemberName, typeof(string)));
+        return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.Ordinal), receiver, LX.Constant(spx.MemberName, typeof(string)));
     }
-
     protected override ExpressionBody Transform(ConstantExpression cx)
     {
         return LX.Constant(cx.Constant);
