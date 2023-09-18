@@ -150,7 +150,7 @@ class ThemedJsonValueFormatter : LogEventPropertyValueVisitor<TextWriter, int>
                     : _scalar;
 
             using (style.Set(state, ref count))
-                JsonValueFormatter.WriteQuotedJsonString((element.Key.Value ?? "null").ToString(), state);
+                JsonValueFormatter.WriteQuotedJsonString(element.Key.Value?.ToString() ?? "null", state);
 
             using (_tertiary.Set(state, ref count))
                 state.Write(":");
@@ -244,7 +244,7 @@ class ThemedJsonValueFormatter : LogEventPropertyValueVisitor<TextWriter, int>
         }
 
         using (_scalar.Set(output, ref count))
-            JsonValueFormatter.WriteQuotedJsonString(value.ToString(), output);
+            JsonValueFormatter.WriteQuotedJsonString(value.ToString() ?? "", output);
 
         return count;
     }

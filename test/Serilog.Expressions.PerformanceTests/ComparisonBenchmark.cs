@@ -23,7 +23,7 @@ public class ComparisonBenchmark
         {
             if (evt.Properties.TryGetValue("A", out var a) && (a as ScalarValue)?.Value is int)
             {
-                return (int)((ScalarValue)a).Value == 3;
+                return (int)((ScalarValue)a).Value! == 3;
             }
 
             return false;

@@ -18,6 +18,7 @@ using Serilog.Expressions;
 using Serilog.Formatting;
 using Serilog.Templates.Compilation;
 using Serilog.Templates.Compilation.NameResolution;
+using Serilog.Templates.Encoding;
 using Serilog.Templates.Parsing;
 using Serilog.Templates.Themes;
 
@@ -43,7 +44,7 @@ public class ExpressionTemplate : ITextFormatter
         [MaybeNullWhen(true)] out string error)
     {
         if (template == null) throw new ArgumentNullException(nameof(template));
-        return TryParse(template, null, null, null, false, out result, out error);
+        return TryParse(template, null, null, null, false, null, out result, out error);
     }
 
     /// <summary>
@@ -59,6 +60,7 @@ public class ExpressionTemplate : ITextFormatter
     /// with which to resolve function names that appear in the template.</param>
     /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
     /// <see cref="System.Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
+    /// <param name="encoder">Optionally, an encoder to apply to output substituted into template holes.</param>
     /// <returns><c langword="true">true</c> if the template was well-formed.</returns>
     public static bool TryParse(
         string template,
@@ -66,6 +68,7 @@ public class ExpressionTemplate : ITextFormatter
         NameResolver? nameResolver,
         TemplateTheme? theme,
         bool applyThemeWhenOutputIsRedirected,
+        TemplateOutputEncoder? encoder,
         [MaybeNullWhen(false)] out ExpressionTemplate result,
         [MaybeNullWhen(true)] out string error)
     {
@@ -85,7 +88,8 @@ public class ExpressionTemplate : ITextFormatter
                 planned,
                 formatProvider,
                 TemplateFunctionNameResolver.Build(nameResolver, planned),
-                SelectTheme(theme, applyThemeWhenOutputIsRedirected)));
+                SelectTheme(theme, applyThemeWhenOutputIsRedirected),
+                new EncodedTemplateFactory(encoder)));
 
         return true;
     }
@@ -106,12 +110,14 @@ public class ExpressionTemplate : ITextFormatter
     /// <param name="theme">Optionally, an ANSI theme to apply to the template output.</param>
     /// <param name="applyThemeWhenOutputIsRedirected">Apply <paramref name="theme"/> even when
     /// <see cref="Console.IsOutputRedirected"/> or <see cref="Console.IsErrorRedirected"/> returns <c>true</c>.</param>
+    /// <param name="encoder">Optionally, an encoder to apply to output substituted into template holes.</param>
     public ExpressionTemplate(
         string template,
         IFormatProvider? formatProvider = null,
         NameResolver? nameResolver = null,
         TemplateTheme? theme = null,
-        bool applyThemeWhenOutputIsRedirected = false)
+        bool applyThemeWhenOutputIsRedirected = false,
+        TemplateOutputEncoder? encoder = null)
     {
         if (template == null) throw new ArgumentNullException(nameof(template));
 
@@ -125,7 +131,8 @@ public class ExpressionTemplate : ITextFormatter
             planned,
             formatProvider,
             TemplateFunctionNameResolver.Build(nameResolver, planned),
-            SelectTheme(theme, applyThemeWhenOutputIsRedirected));
+            SelectTheme(theme, applyThemeWhenOutputIsRedirected),
+            new EncodedTemplateFactory(encoder));
     }
 
     static TemplateTheme SelectTheme(TemplateTheme? supplied, bool applyThemeWhenOutputIsRedirected)
