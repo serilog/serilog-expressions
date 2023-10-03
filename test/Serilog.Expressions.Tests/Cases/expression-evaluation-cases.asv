@@ -304,3 +304,12 @@ undefined() = undefined() ci         ⇶ undefined()
 'test' like '%'                      ⇶ true
 'test' like ''                       ⇶ false
 '' like ''                           ⇶ true
+
+// Built-ins
+
+@m                                   ⇶ 'Hello, World!'
+@mt                                  ⇶ 'Hello, {Name}!'
+tostring(@x) like 'System.DivideByZeroException%' ⇶ true
+@l                                   ⇶ 'Warning'
+@sp                                  ⇶ 'bb1111820570b80e'
+@tr                                  ⇶ '1befc31e94b01d1a473f63a7905f6c9b'
