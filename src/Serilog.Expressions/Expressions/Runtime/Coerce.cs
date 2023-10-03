@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Serilog.Events;
 
@@ -75,6 +76,18 @@ static class Coerce
             if (sv.Value?.GetType().IsEnum ?? false)
             {
                 str = sv.Value.ToString()!;
+                return true;
+            }
+
+            if (sv.Value is ActivityTraceId traceId)
+            {
+                str = traceId.ToHexString();
+                return true;
+            }
+
+            if (sv.Value is ActivitySpanId spanId)
+            {
+                str = spanId.ToHexString();
                 return true;
             }
         }
