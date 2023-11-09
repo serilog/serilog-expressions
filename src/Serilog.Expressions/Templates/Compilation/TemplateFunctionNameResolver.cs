@@ -17,6 +17,7 @@ using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Runtime;
 using Serilog.Templates.Ast;
 using Serilog.Templates.Compilation.UnreferencedProperties;
+using Serilog.Templates.Compilation.Unsafe;
 
 namespace Serilog.Templates.Compilation;
 
@@ -27,7 +28,8 @@ static class TemplateFunctionNameResolver
         var resolvers = new List<NameResolver>
         {
             new StaticMemberNameResolver(typeof(RuntimeOperators)),
-            new UnreferencedPropertiesFunction(template)
+            new UnreferencedPropertiesFunction(template),
+            new UnsafeOutputFunction()
         };
 
         if (additionalNameResolver != null)

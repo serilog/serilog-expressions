@@ -186,9 +186,8 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     protected override ExpressionBody Transform(AccessorExpression spx)
     {
         var receiver = Transform(spx.Receiver);
-        return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.OrdinalIgnoreCase), receiver, LX.Constant(spx.MemberName, typeof(string)));
+        return LX.Call(TryGetStructurePropertyValueMethod, LX.Constant(StringComparison.Ordinal), receiver, LX.Constant(spx.MemberName, typeof(string)));
     }
-
     protected override ExpressionBody Transform(ConstantExpression cx)
     {
         return LX.Constant(cx.Constant);
@@ -207,6 +206,10 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
                 BuiltInProperty.Message => Splice(context => new ScalarValue(Intrinsics.RenderMessage(formatter, context))),
                 BuiltInProperty.Exception => Splice(context =>
                     context.LogEvent.Exception == null ? null : new ScalarValue(context.LogEvent.Exception)),
+                BuiltInProperty.TraceId => Splice(context =>
+                    context.LogEvent.TraceId == null ? null : new ScalarValue(context.LogEvent.TraceId.Value)),
+                BuiltInProperty.SpanId => Splice(context =>
+                    context.LogEvent.SpanId == null ? null : new ScalarValue(context.LogEvent.SpanId.Value)),
                 BuiltInProperty.Timestamp => Splice(context => new ScalarValue(context.LogEvent.Timestamp)),
                 BuiltInProperty.MessageTemplate => Splice(context => new ScalarValue(context.LogEvent.MessageTemplate.Text)),
                 BuiltInProperty.Properties => Splice(context =>
