@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Serilog.Expressions;
 using Serilog.Expressions.Ast;
+using Serilog.Expressions.Compilation;
 using Serilog.Expressions.Compilation.Transformations;
 
 namespace Serilog.Templates.Compilation.UnreferencedProperties;
@@ -47,7 +49,11 @@ class ExpressionReferencedPropertiesFinder : SerilogExpressionTransformer<IEnume
 
     protected override IEnumerable<string> Transform(AccessorExpression spx)
     {
-        return Transform(spx.Receiver);
+        if (Pattern.IsAmbientProperty(spx.Receiver, BuiltInProperty.Properties, true))
+            yield return spx.MemberName;
+        
+        foreach (var nested in Transform(spx.Receiver))
+            yield return nested;
     }
 
     protected override IEnumerable<string> Transform(LambdaExpression lmx)
@@ -79,7 +85,18 @@ class ExpressionReferencedPropertiesFinder : SerilogExpressionTransformer<IEnume
 
     protected override IEnumerable<string> Transform(IndexerExpression ix)
     {
-        return Transform(ix.Index).Concat(Transform(ix.Receiver));
+        if (Pattern.IsAmbientProperty(ix.Receiver, BuiltInProperty.Properties, true) &&
+            Pattern.IsStringConstant(ix.Index, out var name))
+        {
+            yield return name;
+        }
+        else
+        {
+            foreach (var nested in Transform(ix.Index).Concat(Transform(ix.Receiver)))
+            {
+                yield return nested;
+            }
+        }
     }
 
     protected override IEnumerable<string> Transform(IndexOfMatchExpression mx)
