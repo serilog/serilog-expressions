@@ -135,6 +135,10 @@ The following properties are available in expressions:
 
 The built-in properties mirror those available in the CLEF format.
 
+The exception property `@x` is treated as a scalar and will appear as a string when formatted into text. The properties of
+the underlying `Exception` object can be accessed using `Inspect()`, for example `Inspect(@x).Message`, and the type of the
+exception retrieved using `TypeOf(@x)`.
+
 ### Literals
 
 | Data type | Description | Examples |
@@ -181,29 +185,30 @@ calling a function will be undefined if:
  * any argument is undefined, or
  * any argument is of an incompatible type.
 
-| Function | Description |
-| :--- | :--- |
-| `Coalesce(p0, p1, [..pN])` | Returns the first defined, non-null argument. |
-| `Concat(s0, s1, [..sN])` | Concatenate two or more strings. |
-| `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
-| `ElementAt(x, i)` | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`. |
-| `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
-| `IndexOf(s, t)` | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear. |
-| `IndexOfMatch(s, p)` | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match. |
-| `IsMatch(s, p)` | Tests whether the regular expression `p` matches within the string `s`. |
-| `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
-| `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
-| `Length(x)` | Returns the length of a string or array. |
-| `Now()` | Returns `DateTimeOffset.Now`. |
-| `Rest([deep])` | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
-| `Round(n, m)` | Round the number `n` to `m` decimal places. |
-| `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
-| `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
-| `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
-| `ToString(x, [format])` | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`. |
-| `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
-| `Undefined()` | Explicitly mark an undefined value. |
-| `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
+| Function                        | Description                                                                                                                                                                                                                   |
+|:--------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Coalesce(p0, p1, [..pN])`      | Returns the first defined, non-null argument.                                                                                                                                                                                 |
+| `Concat(s0, s1, [..sN])`        | Concatenate two or more strings.                                                                                                                                                                                              |
+| `Contains(s, t)`                | Tests whether the string `s` contains the substring `t`.                                                                                                                                                                      |
+| `ElementAt(x, i)`               | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`.                                                                                                                                        |
+| `EndsWith(s, t)`                | Tests whether the string `s` ends with substring `t`.                                                                                                                                                                         |
+| `IndexOf(s, t)`                 | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear.                                                                                                                               |
+| `IndexOfMatch(s, p)`            | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match.                                                                                                 |
+| `Inspect(o, [deep])`            | Read properties from an object captured as the scalar value `o`.                                                                                                                                                              |
+| `IsMatch(s, p)`                 | Tests whether the regular expression `p` matches within the string `s`.                                                                                                                                                       |
+| `IsDefined(x)`                  | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined.                                                                                                                           |
+| `LastIndexOf(s, t)`             | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear.                                                                                                                                |
+| `Length(x)`                     | Returns the length of a string or array.                                                                                                                                                                                      |
+| `Now()`                         | Returns `DateTimeOffset.Now`.                                                                                                                                                                                                 |
+| `Rest([deep])`                  | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
+| `Round(n, m)`                   | Round the number `n` to `m` decimal places.                                                                                                                                                                                   |
+| `StartsWith(s, t)`              | Tests whether the string `s` starts with substring `t`.                                                                                                                                                                       |
+| `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied.                                                                                            |
+| `TagOf(o)`                      | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`).                                                                                                                                      |
+| `ToString(x, [format])`         | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`.                                                                                                                                        |
+| `TypeOf(x)`                     | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`.                                                |
+| `Undefined()`                   | Explicitly mark an undefined value.                                                                                                                                                                                           |
+| `UtcDateTime(x)`                | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`.                                                                                                                                                               |
 
 Functions that compare text accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 
