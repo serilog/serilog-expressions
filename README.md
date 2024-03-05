@@ -132,6 +132,8 @@ The following properties are available in expressions:
  * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
  * `@i` - event id; a 32-bit numeric hash of the event's message template
  * `@r` - renderings; if any tokens in the message template include .NET-specific formatting, an array of rendered values for each such token
+ * `@tr` - trace id; The id of the trace that was active when the event was created, if any
+ * `@sp` - span id; The id of the span that was active when the event was created, if any
 
 The built-in properties mirror those available in the CLEF format.
 

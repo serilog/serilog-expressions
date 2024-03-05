@@ -28,7 +28,11 @@ public class StaticMemberNameResolver : NameResolver
     /// Create a <see cref="StaticMemberNameResolver"/> that returns members of the specified <see cref="Type"/>.
     /// </summary>
     /// <param name="type">A <see cref="Type"/> with public static members implementing runtime functions.</param>
-    public StaticMemberNameResolver(Type type)
+    public StaticMemberNameResolver(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
+        Type type)
     {
         if (type == null) throw new ArgumentNullException(nameof(type));
 
