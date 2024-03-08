@@ -5,6 +5,8 @@ namespace Serilog.Expressions.Tests.Support;
 
 static class Some
 {
+    static int _next;
+    
     public static LogEvent InformationEvent(string messageTemplate = "Hello, world!", params object?[] propertyValues)
     {
         return LogEvent(LogEventLevel.Information, messageTemplate, propertyValues);
@@ -29,11 +31,21 @@ static class Some
 
     public static object AnonymousObject()
     {
-        return new {A = 42};
+        return new {A = Int()};
     }
 
     public static LogEventPropertyValue LogEventPropertyValue()
     {
         return new ScalarValue(AnonymousObject());
+    }
+
+    static int Int()
+    {
+        return Interlocked.Increment(ref _next);
+    }
+
+    public static string String()
+    {
+        return $"+S_{Int()}";
     }
 }

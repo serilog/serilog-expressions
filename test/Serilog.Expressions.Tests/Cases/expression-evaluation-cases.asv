@@ -264,6 +264,7 @@ typeof(true)                         ⇶ 'System.Boolean'
 typeof(null)                         ⇶ 'null'
 typeof([])                           ⇶ 'array'
 typeof({})                           ⇶ 'object'
+typeof(@x)                           ⇶ 'System.DivideByZeroException'
 
 // UtcDateTime
 tostring(utcdatetime(now()), 'o') like '20%' ⇶ true
@@ -313,3 +314,6 @@ tostring(@x) like 'System.DivideByZeroException%' ⇶ true
 @l                                   ⇶ 'Warning'
 @sp                                  ⇶ 'bb1111820570b80e'
 @tr                                  ⇶ '1befc31e94b01d1a473f63a7905f6c9b'
+
+// Inspect
+inspect(@x).Message                  ⇶ 'Attempted to divide by zero.'
