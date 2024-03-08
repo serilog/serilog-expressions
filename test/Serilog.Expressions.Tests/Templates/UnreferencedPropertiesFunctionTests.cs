@@ -19,32 +19,34 @@ public class UnreferencedPropertiesFunctionTests
     [Fact]
     public void UnreferencedPropertiesExcludeThoseInMessageAndTemplate()
     {
-        Assert.True(new TemplateParser().TryParse("{@m}{A + 1}{#if true}{B}{#end}", out var template, out _));
+        Assert.True(new TemplateParser().TryParse("{@m}{A + 1}{#if true}{B}{@p.C}{@p['D']}{#end}", out var template, out _));
 
-        var function = new UnreferencedPropertiesFunction(template!);
+        var function = new UnreferencedPropertiesFunction(template);
 
         var evt = new LogEvent(
             DateTimeOffset.Now,
             LogEventLevel.Debug,
             null,
-            new(new[] {new PropertyToken("C", "{C}")}),
+            new(new[] {new PropertyToken("E", "{E}")}),
             new[]
             {
                 new LogEventProperty("A", new ScalarValue(null)),
                 new LogEventProperty("B", new ScalarValue(null)),
                 new LogEventProperty("C", new ScalarValue(null)),
                 new LogEventProperty("D", new ScalarValue(null)),
+                new LogEventProperty("E", new ScalarValue(null)),
+                new LogEventProperty("F", new ScalarValue(null)),
             });
 
         var deep = UnreferencedPropertiesFunction.Implementation(function, evt, new ScalarValue(true));
 
         var sv = Assert.IsType<StructureValue>(deep);
         var included = Assert.Single(sv.Properties);
-        Assert.Equal("D", included!.Name);
+        Assert.Equal("F", included.Name);
 
         var shallow = UnreferencedPropertiesFunction.Implementation(function, evt);
         sv = Assert.IsType<StructureValue>(shallow);
-        Assert.Contains(sv.Properties, p => p.Name == "C");
-        Assert.Contains(sv.Properties, p => p.Name == "D");
+        Assert.Contains(sv.Properties, p => p.Name == "E");
+        Assert.Contains(sv.Properties, p => p.Name == "F");
     }
 }
