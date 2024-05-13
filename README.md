@@ -125,7 +125,7 @@ The following properties are available in expressions:
 
  * **All first-class properties of the event** - no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
- * `@m` - the rendered message (Note: do not add format specifiers like `:lj` or you'll lose theme color rendering. These format specifiers are not supported as they've become the default and only option - see their discussion [here](https://github.com/serilog/serilog-expressions/issues/56#issuecomment-1146472988))
+ * `@m` - the rendered message (Note: do not add format specifiers like `:lj` or you'll lose theme color rendering. These format specifiers are not supported as they've become the default and only option - [see the discussion here](https://github.com/serilog/serilog-expressions/issues/56#issuecomment-1146472988)
  * `@mt` - the raw message template
  * `@l` - the event's level, as a `LogEventLevel`
  * `@x` - the exception associated with the event, if any, as an `Exception`
