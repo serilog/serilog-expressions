@@ -85,7 +85,7 @@ static class Result
         if (expectations == null)
             expectations = second.Expectations;
         else if (second.Expectations != null)
-            expectations = ArrayEnumerable.Concat(first.Expectations!, second.Expectations);
+            expectations = [..first.Expectations!, ..second.Expectations];
 
         return new(second.Remainder, second.ErrorMessage, expectations, second.Backtrack);
     }

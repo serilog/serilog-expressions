@@ -48,9 +48,7 @@ class LikeSyntaxTransformer: IdentityTransformer
 
     Expression TryCompileLikeExpression(bool ignoreCase, Expression corpus, Expression like)
     {
-        if (like is ConstantExpression cx &&
-            cx.Constant is ScalarValue scalar &&
-            scalar.Value is string s)
+        if (like is ConstantExpression { Constant: ScalarValue { Value: string s } })
         {
             var regex = LikeToRegex(s);
             var opts = RegexOptions.Compiled | RegexOptions.ExplicitCapture;

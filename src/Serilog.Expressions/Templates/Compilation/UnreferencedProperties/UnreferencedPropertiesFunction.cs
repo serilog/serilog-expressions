@@ -42,7 +42,7 @@ class UnreferencedPropertiesFunction : NameResolver
     public UnreferencedPropertiesFunction(Template template)
     {
         var finder = new TemplateReferencedPropertiesFinder();
-        _referencedInTemplate = new(finder.FindReferencedProperties(template));
+        _referencedInTemplate = [..finder.FindReferencedProperties(template)];
     }
 
     public override bool TryBindFunctionParameter(ParameterInfo parameter, [MaybeNullWhen(false)] out object boundValue)

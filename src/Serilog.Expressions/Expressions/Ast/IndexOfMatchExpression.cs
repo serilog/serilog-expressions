@@ -16,6 +16,10 @@ using System.Text.RegularExpressions;
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// A non-syntax expression tree node used when compiling the <see cref="Operators.OpIndexOfMatch"/>,
+/// <see cref="Operators.OpIsMatch"/>, and SQL-style <code>like</code> expressions.
+/// </summary>
 class IndexOfMatchExpression : Expression
 {
     public Expression Corpus { get; }

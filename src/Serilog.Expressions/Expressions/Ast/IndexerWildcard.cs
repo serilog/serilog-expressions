@@ -14,4 +14,7 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// Describes the wildcard in a <see cref="IndexerWildcardExpression"/>.
+/// </summary>
 enum IndexerWildcard { Undefined, Any, All }

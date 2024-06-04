@@ -45,7 +45,7 @@ static class Character
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
         if (name == null) throw new ArgumentNullException(nameof(name));
 
-        return Matching(predicate, new[] { name });
+        return Matching(predicate, [name]);
     }
 
     /// <summary>

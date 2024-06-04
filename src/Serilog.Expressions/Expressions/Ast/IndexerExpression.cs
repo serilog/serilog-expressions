@@ -14,6 +14,11 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An <see cref="IndexerExpression"/> retrieves a property from an object, by name, or an item from an array
+/// by zero-based numeric index. For example, <code>Headers['Content-Type']</code> and <code>Items[2]</code> are
+/// parsed as indexer expressions.
+/// </summary>
 class IndexerExpression : Expression
 {
     public Expression Receiver { get; }

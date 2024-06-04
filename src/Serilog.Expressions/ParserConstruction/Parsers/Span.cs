@@ -44,7 +44,7 @@ static class Span
                     if (ch.Location == input)
                         return Result.Empty<TextSpan>(ch.Location, expectations);
 
-                    return Result.Empty<TextSpan>(ch.Location, new[] { Presentation.FormatLiteral(text[i]) });
+                    return Result.Empty<TextSpan>(ch.Location, [Presentation.FormatLiteral(text[i])]);
                 }
                 remainder = ch.Remainder;
             }

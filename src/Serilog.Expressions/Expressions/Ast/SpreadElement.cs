@@ -14,6 +14,13 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An element in an <see cref="ArrayExpression"/> that describes zero or more items to include in the array.
+/// Spread elements are written with two dots preceding an expression that evaluates to an array of elements to
+/// insert into the result array at the position of the spread element, for example, in <code>[1, 2, ..Others]</code>,
+/// the <code>..Others</code> expression is a spread element. If the value of the array in the spread is
+/// undefined, no items will be added to the list.
+/// </summary>
 class SpreadElement : Element
 {
     public Expression Content { get; }

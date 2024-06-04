@@ -17,6 +17,9 @@ using Serilog.Events;
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// A constant such as <code>'hello'</code>, <code>true</code>, <code>null</code>, or <code>123.45</code>.
+/// </summary>
 class ConstantExpression : Expression
 {
     public ConstantExpression(LogEventPropertyValue constant)
@@ -30,19 +33,14 @@ class ConstantExpression : Expression
     {
         if (Constant is ScalarValue sv)
         {
-            switch (sv.Value)
+            return sv.Value switch
             {
-                case string s:
-                    return "'" + s.Replace("'", "''") + "'";
-                case true:
-                    return "true";
-                case false:
-                    return "false";
-                case IFormattable formattable:
-                    return formattable.ToString(null, CultureInfo.InvariantCulture);
-                default:
-                    return (sv.Value ?? "null").ToString() ?? "<ToString() returned null>";
-            }
+                string s => "'" + s.Replace("'", "''") + "'",
+                true => "true",
+                false => "false",
+                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                _ => (sv.Value ?? "null").ToString() ?? "<ToString() returned null>"
+            };
         }
 
         return Constant.ToString();

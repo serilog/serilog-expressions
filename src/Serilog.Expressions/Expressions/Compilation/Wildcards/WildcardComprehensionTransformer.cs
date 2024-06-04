@@ -68,7 +68,7 @@ class WildcardComprehensionTransformer : IdentityTransformer
         comparisonArgs[indexerOperand] = nestedComparand;
         var body = new CallExpression(lx.IgnoreCase, lx.OperatorName, comparisonArgs);
 
-        var lambda = new LambdaExpression(new[] { px }, body);
+        var lambda = new LambdaExpression([px], body);
 
         var op = Operators.ToRuntimeWildcardOperator(wc);
         var call = new CallExpression(false, op, coll, lambda);
@@ -84,7 +84,7 @@ class WildcardComprehensionTransformer : IdentityTransformer
 
         var px = new ParameterExpression("p" + _nextParameter++);
         var coll = Transform(ix.Receiver);
-        var lambda = new LambdaExpression(new[] { px }, px);
+        var lambda = new LambdaExpression([px], px);
         var op = Operators.ToRuntimeWildcardOperator(wx.Wildcard);
         return new CallExpression(false, op, coll, lambda);
     }

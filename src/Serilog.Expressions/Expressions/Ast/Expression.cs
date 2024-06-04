@@ -14,8 +14,15 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An AST node.
+/// </summary>
 abstract class Expression
 {
-    // Used only as an enabler for testing and debugging.
+    /// <summary>
+    /// The <see cref="ToString"/> representation of an <see cref="Expression"/> is <strong>not</strong>
+    /// guaranteed to be syntactically valid: this is provided for debugging purposes only.
+    /// </summary>
+    /// <returns>A textual representation of the expression.</returns>
     public abstract override string ToString();
 }

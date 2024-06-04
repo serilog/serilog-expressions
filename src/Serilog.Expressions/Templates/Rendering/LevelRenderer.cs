@@ -27,34 +27,34 @@ namespace Serilog.Templates.Rendering;
 static class LevelRenderer
 {
     static readonly string[][] TitleCaseLevelMap =
-    {
-        new[] { "V", "Vb", "Vrb", "Verb" },
-        new[] { "D", "De", "Dbg", "Dbug" },
-        new[] { "I", "In", "Inf", "Info" },
-        new[] { "W", "Wn", "Wrn", "Warn" },
-        new[] { "E", "Er", "Err", "Eror" },
-        new[] { "F", "Fa", "Ftl", "Fatl" },
-    };
+    [
+        ["V", "Vb", "Vrb", "Verb"],
+        ["D", "De", "Dbg", "Dbug"],
+        ["I", "In", "Inf", "Info"],
+        ["W", "Wn", "Wrn", "Warn"],
+        ["E", "Er", "Err", "Eror"],
+        ["F", "Fa", "Ftl", "Fatl"]
+    ];
 
     static readonly string[][] LowercaseLevelMap =
-    {
-        new[] { "v", "vb", "vrb", "verb" },
-        new[] { "d", "de", "dbg", "dbug" },
-        new[] { "i", "in", "inf", "info" },
-        new[] { "w", "wn", "wrn", "warn" },
-        new[] { "e", "er", "err", "eror" },
-        new[] { "f", "fa", "ftl", "fatl" },
-    };
+    [
+        ["v", "vb", "vrb", "verb"],
+        ["d", "de", "dbg", "dbug"],
+        ["i", "in", "inf", "info"],
+        ["w", "wn", "wrn", "warn"],
+        ["e", "er", "err", "eror"],
+        ["f", "fa", "ftl", "fatl"]
+    ];
 
     static readonly string[][] UppercaseLevelMap =
-    {
-        new[] { "V", "VB", "VRB", "VERB" },
-        new[] { "D", "DE", "DBG", "DBUG" },
-        new[] { "I", "IN", "INF", "INFO" },
-        new[] { "W", "WN", "WRN", "WARN" },
-        new[] { "E", "ER", "ERR", "EROR" },
-        new[] { "F", "FA", "FTL", "FATL" },
-    };
+    [
+        ["V", "VB", "VRB", "VERB"],
+        ["D", "DE", "DBG", "DBUG"],
+        ["I", "IN", "INF", "INFO"],
+        ["W", "WN", "WRN", "WARN"],
+        ["E", "ER", "ERR", "EROR"],
+        ["F", "FA", "FTL", "FATL"]
+    ];
 
     public static string GetLevelMoniker(LogEventLevel value, string? format)
     {
