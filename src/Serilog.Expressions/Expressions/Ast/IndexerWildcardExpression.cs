@@ -14,6 +14,11 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An indexer wildcard is a placeholder in a property path expression. For example,
+/// in <code>Headers[?] = 'test'</code>, the question-mark token is a wildcard that means "any property of
+/// the <code>Headers</code> object". The other wildcard indexer is the asterisk, meaning "all".
+/// </summary>
 class IndexerWildcardExpression : Expression
 {
     public IndexerWildcardExpression(IndexerWildcard wildcard)

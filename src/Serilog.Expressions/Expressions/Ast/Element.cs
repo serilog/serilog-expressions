@@ -14,6 +14,7 @@
 
 namespace Serilog.Expressions.Ast;
 
-abstract class Element
-{
-}
+/// <summary>
+/// An element in an <see cref="ArrayExpression"/>.
+/// </summary>
+abstract class Element;

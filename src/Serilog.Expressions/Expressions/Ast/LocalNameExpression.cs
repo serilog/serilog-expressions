@@ -14,6 +14,9 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// Represents the iteration variable in template <code>#each</code> directives.
+/// </summary>
 class LocalNameExpression : Expression
 {
     public LocalNameExpression(string name)

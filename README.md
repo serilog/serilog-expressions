@@ -125,15 +125,21 @@ The following properties are available in expressions:
 
  * **All first-class properties of the event** - no special syntax: `SourceContext` and `Cart` are used in the formatting examples above
  * `@t` - the event's timestamp, as a `DateTimeOffset`
- * `@m` - the rendered message
+ * `@m` - the rendered message (Note: do not add format specifiers like `:lj` or you'll lose theme color rendering. These format specifiers are not supported as they've become the default and only option - [see the discussion here](https://github.com/serilog/serilog-expressions/issues/56#issuecomment-1146472988)
  * `@mt` - the raw message template
  * `@l` - the event's level, as a `LogEventLevel`
  * `@x` - the exception associated with the event, if any, as an `Exception`
  * `@p` - a dictionary containing all first-class properties; this supports properties with non-identifier names, for example `@p['snake-case-name']`
  * `@i` - event id; a 32-bit numeric hash of the event's message template
  * `@r` - renderings; if any tokens in the message template include .NET-specific formatting, an array of rendered values for each such token
+ * `@tr` - trace id; The id of the trace that was active when the event was created, if any
+ * `@sp` - span id; The id of the span that was active when the event was created, if any
 
 The built-in properties mirror those available in the CLEF format.
+
+The exception property `@x` is treated as a scalar and will appear as a string when formatted into text. The properties of
+the underlying `Exception` object can be accessed using `Inspect()`, for example `Inspect(@x).Message`, and the type of the
+exception retrieved using `TypeOf(@x)`.
 
 ### Literals
 
@@ -181,29 +187,30 @@ calling a function will be undefined if:
  * any argument is undefined, or
  * any argument is of an incompatible type.
 
-| Function | Description |
-| :--- | :--- |
-| `Coalesce(p0, p1, [..pN])` | Returns the first defined, non-null argument. |
-| `Concat(s0, s1, [..sN])` | Concatenate two or more strings. |
-| `Contains(s, t)` | Tests whether the string `s` contains the substring `t`. |
-| `ElementAt(x, i)` | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`. |
-| `EndsWith(s, t)` | Tests whether the string `s` ends with substring `t`. |
-| `IndexOf(s, t)` | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear. |
-| `IndexOfMatch(s, p)` | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match. |
-| `IsMatch(s, p)` | Tests whether the regular expression `p` matches within the string `s`. |
-| `IsDefined(x)` | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined. |
-| `LastIndexOf(s, t)` | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear. |
-| `Length(x)` | Returns the length of a string or array. |
-| `Now()` | Returns `DateTimeOffset.Now`. |
-| `Rest([deep])` | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
-| `Round(n, m)` | Round the number `n` to `m` decimal places. |
-| `StartsWith(s, t)` | Tests whether the string `s` starts with substring `t`. |
-| `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied. |
-| `TagOf(o)` | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`). |
-| `ToString(x, [format])` | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`. |
-| `TypeOf(x)` | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`. |
-| `Undefined()` | Explicitly mark an undefined value. |
-| `UtcDateTime(x)` | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`. |
+| Function                        | Description                                                                                                                                                                                                                   |
+|:--------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Coalesce(p0, p1, [..pN])`      | Returns the first defined, non-null argument.                                                                                                                                                                                 |
+| `Concat(s0, s1, [..sN])`        | Concatenate two or more strings.                                                                                                                                                                                              |
+| `Contains(s, t)`                | Tests whether the string `s` contains the substring `t`.                                                                                                                                                                      |
+| `ElementAt(x, i)`               | Retrieves a property of `x` by name `i`, or array element of `x` by numeric index `i`.                                                                                                                                        |
+| `EndsWith(s, t)`                | Tests whether the string `s` ends with substring `t`.                                                                                                                                                                         |
+| `IndexOf(s, t)`                 | Returns the first index of substring `t` in string `s`, or -1 if the substring does not appear.                                                                                                                               |
+| `IndexOfMatch(s, p)`            | Returns the index of the first match of regular expression `p` in string `s`, or -1 if the regular expression does not match.                                                                                                 |
+| `Inspect(o, [deep])`            | Read properties from an object captured as the scalar value `o`.                                                                                                                                                              |
+| `IsMatch(s, p)`                 | Tests whether the regular expression `p` matches within the string `s`.                                                                                                                                                       |
+| `IsDefined(x)`                  | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined.                                                                                                                           |
+| `LastIndexOf(s, t)`             | Returns the last index of substring `t` in string `s`, or -1 if the substring does not appear.                                                                                                                                |
+| `Length(x)`                     | Returns the length of a string or array.                                                                                                                                                                                      |
+| `Now()`                         | Returns `DateTimeOffset.Now`.                                                                                                                                                                                                 |
+| `Rest([deep])`                  | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
+| `Round(n, m)`                   | Round the number `n` to `m` decimal places.                                                                                                                                                                                   |
+| `StartsWith(s, t)`              | Tests whether the string `s` starts with substring `t`.                                                                                                                                                                       |
+| `Substring(s, start, [length])` | Return the substring of string `s` from `start` to the end of the string, or of `length` characters, if this argument is supplied.                                                                                            |
+| `TagOf(o)`                      | Returns the `TypeTag` field of a captured object (i.e. where `TypeOf(x)` is `'object'`).                                                                                                                                      |
+| `ToString(x, [format])`         | Convert `x` to a string, applying the format string `format` if `x` is `IFormattable`.                                                                                                                                        |
+| `TypeOf(x)`                     | Returns a string describing the type of expression `x`: a .NET type name if `x` is scalar and non-null, or, `'array'`, `'object'`, `'dictionary'`, `'null'`, or `'undefined'`.                                                |
+| `Undefined()`                   | Explicitly mark an undefined value.                                                                                                                                                                                           |
+| `UtcDateTime(x)`                | Convert a `DateTime` or `DateTimeOffset` into a UTC `DateTime`.                                                                                                                                                               |
 
 Functions that compare text accept an optional postfix `ci` modifier to select case-insensitive comparisons:
 

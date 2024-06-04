@@ -14,6 +14,11 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// Constructs an object given a list of members. Members can be <code>name: value</code> pairs, or spread
+/// expressions that include members from another object. Where names conflict, the rightmost appearance of
+/// a name wins. Members that evaluate to an undefined value do not appear in the resulting object.
+/// </summary>
 class ObjectExpression : Expression
 {
     public ObjectExpression(Member[] members)

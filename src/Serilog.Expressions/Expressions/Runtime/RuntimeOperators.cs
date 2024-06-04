@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
+using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
 using Serilog.Templates.Rendering;
@@ -537,5 +539,42 @@ static class RuntimeOperators
     {
         // DateTimeOffset.Now is the generator for LogEvent.Timestamp.
         return new ScalarValue(DateTimeOffset.Now);
+    }
+
+    public static LogEventPropertyValue? Inspect(LogEventPropertyValue? value, LogEventPropertyValue? deep = null)
+    {
+        if (value is not ScalarValue { Value: {} toCapture })
+            return value;
+
+        var result = new List<LogEventProperty>();
+        var logger = new LoggerConfiguration().CreateLogger();
+        var properties = toCapture.GetType()
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+
+        foreach (var property in properties)
+        {
+            object? p;
+            try
+            {
+                p = property.GetValue(toCapture);
+            }
+            catch (Exception ex)
+            {
+                SelfLog.WriteLine("Serilog.Expressions Inspect() target property threw exception: {0}", ex);
+                continue;
+            }
+            
+            if (deep is ScalarValue { Value: true })
+            {
+                if (logger.BindProperty(property.Name, p, destructureObjects: true, out var bound))
+                    result.Add(bound);
+            }
+            else
+            {
+                result.Add(new LogEventProperty(property.Name, new ScalarValue(p)));
+            }
+        }
+
+        return new StructureValue(result);
     }
 }

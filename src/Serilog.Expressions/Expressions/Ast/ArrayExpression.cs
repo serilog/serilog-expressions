@@ -14,6 +14,13 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An array expression constructs an array from a list of elements. For example, <code>[1, 2, 3]</code> is an
+/// array expression. The items in an array expression can be literal values or expressions, like in the
+/// above example, or they can be spread expressions that describe zero or more elements to include in the
+/// list. Whether included via regular elements or spread expressions, undefined values are ignored and won't
+/// appear in the resulting array value.
+/// </summary>
 class ArrayExpression : Expression
 {
     public ArrayExpression(Element[] elements)

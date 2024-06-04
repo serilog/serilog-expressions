@@ -18,6 +18,6 @@ static class CharInfo
 {
     public static bool IsLatinDigit(char ch)
     {
-        return ch >= '0' && ch <= '9';
+        return ch is >= '0' and <= '9';
     }
 }

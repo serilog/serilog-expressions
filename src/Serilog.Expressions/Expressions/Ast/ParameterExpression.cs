@@ -14,6 +14,9 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// Non-syntax expression type used to represent parameters in <see cref="LambdaExpression"/> bodies.
+/// </summary>
 class ParameterExpression : Expression
 {
     public ParameterExpression(string parameterName)

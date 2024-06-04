@@ -112,7 +112,7 @@ static class Combinators
     public static TextParser<T[]> AtLeastOnce<T>(this TextParser<T> parser)
     {
         if (parser == null) throw new ArgumentNullException(nameof(parser));
-        return parser.Then(first => parser.Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
+        return parser.Then(first => parser.Many().Select(rest => (T[])[first, ..rest]));
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ static class Combinators
         if (parser == null) throw new ArgumentNullException(nameof(parser));
         if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
 
-        return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)));
+        return parser.Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => (T[])[first, ..rest]));
     }
 
     /// <summary>
@@ -280,11 +280,11 @@ static class Combinators
             return parser
                 .AtLeastOnceDelimitedBy(delimiter)
                 .Then(p => end.Value(p))
-                .Or(end.Value(new T[0]));
+                .Or(end.Value(Array.Empty<T>()));
 
         return parser
-            .Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => ArrayEnumerable.Cons(first, rest)))
-            .OptionalOrDefault(new T[0]);
+            .Then(first => delimiter.IgnoreThen(parser).Many().Select(rest => (T[])[first, ..rest]))
+            .OptionalOrDefault([]);
     }
 
     /// <summary>
@@ -306,7 +306,7 @@ static class Combinators
             if (result.HasValue || result.IsPartial(input))
                 return result;
 
-            return TokenListParserResult.Empty<TKind, T>(result.Remainder, new[] { name });
+            return TokenListParserResult.Empty<TKind, T>(result.Remainder, [name]);
         };
     }
 
@@ -328,7 +328,7 @@ static class Combinators
             if (result.HasValue || result.IsPartial(input))
                 return result;
 
-            return Result.Empty<T>(result.Remainder, new[] { name });
+            return Result.Empty<T>(result.Remainder, [name]);
         };
     }
 

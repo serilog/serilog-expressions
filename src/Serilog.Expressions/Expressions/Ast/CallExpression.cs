@@ -14,6 +14,10 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// A <see cref="CallExpression"/> is a function call made up of the function name, parenthesised argument
+/// list, and optional postfix <code>ci</code> modifier. For example, <code>Substring(RequestPath, 0, 5)</code>.
+/// </summary>
 class CallExpression : Expression
 {
     public CallExpression(bool ignoreCase, string operatorName, params Expression[] operands)

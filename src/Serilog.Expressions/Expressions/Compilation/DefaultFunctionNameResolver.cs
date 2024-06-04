@@ -22,7 +22,7 @@ static class DefaultFunctionNameResolver
     {
         var defaultResolver = new StaticMemberNameResolver(typeof(RuntimeOperators));
         return additionalNameResolver == null
-            ? (NameResolver) defaultResolver
+            ? defaultResolver
             : new OrderedNameResolver(new[] {defaultResolver, additionalNameResolver });
     }
 }

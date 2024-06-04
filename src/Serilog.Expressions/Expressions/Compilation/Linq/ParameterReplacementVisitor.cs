@@ -23,7 +23,7 @@ class ParameterReplacementVisitor : ExpressionVisitor
     public static Expression ReplaceParameters(LambdaExpression lambda, params ParameterExpression[] newParameters)
     {
         var v = new ParameterReplacementVisitor(lambda.Parameters.ToArray(), newParameters);
-        return v.Visit(lambda.Body);
+        return v.Visit(lambda.Body)!;
     }
 
     ParameterReplacementVisitor(ParameterExpression[] from, ParameterExpression[] to)

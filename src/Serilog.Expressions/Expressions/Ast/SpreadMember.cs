@@ -14,6 +14,11 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An <see cref="ObjectExpression"/> member that designates another object from which to copy members into the
+/// current object. Spread member expressions comprise two dots preceding an expression that is expected to
+/// evaluate to an object.
+/// </summary>
 class SpreadMember : Member
 {
     public Expression Content { get; }

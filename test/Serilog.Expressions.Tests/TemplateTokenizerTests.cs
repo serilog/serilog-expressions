@@ -14,31 +14,26 @@ public class TemplateTokenizerTests
         {
             return new[]
             {
-                new object[]
-                {
+                [
                     "aa",
                     new[] {Text}
-                },
-                new object[]
-                {
+                ],
+                [
                     "{bb}",
                     new[] {LBrace, Identifier, RBrace}
-                },
-                new object[]
-                {
+                ],
+                [
                     "aa{bb}",
                     new[] {Text, LBrace, Identifier, RBrace}
-                },
-                new object[]
-                {
+                ],
+                [
                     "aa{{bb}}",
                     new[] {Text, DoubleLBrace, Text, DoubleRBrace}
-                },
-                new object[]
-                {
+                ],
+                [
                     "{ {b: b} }c",
                     new[] {LBrace, LBrace, Identifier, Colon, Identifier, RBrace, RBrace, Text}
-                },
+                ],
                 new object[]
                 {
                     "{bb,-10:cc}",
