@@ -16,6 +16,11 @@ using Serilog.Events;
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An <see cref="ObjectExpression"/> member comprising an optionally-quoted name and a value, for example
+/// the object <code>{Username: 'alice'}</code> includes a single <see cref="PropertyMember"/> with name
+/// <code>Username</code> and value <code>'alice'</code>.
+/// </summary>
 class PropertyMember : Member
 {
     public string Name { get; }

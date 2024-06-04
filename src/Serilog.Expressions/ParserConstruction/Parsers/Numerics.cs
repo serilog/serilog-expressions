@@ -24,8 +24,8 @@ namespace Serilog.ParserConstruction.Parsers;
 //* of generics over numbers in C#.
 static class Numerics
 {
-    static readonly string[] ExpectedDigit = { "digit" };
-    static readonly string[] ExpectedSignOrDigit = { "sign", "digit" };
+    static readonly string[] ExpectedDigit = ["digit"];
+    static readonly string[] ExpectedSignOrDigit = ["sign", "digit"];
 
     /// <summary>
     /// A string of digits, converted into a <see cref="uint"/>.

@@ -176,7 +176,7 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     {
         return LX.Convert(
             LX.New(
-                typeof(ScalarValue).GetConstructor(new[]{typeof(object)})!,
+                typeof(ScalarValue).GetConstructor([typeof(object)])!,
                 LX.Convert(apply(
                     LX.Call(CoerceToScalarBooleanMethod, lhs),
                     LX.Call(CoerceToScalarBooleanMethod, rhs)), typeof(object))),
@@ -253,7 +253,7 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
         var lambda = LX.Lambda(delegateType, rewritten!, parameters.Select(px => px.Item2).ToArray());
 
         // Unfortunately, right now, functions need to be threaded through in constant scalar values :-D
-        return LX.New(typeof(ScalarValue).GetConstructor(new[] {typeof(object)})!,
+        return LX.New(typeof(ScalarValue).GetConstructor([typeof(object)])!,
             LX.Convert(lambda, typeof(object)));
     }
 

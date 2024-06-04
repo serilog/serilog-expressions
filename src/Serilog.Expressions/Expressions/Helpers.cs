@@ -19,7 +19,7 @@ namespace Serilog.Expressions
     /// <summary>
     /// Helper methods.
     /// </summary>
-    internal static class Helpers
+    static class Helpers
     {
         /// <summary>
         /// Backport .NET Standard 2.1 additions to maintain .NET Standard 2.0 compatibility.
@@ -35,7 +35,7 @@ namespace Serilog.Expressions
         /// <returns></returns>
         public static bool Contains(this string source, string value, StringComparison comparisonType)
         {
-            return source?.IndexOf(value, comparisonType) >= 0;
+            return source.IndexOf(value, comparisonType) >= 0;
         }
     }
 }

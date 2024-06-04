@@ -14,6 +14,11 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An ambient name is generally a property name or built-in that appears standalone in an expression. For example,
+/// in <code>Headers.ContentType</code>, <code>Headers</code> is an ambient name that produces an
+/// <see cref="AmbientNameExpression"/>. Built-ins like <code>@Level</code> are also parsed as ambient names.
+/// </summary>
 class AmbientNameExpression : Expression
 {
     readonly bool _requiresEscape;

@@ -29,15 +29,15 @@ class CompiledLevelToken : CompiledTemplate
     {
         _format = format;
         _alignment = alignment;
-        _levelStyles = new[]
-        {
+        _levelStyles =
+        [
             theme.GetStyle(TemplateThemeStyle.LevelVerbose),
             theme.GetStyle(TemplateThemeStyle.LevelDebug),
             theme.GetStyle(TemplateThemeStyle.LevelInformation),
             theme.GetStyle(TemplateThemeStyle.LevelWarning),
             theme.GetStyle(TemplateThemeStyle.LevelError),
-            theme.GetStyle(TemplateThemeStyle.LevelFatal),
-        };
+            theme.GetStyle(TemplateThemeStyle.LevelFatal)
+        ];
     }
 
     public override void Evaluate(EvaluationContext ctx, TextWriter output)

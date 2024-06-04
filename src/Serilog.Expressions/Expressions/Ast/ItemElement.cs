@@ -14,6 +14,9 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// A single item in an <see cref="ArrayExpression"/>.
+/// </summary>
 class ItemElement : Element
 {
     public Expression Value { get; }

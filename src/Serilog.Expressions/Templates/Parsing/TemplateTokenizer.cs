@@ -81,7 +81,7 @@ class TemplateTokenizer : Tokenizer<ExpressionToken>
                 }
                 else
                 {
-                    yield return Result.Empty<ExpressionToken>(next.Remainder, new[] {"escaped `}`"});
+                    yield return Result.Empty<ExpressionToken>(next.Remainder, ["escaped `}`"]);
                     yield break;
                 }
             }

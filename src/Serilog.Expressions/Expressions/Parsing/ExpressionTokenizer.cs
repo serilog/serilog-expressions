@@ -22,7 +22,7 @@ class ExpressionTokenizer : Tokenizer<ExpressionToken>
     readonly ExpressionToken[] _singleCharOps = new ExpressionToken[128];
 
     readonly ExpressionKeyword[] _keywords =
-    {
+    [
         new("and", ExpressionToken.And),
         new("in", ExpressionToken.In),
         new("is", ExpressionToken.Is),
@@ -38,8 +38,8 @@ class ExpressionTokenizer : Tokenizer<ExpressionToken>
         new("end", ExpressionToken.End),
         new("ci", ExpressionToken.CI),
         new("each", ExpressionToken.Each),
-        new("delimit", ExpressionToken.Delimit),
-    };
+        new("delimit", ExpressionToken.Delimit)
+    ];
 
     public ExpressionTokenizer()
     {
@@ -109,7 +109,7 @@ class ExpressionTokenizer : Tokenizer<ExpressionToken>
 
                 if (!IsDelimiter(next))
                 {
-                    yield return Result.Empty<ExpressionToken>(next.Location, new[] { "digit" });
+                    yield return Result.Empty<ExpressionToken>(next.Location, ["digit"]);
                 }
             }
             else if (next.Value == '\'')
@@ -134,7 +134,7 @@ class ExpressionTokenizer : Tokenizer<ExpressionToken>
 
                 if (next.Remainder == startOfName)
                 {
-                    yield return Result.Empty<ExpressionToken>(startOfName, new[] { "built-in identifier name" });
+                    yield return Result.Empty<ExpressionToken>(startOfName, ["built-in identifier name"]);
                 }
                 else
                 {

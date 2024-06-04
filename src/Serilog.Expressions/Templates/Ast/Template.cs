@@ -14,6 +14,4 @@
 
 namespace Serilog.Templates.Ast;
 
-abstract class Template
-{
-}
+abstract class Template;

@@ -14,6 +14,14 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// An accessor retrieves a property from a (structured) object. For example, in the expression
+/// <code>Headers.ContentType</code> the <code>.</code> operator forms an accessor expression that
+/// retrieves the <code>ContentType</code> property from the <code>Headers</code> object.
+/// </summary>
+/// <remarks>Note that the AST type can represent accessors that cannot be validly written using
+/// <code>.</code> notation. In these cases, if the accessor is formatted back out as an expression,
+/// <see cref="IndexerExpression"/> notation will be used.</remarks>
 class AccessorExpression : Expression
 {
     public AccessorExpression(Expression receiver, string memberName)

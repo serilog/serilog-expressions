@@ -20,10 +20,13 @@ namespace Serilog.Expressions.Runtime;
 
 static class Coerce
 {
-    static readonly Type[] NumericTypes = { typeof(decimal),
+    static readonly Type[] NumericTypes =
+    [
+        typeof(decimal),
         typeof(int), typeof(long), typeof(double),
         typeof(float), typeof(uint), typeof(sbyte),
-        typeof(byte), typeof(short), typeof(ushort), typeof(ulong) };
+        typeof(byte), typeof(short), typeof(ushort), typeof(ulong)
+    ];
 
     public static bool Numeric(LogEventPropertyValue? value, out decimal numeric)
     {

@@ -14,6 +14,7 @@
 
 namespace Serilog.Expressions.Ast;
 
-abstract class Member
-{
-}
+/// <summary>
+/// A member in an <see cref="ObjectExpression"/>.
+/// </summary>
+abstract class Member;

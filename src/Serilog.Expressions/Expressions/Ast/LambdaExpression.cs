@@ -14,6 +14,10 @@
 
 namespace Serilog.Expressions.Ast;
 
+/// <summary>
+/// A non-syntax expression tree node used in the compilation of <see cref="IndexerWildcardExpression"/>. Only
+/// very limited support for lambda expressions is currently present.
+/// </summary>
 class LambdaExpression : Expression
 {
     public LambdaExpression(ParameterExpression[] parameters, Expression body)
