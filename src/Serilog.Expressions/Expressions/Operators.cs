@@ -33,6 +33,7 @@ static class Operators
     public const string OpEndsWith = "EndsWith";
     public const string OpIndexOf = "IndexOf";
     public const string OpIndexOfMatch = "IndexOfMatch";
+    public const string OpInspect = "Inspect";
     public const string OpIsMatch = "IsMatch";
     public const string OpIsDefined = "IsDefined";
     public const string OpLastIndexOf = "LastIndexOf";
