@@ -60,7 +60,7 @@ static class Coerce
         return Boolean(value, out var b) && b;
     }
 
-    public static bool String(LogEventPropertyValue? value, [MaybeNullWhen(false)] out string str)
+    public static bool String(LogEventPropertyValue? value, [NotNullWhen(true)] out string? str)
     {
         if (value is ScalarValue sv)
         {

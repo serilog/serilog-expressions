@@ -30,7 +30,7 @@ foreach ($src in gci src/*) {
     } else {
         & dotnet pack -c Release --include-source --no-build -o ../../artifacts
     }
-    if($LASTEXITCODE -ne 0) { exit 1 }
+    if($LASTEXITCODE -ne 0) { throw "build failed" }
 
     Pop-Location
 }
@@ -41,7 +41,7 @@ foreach ($test in gci test/*.Tests) {
 	echo "build: Testing project in $test"
 
     & dotnet test -c Release
-    if($LASTEXITCODE -ne 0) { exit 3 }
+    if($LASTEXITCODE -ne 0) { throw "test failed" }
 
     Pop-Location
 }
@@ -52,7 +52,7 @@ foreach ($test in ls test/*.PerformanceTests) {
 	echo "build: Building performance test project in $test"
 
     & dotnet build -c Release
-    if($LASTEXITCODE -ne 0) { exit 2 }
+    if($LASTEXITCODE -ne 0) { throw "perf test build failed" }
 
     Pop-Location
 }

@@ -22,12 +22,21 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);NO_CI_STRING_CONTAINS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net471' ">
+    <DefineConstants>$(DefineConstants);NO_CI_STRING_CONTAINS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <DefineConstants>$(DefineConstants);NO_CI_STRING_CONTAINS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Serilog" Version="4.0.0" />
     <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
     <None Include="..\..\README.md" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
