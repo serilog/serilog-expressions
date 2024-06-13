@@ -206,6 +206,7 @@ static class RuntimeOperators
             for (var i = 0; i < arr.Elements.Count; ++i)
             {
                 var element = arr.Elements[i];
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (element != null && UnboxedEqualHelper(sc, element, item))
                     return ConstantTrue;
             }
@@ -350,6 +351,7 @@ static class RuntimeOperators
         {
             // The lack of eager numeric type coercion means that here, `sv` may logically equal one
             // of the keys, but not be equal according to the dictionary's `IEqualityComparer`.
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             var entry = dict.Elements.FirstOrDefault(kv => kv.Key != null && UnboxedEqualHelper(sc, kv.Key, sv));
             return entry.Value; // KVP is a struct; default is a pair of nulls.
         }
