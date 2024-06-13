@@ -302,7 +302,6 @@ undefined() = undefined() ci         ⇶ undefined()
 'test' like '%'                      ⇶ true
 'test' like 't%s%'                   ⇶ true
 'test' like 'es'                     ⇶ false
-'test' like '%'                      ⇶ true
 'test' like ''                       ⇶ false
 '' like ''                           ⇶ true
 
