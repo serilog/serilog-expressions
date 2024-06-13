@@ -7,11 +7,11 @@ namespace Serilog.Expressions.Tests;
 
 public class ExpressionTranslationTests
 {
-    public static IEnumerable<object[]> ExpressionEvaluationCases =>
+    public static IEnumerable<object[]> ExpressionTranslationCases =>
         AsvCases.ReadCases("translation-cases.asv");
 
     [Theory]
-    [MemberData(nameof(ExpressionEvaluationCases))]
+    [MemberData(nameof(ExpressionTranslationCases))]
     public void ExpressionsAreCorrectlyTranslated(string expr, string expected)
     {
         var parsed = new ExpressionParser().Parse(expr);

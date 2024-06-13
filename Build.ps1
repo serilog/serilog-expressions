@@ -3,8 +3,8 @@ echo "build: Build started"
 Push-Location $PSScriptRoot
 
 if(Test-Path .\artifacts) {
-	echo "build: Cleaning ./artifacts"
-	Remove-Item ./artifacts -Force -Recurse
+	echo "build: Cleaning .\artifacts"
+	Remove-Item .\artifacts -Force -Recurse
 }
 
 & dotnet restore --no-cache
@@ -16,32 +16,31 @@ $commitHash = $(git rev-parse --short HEAD)
 $buildSuffix = @{ $true = "$($suffix)-$($commitHash)"; $false = "$($branch)-$($commitHash)" }[$suffix -ne ""]
 
 echo "build: Package version suffix is $suffix"
-echo "build: Build version suffix is $buildSuffix"
+echo "build: Build version suffix is $buildSuffix" 
 
-foreach ($src in gci src/*) {
+foreach ($src in ls src/*) {
     Push-Location $src
 
 	echo "build: Packaging project in $src"
 
-    & dotnet build -c Release --version-suffix=$buildSuffix
-
-    if($suffix) {
-        & dotnet pack -c Release --include-source --no-build -o ../../artifacts --version-suffix=$suffix
+    & dotnet build -c Release --version-suffix=$buildSuffix -p:EnableSourceLink=true
+    if ($suffix) {
+        & dotnet pack -c Release -o ..\..\artifacts --version-suffix=$suffix --no-build
     } else {
-        & dotnet pack -c Release --include-source --no-build -o ../../artifacts
+        & dotnet pack -c Release -o ..\..\artifacts --no-build
     }
-    if($LASTEXITCODE -ne 0) { throw "build failed" }
+    if($LASTEXITCODE -ne 0) { throw "build failed" }    
 
     Pop-Location
 }
 
-foreach ($test in gci test/*.Tests) {
+foreach ($test in ls test/*.Tests) {
     Push-Location $test
 
 	echo "build: Testing project in $test"
 
     & dotnet test -c Release
-    if($LASTEXITCODE -ne 0) { throw "test failed" }
+    if($LASTEXITCODE -ne 0) { throw "tests failed" }    
 
     Pop-Location
 }
@@ -49,10 +48,10 @@ foreach ($test in gci test/*.Tests) {
 foreach ($test in ls test/*.PerformanceTests) {
     Push-Location $test
 
-	echo "build: Building performance test project in $test"
+	echo "build: Building project in $test"
 
     & dotnet build -c Release
-    if($LASTEXITCODE -ne 0) { throw "perf test build failed" }
+    if($LASTEXITCODE -ne 0) { throw "performance test build failed" }    
 
     Pop-Location
 }
