@@ -137,8 +137,8 @@ public class ExpressionCompilerTests
     [InlineData("now(1)", "The function `now` accepts no arguments.")]
     [InlineData("length()", "The function `length` accepts one argument, `value`.")]
     [InlineData("length(1, 2)", "The function `length` accepts one argument, `value`.")]
-    [InlineData("round()", "The function `round` accepts two arguments, `number` and `places`.")]
-    [InlineData("substring()", "The function `substring` accepts arguments `string`, `startIndex`, and `length` (optional).")]
+    [InlineData("round()", "The function `round` accepts two arguments, `value` and `places`.")]
+    [InlineData("substring()", "The function `substring` accepts arguments `value`, `startIndex`, and `length` (optional).")]
     public void ReportsArityMismatches(string call, string expectedError)
     {
         // These will eventually be reported gracefully by `TryCompile()`...

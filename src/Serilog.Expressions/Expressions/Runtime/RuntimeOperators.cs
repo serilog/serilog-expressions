@@ -230,16 +230,16 @@ static class RuntimeOperators
         return ScalarBoolean(!UnboxedEqualHelper(sc, left, right));
     }
 
-    public static LogEventPropertyValue? _Internal_Negate(LogEventPropertyValue? operand)
+    public static LogEventPropertyValue? _Internal_Negate(LogEventPropertyValue? value)
     {
-        if (Coerce.Numeric(operand, out var numeric))
+        if (Coerce.Numeric(value, out var numeric))
             return new ScalarValue(-numeric);
         return null;
     }
 
-    public static LogEventPropertyValue? Round(LogEventPropertyValue? number, LogEventPropertyValue? places)
+    public static LogEventPropertyValue? Round(LogEventPropertyValue? value, LogEventPropertyValue? places)
     {
-        if (!Coerce.Numeric(number, out var v) ||
+        if (!Coerce.Numeric(value, out var v) ||
             !Coerce.Numeric(places, out var p) ||
             p is < 0 or > 32) // Check my memory, here :D
         {
@@ -249,45 +249,45 @@ static class RuntimeOperators
         return new ScalarValue(Math.Round(v, (int)p));
     }
 
-    public static LogEventPropertyValue? _Internal_Not(LogEventPropertyValue? operand)
+    public static LogEventPropertyValue? _Internal_Not(LogEventPropertyValue? value)
     {
-        if (operand is null)
+        if (value is null)
             return ConstantTrue;
 
-        return Coerce.Boolean(operand, out var b) ?
+        return Coerce.Boolean(value, out var b) ?
             ScalarBoolean(!b) :
             null;
     }
 
-    public static LogEventPropertyValue? _Internal_StrictNot(LogEventPropertyValue? operand)
+    public static LogEventPropertyValue? _Internal_StrictNot(LogEventPropertyValue? value)
     {
-        return Coerce.Boolean(operand, out var b) ?
+        return Coerce.Boolean(value, out var b) ?
             ScalarBoolean(!b) :
             null;
     }
 
-    public static LogEventPropertyValue? Contains(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
+    public static LogEventPropertyValue? Contains(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
-        if (!Coerce.String(@string, out var ctx) ||
-            !Coerce.String(substring, out var ptx))
+        if (!Coerce.String(haystack, out var ctx) ||
+            !Coerce.String(needle, out var ptx))
             return null;
 
         return ScalarBoolean(ctx.Contains(ptx, sc));
     }
 
-    public static LogEventPropertyValue? IndexOf(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
+    public static LogEventPropertyValue? IndexOf(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
-        if (!Coerce.String(@string, out var ctx) ||
-            !Coerce.String(substring, out var ptx))
+        if (!Coerce.String(haystack, out var ctx) ||
+            !Coerce.String(needle, out var ptx))
             return null;
 
         return new ScalarValue(ctx.IndexOf(ptx, sc));
     }
 
-    public static LogEventPropertyValue? LastIndexOf(StringComparison sc, LogEventPropertyValue? @string, LogEventPropertyValue? substring)
+    public static LogEventPropertyValue? LastIndexOf(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
-        if (!Coerce.String(@string, out var ctx) ||
-            !Coerce.String(substring, out var ptx))
+        if (!Coerce.String(haystack, out var ctx) ||
+            !Coerce.String(needle, out var ptx))
             return null;
 
         return new ScalarValue(ctx.LastIndexOf(ptx, sc));
@@ -304,19 +304,19 @@ static class RuntimeOperators
         return null;
     }
 
-    public static LogEventPropertyValue? StartsWith(StringComparison sc, LogEventPropertyValue? value, LogEventPropertyValue? substring)
+    public static LogEventPropertyValue? StartsWith(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
-        if (!Coerce.String(value, out var ctx) ||
-            !Coerce.String(substring, out var ptx))
+        if (!Coerce.String(haystack, out var ctx) ||
+            !Coerce.String(needle, out var ptx))
             return null;
 
         return ScalarBoolean(ctx.StartsWith(ptx, sc));
     }
 
-    public static LogEventPropertyValue? EndsWith(StringComparison sc, LogEventPropertyValue? value, LogEventPropertyValue? substring)
+    public static LogEventPropertyValue? EndsWith(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
-        if (!Coerce.String(value, out var ctx) ||
-            !Coerce.String(substring, out var ptx))
+        if (!Coerce.String(haystack, out var ctx) ||
+            !Coerce.String(needle, out var ptx))
             return null;
 
         return ScalarBoolean(ctx.EndsWith(ptx, sc));
@@ -327,10 +327,10 @@ static class RuntimeOperators
         return ScalarBoolean(value != null);
     }
 
-    public static LogEventPropertyValue? ElementAt(StringComparison sc, LogEventPropertyValue? items, LogEventPropertyValue? index)
+    public static LogEventPropertyValue? ElementAt(StringComparison sc, LogEventPropertyValue? collection, LogEventPropertyValue? index)
     {
         // ReSharper disable once ConvertIfStatementToSwitchStatement
-        if (items is SequenceValue arr && Coerce.Numeric(index, out var ix))
+        if (collection is SequenceValue arr && Coerce.Numeric(index, out var ix))
         {
             if (ix != Math.Floor(ix))
                 return null;
@@ -342,12 +342,12 @@ static class RuntimeOperators
             return arr.Elements.ElementAt(idx);
         }
 
-        if (items is StructureValue st && Coerce.String(index, out var s))
+        if (collection is StructureValue st && Coerce.String(index, out var s))
         {
             return Intrinsics.TryGetStructurePropertyValue(sc, st, s);
         }
 
-        if (items is DictionaryValue dict && index is ScalarValue sv)
+        if (collection is DictionaryValue dict && index is ScalarValue sv)
         {
             // The lack of eager numeric type coercion means that here, `sv` may logically equal one
             // of the keys, but not be equal according to the dictionary's `IEqualityComparer`.
@@ -359,22 +359,22 @@ static class RuntimeOperators
         return null;
     }
 
-    public static LogEventPropertyValue? _Internal_Any(LogEventPropertyValue? items, LogEventPropertyValue? predicate)
+    public static LogEventPropertyValue? _Internal_Any(LogEventPropertyValue? collection, LogEventPropertyValue? predicate)
     {
         if (!Coerce.Predicate(predicate, out var pred))
             return null;
 
-        if (items is SequenceValue arr)
+        if (collection is SequenceValue arr)
         {
             return ScalarBoolean(arr.Elements.Any(e => Coerce.IsTrue(pred(e))));
         }
 
-        if (items is StructureValue structure)
+        if (collection is StructureValue structure)
         {
             return ScalarBoolean(structure.Properties.Any(e => Coerce.IsTrue(pred(e.Value))));
         }
 
-        if (items is DictionaryValue dictionary)
+        if (collection is DictionaryValue dictionary)
         {
             return ScalarBoolean(dictionary.Elements.Any(e => Coerce.IsTrue(pred(e.Value))));
         }
@@ -382,22 +382,22 @@ static class RuntimeOperators
         return null;
     }
 
-    public static LogEventPropertyValue? _Internal_All(LogEventPropertyValue? items, LogEventPropertyValue? predicate)
+    public static LogEventPropertyValue? _Internal_All(LogEventPropertyValue? collection, LogEventPropertyValue? predicate)
     {
         if (!Coerce.Predicate(predicate, out var pred))
             return null;
 
-        if (items is SequenceValue arr)
+        if (collection is SequenceValue arr)
         {
             return ScalarBoolean(arr.Elements.All(e => Coerce.IsTrue(pred(e))));
         }
 
-        if (items is StructureValue structure)
+        if (collection is StructureValue structure)
         {
             return ScalarBoolean(structure.Properties.All(e => Coerce.IsTrue(pred(e.Value))));
         }
 
-        if (items is DictionaryValue dictionary)
+        if (collection is DictionaryValue dictionary)
         {
             return ScalarBoolean(dictionary.Elements.All(e => Coerce.IsTrue(pred(e.Value))));
         }
@@ -451,9 +451,9 @@ static class RuntimeOperators
         return value0;
     }
 
-    public static LogEventPropertyValue? Substring(LogEventPropertyValue? @string, LogEventPropertyValue? startIndex, LogEventPropertyValue? length = null)
+    public static LogEventPropertyValue? Substring(LogEventPropertyValue? value, LogEventPropertyValue? startIndex, LogEventPropertyValue? length = null)
     {
-        if (!Coerce.String(@string, out var str) ||
+        if (!Coerce.String(value, out var str) ||
             !Coerce.Numeric(startIndex, out var si))
             return null;
 
@@ -482,14 +482,24 @@ static class RuntimeOperators
         return null;
     }
 
+    public static LogEventPropertyValue? Replace(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle, LogEventPropertyValue? replacement)
+    {
+        if (Coerce.String(haystack, out var h) && Coerce.String(needle, out var n) && Coerce.String(replacement, out var r))
+        {
+            return new ScalarValue(h.Replace(n, r, sc));
+        }
+
+        return null;
+    }
+
     // ReSharper disable once ReturnTypeCanBeNotNullable
-    public static LogEventPropertyValue? IndexOfMatch(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
+    public static LogEventPropertyValue? IndexOfMatch(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
         throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
     }
 
     // ReSharper disable once ReturnTypeCanBeNotNullable
-    public static LogEventPropertyValue? IsMatch(StringComparison sc, LogEventPropertyValue? corpus, LogEventPropertyValue? regex)
+    public static LogEventPropertyValue? IsMatch(StringComparison sc, LogEventPropertyValue? haystack, LogEventPropertyValue? needle)
     {
         throw new InvalidOperationException("Regular expression evaluation is intrinsic.");
     }

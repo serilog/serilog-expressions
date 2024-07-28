@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.RegularExpressions;
+
 #if NO_CI_STRING_CONTAINS
 
 namespace Serilog.Expressions
@@ -29,13 +31,27 @@ namespace Serilog.Expressions
         /// https://github.com/dotnet/runtime/issues/22198
         /// https://stackoverflow.com/questions/444798/case-insensitive-containsstring/444818#444818
         /// </summary>
-        /// <param name="source">input string</param>
+        /// <param name="this">input string</param>
         /// <param name="value">The string to seek.</param>
         /// <param name="comparisonType">Specifies the rule to use in the comparison.</param>
         /// <returns></returns>
-        public static bool Contains(this string source, string value, StringComparison comparisonType)
+        public static bool Contains(this string @this, string value, StringComparison comparisonType)
         {
-            return source.IndexOf(value, comparisonType) >= 0;
+            return @this.IndexOf(value, comparisonType) >= 0;
+        }
+
+        public static string Replace(this string @this, string oldValue, string newValue, StringComparison comparisonType)
+        {
+            if ("a".Equals("A", comparisonType))
+            {
+                return Regex.Replace(
+                    @this,
+                    Regex.Escape(oldValue),
+                    newValue.Replace("$", "$$"),
+                    RegexOptions.IgnoreCase);
+            }
+
+            return @this.Replace(oldValue, newValue);
         }
     }
 }
