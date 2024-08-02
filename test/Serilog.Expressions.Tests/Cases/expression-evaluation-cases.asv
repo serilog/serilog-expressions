@@ -316,3 +316,11 @@ tostring(@x) like 'System.DivideByZeroException%' ⇶ true
 
 // Inspect
 inspect(@x).Message                  ⇶ 'Attempted to divide by zero.'
+
+// Replace
+replace('xYX', 'x', 'z')           ⇶ 'zYX'
+replace('xYX', 'x', 'z') ci        ⇶ 'zYz'
+replace('mess', 'ss', 'an')        ⇶ 'mean'
+replace('mess', 's', 'an')         ⇶ 'meanan'
+replace('xyz', 'x', '$0')          ⇶ '$0yz'
+replace('xyz', 'x', concat('$', '0'))  ⇶ '$0yz'
