@@ -33,3 +33,5 @@ Culture-specific {42.34}                             ⇶ Culture-specific 42,34
 {rest()}                                             ⇶ {"Name":"nblumhardt"}
 {Name} {rest()}                                      ⇶ nblumhardt {}
 {rest(true)}                                         ⇶ {}
+{@t:yyyy-MM-dd HH:mm:ss.ffff zzz}                    ⇶ 2000-12-31 23:59:58.1230 +10:00
+{@t:yyyy-MM-dd HH:mm:ss.ffff zzz------------------}  ⇶ 2000-12-31 23:59:58.1230 +10:00------------------

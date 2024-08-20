@@ -44,6 +44,10 @@ static class TemplateCompiler
                 Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Message },
                 Format: null
             } message => encoder.Wrap(new CompiledMessageToken(formatProvider, message.Alignment, theme)),
+            FormattedExpression
+            {
+                Expression: AmbientNameExpression { IsBuiltIn: true, PropertyName: BuiltInProperty.Timestamp },
+            } timestamp => encoder.Wrap(new CompiledTimestampToken(timestamp.Format, timestamp.Alignment, formatProvider, theme)),
             FormattedExpression expression => encoder.MakeCompiledFormattedExpression(
                 ExpressionCompiler.Compile(expression.Expression, formatProvider, nameResolver), expression.Format, expression.Alignment, formatProvider, theme),
             TemplateBlock block => new CompiledTemplateBlock(block.Elements.Select(e => Compile(e, formatProvider, nameResolver, theme, encoder)).ToArray()),

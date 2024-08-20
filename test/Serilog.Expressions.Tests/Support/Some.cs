@@ -12,12 +12,22 @@ static class Some
         return LogEvent(LogEventLevel.Information, messageTemplate, propertyValues);
     }
 
+    public static LogEvent InformationEvent(DateTimeOffset timestamp, string messageTemplate = "Hello, world!", params object?[] propertyValues)
+    {
+        return LogEvent(timestamp, LogEventLevel.Information, messageTemplate, propertyValues);
+    }
+
     public static LogEvent WarningEvent(string messageTemplate = "Hello, world!", params object?[] propertyValues)
     {
         return LogEvent(LogEventLevel.Warning, messageTemplate, propertyValues);
     }
 
     public static LogEvent LogEvent(LogEventLevel level, string messageTemplate = "Hello, world!", params object?[] propertyValues)
+    {
+        return LogEvent(DateTimeOffset.Now, level, messageTemplate, propertyValues);
+    }
+
+    public static LogEvent LogEvent(DateTimeOffset timestamp, LogEventLevel level, string messageTemplate = "Hello, world!", params object?[] propertyValues)
     {
         var log = new LoggerConfiguration().CreateLogger();
 #pragma warning disable Serilog004 // Constant MessageTemplate verifier
@@ -26,7 +36,7 @@ static class Some
         {
             throw new XunitException("Template could not be bound.");
         }
-        return new(DateTimeOffset.Now, level, null, template, properties);
+        return new(timestamp, level, null, template, properties);
     }
 
     public static object AnonymousObject()
