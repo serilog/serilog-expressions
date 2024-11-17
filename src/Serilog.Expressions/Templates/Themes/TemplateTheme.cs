@@ -34,6 +34,11 @@ public class TemplateTheme
     /// </summary>
     public static TemplateTheme Literate { get; } = TemplateThemes.Literate;
 
+    /// <summary>
+    /// A theme in the style of the original <i>Serilog.Sinks.Literate</i> using only standard 16 terminal colors that will work on light backgrounds.
+    /// </summary>
+    public static TemplateTheme Sixteen { get; } = TemplateThemes.Sixteen;
+
     internal static TemplateTheme None { get; } = new(new Dictionary<TemplateThemeStyle, string>());
 
     readonly Dictionary<TemplateThemeStyle, Style> _styles;
@@ -46,7 +51,8 @@ public class TemplateTheme
     /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
     public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
     {
-        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+        if (ansiStyles is null)
+            throw new ArgumentNullException(nameof(ansiStyles));
         _styles = ansiStyles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
     }
 
@@ -59,8 +65,10 @@ public class TemplateTheme
     /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
     public TemplateTheme(TemplateTheme baseTheme, IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
     {
-        if (baseTheme == null) throw new ArgumentNullException(nameof(baseTheme));
-        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
+        if (baseTheme == null)
+            throw new ArgumentNullException(nameof(baseTheme));
+        if (ansiStyles is null)
+            throw new ArgumentNullException(nameof(ansiStyles));
         _styles = new(baseTheme._styles);
         foreach (var kv in ansiStyles)
             _styles[kv.Key] = new(kv.Value);
