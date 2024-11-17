@@ -51,8 +51,7 @@ public class TemplateTheme
     /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
     public TemplateTheme(IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
     {
-        if (ansiStyles is null)
-            throw new ArgumentNullException(nameof(ansiStyles));
+        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
         _styles = ansiStyles.ToDictionary(kv => kv.Key, kv => new Style(kv.Value));
     }
 
@@ -65,10 +64,8 @@ public class TemplateTheme
     /// <exception cref="ArgumentNullException">When <paramref name="ansiStyles"/> is <code>null</code></exception>
     public TemplateTheme(TemplateTheme baseTheme, IReadOnlyDictionary<TemplateThemeStyle, string> ansiStyles)
     {
-        if (baseTheme == null)
-            throw new ArgumentNullException(nameof(baseTheme));
-        if (ansiStyles is null)
-            throw new ArgumentNullException(nameof(ansiStyles));
+        if (baseTheme == null) throw new ArgumentNullException(nameof(baseTheme));
+        if (ansiStyles is null) throw new ArgumentNullException(nameof(ansiStyles));
         _styles = new(baseTheme._styles);
         foreach (var kv in ansiStyles)
             _styles[kv.Key] = new(kv.Value);
