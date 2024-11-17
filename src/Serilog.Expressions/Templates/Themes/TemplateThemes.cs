@@ -1,4 +1,4 @@
-﻿// Copyright © Serilog Contributors
+// Copyright © Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@ namespace Serilog.Templates.Themes;
 
 static class TemplateThemes
 {
-    public static TemplateTheme Literate
-    {
-        get;
-    } = new(
+    public static TemplateTheme Literate { get; } = new(
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.Text] = "\x1b[38;5;0015m",
@@ -40,10 +37,7 @@ static class TemplateThemes
             [TemplateThemeStyle.LevelFatal] = "\x1b[38;5;0015m\x1b[48;5;0196m",
         });
 
-    public static TemplateTheme Grayscale
-    {
-        get;
-    } = new(
+    public static TemplateTheme Grayscale { get; } = new(
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.Text] = "\x1b[37;1m",
@@ -64,10 +58,7 @@ static class TemplateThemes
             [TemplateThemeStyle.LevelFatal] = "\x1b[30m\x1b[47m",
         });
 
-    public static TemplateTheme Code
-    {
-        get;
-    } = new(
+    public static TemplateTheme Code { get; } = new(
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.Text] = "\x1b[38;5;0253m",
@@ -88,10 +79,7 @@ static class TemplateThemes
             [TemplateThemeStyle.LevelFatal] = "\x1b[38;5;0197m\x1b[48;5;0238m",
         });
 
-    public static TemplateTheme Sixteen
-    {
-        get;
-    } = new(
+    public static TemplateTheme Sixteen { get; } = new(
         new Dictionary<TemplateThemeStyle, string>
         {
             [TemplateThemeStyle.Text] = string.Empty,
