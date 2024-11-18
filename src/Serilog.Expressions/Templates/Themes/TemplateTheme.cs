@@ -34,6 +34,11 @@ public class TemplateTheme
     /// </summary>
     public static TemplateTheme Literate { get; } = TemplateThemes.Literate;
 
+    /// <summary>
+    /// A theme in the style of the original <i>Serilog.Sinks.Literate</i> using only standard 16 terminal colors that will work on light backgrounds.
+    /// </summary>
+    public static TemplateTheme Sixteen { get; } = TemplateThemes.Sixteen;
+
     internal static TemplateTheme None { get; } = new(new Dictionary<TemplateThemeStyle, string>());
 
     readonly Dictionary<TemplateThemeStyle, Style> _styles;

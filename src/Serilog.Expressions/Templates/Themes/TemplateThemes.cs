@@ -1,4 +1,4 @@
-﻿// Copyright © Serilog Contributors
+// Copyright © Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,5 +77,26 @@ static class TemplateThemes
             [TemplateThemeStyle.LevelWarning] = "\x1b[38;5;0229m",
             [TemplateThemeStyle.LevelError] = "\x1b[38;5;0197m\x1b[48;5;0238m",
             [TemplateThemeStyle.LevelFatal] = "\x1b[38;5;0197m\x1b[48;5;0238m",
+        });
+
+    public static TemplateTheme Sixteen { get; } = new(
+        new Dictionary<TemplateThemeStyle, string>
+        {
+            [TemplateThemeStyle.Text] = string.Empty,
+            [TemplateThemeStyle.SecondaryText] = string.Empty,
+            [TemplateThemeStyle.TertiaryText] = string.Empty,
+            [TemplateThemeStyle.Invalid] = "\x1b[33m",
+            [TemplateThemeStyle.Null] = "\x1b[34m",
+            [TemplateThemeStyle.Name] = string.Empty,
+            [TemplateThemeStyle.String] = "\x1b[36m",
+            [TemplateThemeStyle.Number] = "\x1b[35m",
+            [TemplateThemeStyle.Boolean] = "\x1b[34m",
+            [TemplateThemeStyle.Scalar] = "\x1b[32m",
+            [TemplateThemeStyle.LevelVerbose] = "\x1b[30;1m",
+            [TemplateThemeStyle.LevelDebug] = "\x1b[1m",
+            [TemplateThemeStyle.LevelInformation] = "\x1b[36;1m",
+            [TemplateThemeStyle.LevelWarning] = "\x1b[33;1m",
+            [TemplateThemeStyle.LevelError] = "\x1b[31;1m",
+            [TemplateThemeStyle.LevelFatal] = "\x1b[31;1m",
         });
 }
