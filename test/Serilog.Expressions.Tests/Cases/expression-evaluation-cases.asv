@@ -324,3 +324,7 @@ replace('mess', 'ss', 'an')        ⇶ 'mean'
 replace('mess', 's', 'an')         ⇶ 'meanan'
 replace('xyz', 'x', '$0')          ⇶ '$0yz'
 replace('xyz', 'x', concat('$', '0'))  ⇶ '$0yz'
+
+// Nest
+nest({'a.b': 1, 'a.c': 2, 'a.c.d': 3}) ⇶ {a: {b: 1, c: 2, 'c.d': 3}}
+nest('a.b.c')                      ⇶ undefined()

@@ -38,6 +38,7 @@ static class Operators
     public const string OpIsDefined = "IsDefined";
     public const string OpLastIndexOf = "LastIndexOf";
     public const string OpLength = "Length";
+    public const string OpNest = "Nest";
     public const string OpNow = "Now";
     public const string OpReplace = "Replace";
     public const string OpRound = "Round";
