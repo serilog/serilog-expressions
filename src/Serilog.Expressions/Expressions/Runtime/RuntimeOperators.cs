@@ -16,6 +16,7 @@ using System.Reflection;
 using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Expressions.Compilation.Linq;
+using Serilog.Expressions.Runtime.Support;
 using Serilog.Templates.Rendering;
 
 // ReSharper disable ForCanBeConvertedToForeach, InvertIf, MemberCanBePrivate.Global, UnusedMember.Global, InconsistentNaming, ReturnTypeCanBeNotNullable
@@ -588,5 +589,21 @@ static class RuntimeOperators
         }
 
         return new StructureValue(result);
+    }
+
+    public static LogEventPropertyValue? Nest(LogEventPropertyValue? maybeStructure)
+    {
+        if (maybeStructure is not StructureValue { Properties: { } flat })
+            return null;
+
+        var byName = new Dictionary<string, LogEventPropertyValue>(flat.Count);
+        foreach (var property in flat)
+        {
+            // Supports duplicate property names, despite these being hard to generate.
+            byName[property.Name] = property.Value;
+        }
+        
+        var props = UnflattenDottedPropertyNames.ProcessDottedPropertyNames(byName);
+        return new StructureValue(props.Select(p => new LogEventProperty(p.Key, p.Value)).ToList());
     }
 }

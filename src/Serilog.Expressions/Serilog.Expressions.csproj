@@ -3,22 +3,18 @@
   <PropertyGroup>
     <Description>An embeddable mini-language for filtering, enriching, and formatting Serilog
       events, ideal for use with JSON or XML configuration.</Description>
-    <VersionPrefix>5.1.0</VersionPrefix>
     <Authors>Serilog Contributors</Authors>
     <!-- .NET Framework version targeting is frozen at these two TFMs. -->
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">net471;net462</TargetFrameworks>
     <!-- Policy is to trim TFM-specific builds to `netstandard2.0`, `net6.0`,
     all active LTS versions, and optionally the latest RTM version, when releasing new
     major Serilog versions. -->
-    <TargetFrameworks>$(TargetFrameworks);net8.0;net6.0;netstandard2.0</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <RootNamespace>Serilog</RootNamespace>
+    <TargetFrameworks>$(TargetFrameworks);net9.0;net8.0;net6.0;netstandard2.0</TargetFrameworks>
     <PackageTags>serilog</PackageTags>
     <PackageProjectUrl>https://github.com/serilog/serilog-expressions</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/serilog/serilog-expressions</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
+    <RootNamespace>Serilog</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -35,7 +31,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="All" />
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
     <None Include="..\..\README.md" Pack="true" Visible="false" PackagePath="" />

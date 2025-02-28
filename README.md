@@ -1,4 +1,4 @@
-# _Serilog Expressions_ [![Build status](https://ci.appveyor.com/api/projects/status/vmcskdk2wjn1rpps/branch/dev?svg=true)](https://ci.appveyor.com/project/serilog/serilog-expressions/branch/dev) [![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
+# Serilog.Expressions&nbsp;[![Build status](https://github.com/serilog/serilog-expressions/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/serilog/serilog-expressions/actions)&nbsp;[![NuGet Package](https://img.shields.io/nuget/vpre/serilog.expressions)](https://nuget.org/packages/serilog.expressions)
 
 An embeddable mini-language for filtering, enriching, and formatting Serilog
 events, ideal for use with JSON or XML configuration.
@@ -201,6 +201,7 @@ calling a function will be undefined if:
 | `IsDefined(x)`                  | Returns `true` if the expression `x` has a value, including `null`, or `false` if `x` is undefined.                                                                                                                           |
 | `LastIndexOf(s, p)`             | Returns the last index of substring `p` in string `s`, or -1 if the substring does not appear.                                                                                                                                |
 | `Length(x)`                     | Returns the length of a string or array.                                                                                                                                                                                      |
+| `Nest(o)`                       | Converts dotted (flattened) property names of object `o` into nested sub-objects.                                                                                                                                             |
 | `Now()`                         | Returns `DateTimeOffset.Now`.                                                                                                                                                                                                 |
 | `Replace(s, p, r)`              | Replace occurrences of substring `p` in string `s` with replacement `r`.                                                                                                                                                      |
 | `Rest([deep])`                  | In an `ExpressionTemplate`, returns an object containing the first-class event properties not otherwise referenced in the template. If `deep` is `true`, also excludes properties referenced in the event's message template. |
