@@ -15,6 +15,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Serilog.Expressions.Compilation;
+using Serilog.Expressions.Compilation.Validation;
 using Serilog.Expressions.Parsing;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -101,10 +102,30 @@ public static class SerilogExpression
             return false;
         }
 
-        var evaluate = ExpressionCompiler.Compile(root, formatProvider, DefaultFunctionNameResolver.Build(nameResolver));
-        result = evt => evaluate(new(evt));
-        error = null;
-        return true;
+        var resolver = DefaultFunctionNameResolver.Build(nameResolver);
+        
+        // Validate the expression before compilation
+        if (!ExpressionValidator.Validate(root, resolver, out var validationError))
+        {
+            result = null;
+            error = validationError ?? "Unknown validation error";
+            return false;
+        }
+
+        try
+        {
+            var evaluate = ExpressionCompiler.Compile(root, formatProvider, resolver);
+            result = evt => evaluate(new(evt));
+            error = null;
+            return true;
+        }
+        catch (ArgumentException ex)
+        {
+            // Catch any remaining exceptions that weren't caught by validation
+            result = null;
+            error = ex.Message;
+            return false;
+        }
     }
 
     /// <summary>
