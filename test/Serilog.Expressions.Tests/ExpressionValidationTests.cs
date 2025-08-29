@@ -115,6 +115,9 @@ public class ExpressionValidationTests
         
         Assert.Throws<ArgumentException>(() => 
             SerilogExpression.Compile("Length(Name) ci"));
+        
+        Assert.Throws<ArgumentException>(() => 
+            SerilogExpression.Compile("IndexOfMatch(Text, '(?<')"));
     }
 
     [Theory]

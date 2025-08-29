@@ -66,7 +66,7 @@ class TextMatchingTransformer: IdentityTransformer
             }
         }
 
-        SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found ${regex}.");
+        SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found {regex}.");
         return new CallExpression(false, Operators.OpUndefined);
     }
 }

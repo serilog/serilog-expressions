@@ -26,7 +26,7 @@ class ExpressionValidator : IdentityTransformer
     readonly List<string> _errors = new();
 
     // Functions that support case-insensitive operations (have StringComparison parameter)
-    static readonly HashSet<string> CaseSensitiveFunctions = new(StringComparer.OrdinalIgnoreCase)
+    static readonly HashSet<string> CaseInsensitiveCapableFunctions = new(StringComparer.OrdinalIgnoreCase)
     {
         // String operations
         Operators.OpContains,
@@ -103,7 +103,7 @@ class ExpressionValidator : IdentityTransformer
         }
 
         // Check for invalid CI modifier usage
-        if (call.IgnoreCase && !CaseSensitiveFunctions.Contains(call.OperatorName))
+        if (call.IgnoreCase && !CaseInsensitiveCapableFunctions.Contains(call.OperatorName))
         {
             _errors.Add($"The function `{call.OperatorName}` does not support case-insensitive operation.");
         }
