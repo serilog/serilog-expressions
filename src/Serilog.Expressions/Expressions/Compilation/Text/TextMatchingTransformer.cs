@@ -61,8 +61,7 @@ class TextMatchingTransformer: IdentityTransformer
             }
             catch (ArgumentException ex)
             {
-                SelfLog.WriteLine($"Serilog.Expressions: Invalid regular expression in `IndexOfMatch()`: {ex.Message}");
-                return new CallExpression(false, Operators.OpUndefined);
+                throw new ExpressionValidationException($"Invalid regular expression in IndexOfMatch: {ex.Message}", ex);
             }
         }
 

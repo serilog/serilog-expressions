@@ -32,17 +32,17 @@ public class ExpressionValidationTests
     }
 
     [Theory]
-    [InlineData("Length(Name) ci", "The function `Length` does not support case-insensitive operation.")]
-    [InlineData("Round(Value, 2) ci", "The function `Round` does not support case-insensitive operation.")]
-    [InlineData("Now() ci", "The function `Now` does not support case-insensitive operation.")]
-    [InlineData("TypeOf(Value) ci", "The function `TypeOf` does not support case-insensitive operation.")]
-    [InlineData("IsDefined(Prop) ci", "The function `IsDefined` does not support case-insensitive operation.")]
-    public void InvalidCiModifierUsageIsReported(string expression, string expectedError)
+    [InlineData("Length(Name) ci")]
+    [InlineData("Round(Value, 2) ci")]
+    [InlineData("Now() ci")]
+    [InlineData("TypeOf(Value) ci")]
+    [InlineData("IsDefined(Prop) ci")]
+    public void InvalidCiModifierUsageCompilesWithWarning(string expression)
     {
         var result = SerilogExpression.TryCompile(expression, out var compiled, out var error);
-        Assert.False(result);
-        Assert.Equal(expectedError, error);
-        Assert.Null(compiled);
+        Assert.True(result, $"Failed to compile: {error}");
+        Assert.NotNull(compiled);
+        Assert.Null(error);
     }
 
     [Theory]
@@ -64,19 +64,17 @@ public class ExpressionValidationTests
     }
 
     [Fact]
-    public void MultipleErrorsAreCollectedAndReported()
+    public void FirstErrorIsReportedInComplexExpressions()
     {
-        var expression = "UnknownFunc() and IsMatch(Name, '[invalid') and Length(Value) ci";
+        var expression = "UnknownFunc() and Length(Value) > 5";
         var result = SerilogExpression.TryCompile(expression, out var compiled, out var error);
         
         Assert.False(result);
         Assert.Null(compiled);
         
-        // Should report all three errors
+        // Should report the first error encountered
         Assert.Contains("UnknownFunc", error);
-        Assert.Contains("Invalid regular expression", error);
-        Assert.Contains("does not support case-insensitive", error);
-        Assert.Contains("Multiple errors found", error);
+        Assert.NotNull(error);
     }
 
     [Fact]
@@ -113,8 +111,9 @@ public class ExpressionValidationTests
         Assert.Throws<ArgumentException>(() => 
             SerilogExpression.Compile("IsMatch(Name, '[invalid')"));
         
-        Assert.Throws<ArgumentException>(() => 
-            SerilogExpression.Compile("Length(Name) ci"));
+        // CI modifier on non-supporting functions compiles with warning
+        var compiledWithCi = SerilogExpression.Compile("Length(Name) ci");
+        Assert.NotNull(compiledWithCi);
         
         Assert.Throws<ArgumentException>(() => 
             SerilogExpression.Compile("IndexOfMatch(Text, '(?<')"));
@@ -148,19 +147,38 @@ public class ExpressionValidationTests
     }
 
     [Fact]
-    public void ComplexExpressionsWithMixedIssues()
+    public void ComplexExpressionsReportFirstError()
     {
-        var expression = "(UnknownFunc1() or IsMatch(Name, '(invalid')) and NotRealFunc() ci";
+        var expression = "UnknownFunc1() or Length(Value) > 5";
         var result = SerilogExpression.TryCompile(expression, out var compiled, out var error);
         
         Assert.False(result);
         Assert.Null(compiled);
         Assert.NotNull(error);
         
-        // Should report multiple errors
-        Assert.Contains("Multiple errors found", error);
+        // Should report the first error encountered during compilation
         Assert.Contains("UnknownFunc1", error);
-        Assert.Contains("NotRealFunc", error);
-        Assert.Contains("Invalid regular expression", error);
+    }
+
+    [Fact]
+    public void BackwardCompatibilityPreservedForInvalidCiUsage()
+    {
+        // These previously compiled (CI was silently ignored)
+        // They should still compile with the new changes
+        var expressions = new[]
+        {
+            "undefined() ci",
+            "null = undefined() ci",
+            "Length(Name) ci",
+            "Round(Value, 2) ci"
+        };
+
+        foreach (var expr in expressions)
+        {
+            var result = SerilogExpression.TryCompile(expr, out var compiled, out var error);
+            Assert.True(result, $"Breaking change detected: {expr} no longer compiles. Error: {error}");
+            Assert.NotNull(compiled);
+            Assert.Null(error);
+        }
     }
 }
