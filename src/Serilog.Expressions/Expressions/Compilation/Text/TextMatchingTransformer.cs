@@ -51,14 +51,21 @@ class TextMatchingTransformer: IdentityTransformer
     {
         if (regex is ConstantExpression { Constant: ScalarValue { Value: string s } })
         {
-            var opts = RegexOptions.Compiled | RegexOptions.ExplicitCapture;
-            if (ignoreCase)
-                opts |= RegexOptions.IgnoreCase;
-            var compiled = new Regex(s, opts, TimeSpan.FromMilliseconds(100));
-            return new IndexOfMatchExpression(Transform(corpus), compiled);
+            try
+            {
+                var opts = RegexOptions.Compiled | RegexOptions.ExplicitCapture;
+                if (ignoreCase)
+                    opts |= RegexOptions.IgnoreCase;
+                var compiled = new Regex(s, opts, TimeSpan.FromMilliseconds(100));
+                return new IndexOfMatchExpression(Transform(corpus), compiled);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ExpressionValidationException($"Invalid regular expression in IndexOfMatch: {ex.Message}", ex);
+            }
         }
 
-        SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found ${regex}.");
+        SelfLog.WriteLine($"Serilog.Expressions: `IndexOfMatch()` requires a constant string regular expression argument; found {regex}.");
         return new CallExpression(false, Operators.OpUndefined);
     }
 }

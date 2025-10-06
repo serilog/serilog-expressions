@@ -53,8 +53,8 @@ public static class SerilogExpression
     /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
     /// <param name="error">The reported error, if compilation was unsuccessful.</param>
     /// <returns>True if the function could be created; otherwise, false.</returns>
-    /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
-    /// errors.</remarks>
+    /// <remarks>Validation errors including invalid regular expressions and unknown function names are returned
+    /// as friendly error messages. Invalid case-insensitive modifiers are ignored with warnings.</remarks>
     public static bool TryCompile(
         string expression,
         [MaybeNullWhen(false)] out CompiledExpression result,
@@ -75,8 +75,8 @@ public static class SerilogExpression
     /// <param name="result">A function that evaluates the expression in the context of a log event.</param>
     /// <param name="error">The reported error, if compilation was unsuccessful.</param>
     /// <returns>True if the function could be created; otherwise, false.</returns>
-    /// <remarks>Regular expression syntax errors currently generate exceptions instead of producing friendly
-    /// errors.</remarks>
+    /// <remarks>Validation errors including invalid regular expressions and unknown function names are returned
+    /// as friendly error messages. Invalid case-insensitive modifiers are ignored with warnings.</remarks>
     public static bool TryCompile(string expression,
         IFormatProvider? formatProvider,
         NameResolver nameResolver,
@@ -101,10 +101,20 @@ public static class SerilogExpression
             return false;
         }
 
-        var evaluate = ExpressionCompiler.Compile(root, formatProvider, DefaultFunctionNameResolver.Build(nameResolver));
-        result = evt => evaluate(new(evt));
-        error = null;
-        return true;
+        try
+        {
+            var evaluate = ExpressionCompiler.Compile(root, formatProvider, DefaultFunctionNameResolver.Build(nameResolver));
+            result = evt => evaluate(new(evt));
+            error = null;
+            return true;
+        }
+        catch (ExpressionValidationException ex)
+        {
+            // Catch validation errors from compilation
+            result = null;
+            error = ex.Message;
+            return false;
+        }
     }
 
     /// <summary>

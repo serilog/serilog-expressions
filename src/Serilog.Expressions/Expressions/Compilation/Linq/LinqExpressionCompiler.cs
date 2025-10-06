@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Expressions.Ast;
 using Serilog.Expressions.Compilation.Transformations;
@@ -99,11 +100,23 @@ class LinqExpressionCompiler : SerilogExpressionTransformer<ExpressionBody>
     protected override ExpressionBody Transform(CallExpression call)
     {
         if (!_nameResolver.TryResolveFunctionName(call.OperatorName, out var m))
-            throw new ArgumentException($"The function name `{call.OperatorName}` was not recognized.");
+            throw new ExpressionValidationException($"The function name `{call.OperatorName}` was not recognized.");
 
         var methodParameters = m.GetParameters()
             .Select(info => (pi: info, optional: info.GetCustomAttribute<OptionalAttribute>() != null))
             .ToList();
+
+        // Log warning for CI modifier usage on functions that don't support it
+        // Note: We log a warning rather than throwing to maintain backward compatibility
+        // Previously, invalid CI usage was silently ignored
+        if (call.IgnoreCase)
+        {
+            var supportsStringComparison = methodParameters.Any(p => p.pi.ParameterType == typeof(StringComparison));
+            if (!supportsStringComparison)
+            {
+                SelfLog.WriteLine($"The function `{call.OperatorName}` does not support case-insensitive operation; the 'ci' modifier will be ignored.");
+            }
+        }
 
         var allowedParameters = methodParameters.Where(info => info.pi.ParameterType == typeof(LogEventPropertyValue)).ToList();
         var requiredParameterCount = allowedParameters.Count(info => !info.optional);
