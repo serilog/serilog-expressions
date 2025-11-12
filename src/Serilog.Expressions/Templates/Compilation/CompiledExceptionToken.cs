@@ -41,10 +41,10 @@ class CompiledExceptionToken : CompiledTemplate
         {
             lines = new StringReader(ctx.LogEvent.Exception.ToString());
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             lines = new StringReader(
-                $"[Exception.ToString() failed: {e.Message}] Original exception type: {ctx.LogEvent.Exception?.GetType().FullName}, message: {ctx.LogEvent.Exception?.Message}{Environment.NewLine}");
+                $"[Exception.ToString() failed: {ex.Message}] Original exception type: {ctx.LogEvent.Exception.GetType().FullName}{Environment.NewLine}");
         }
 
         while (lines.ReadLine() is { } nextLine)
