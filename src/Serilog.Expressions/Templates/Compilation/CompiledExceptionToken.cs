@@ -36,7 +36,17 @@ class CompiledExceptionToken : CompiledTemplate
         if (ctx.LogEvent.Exception is null)
             return;
 
-        var lines = new StringReader(ctx.LogEvent.Exception.ToString());
+        StringReader lines;
+        try
+        {
+            lines = new StringReader(ctx.LogEvent.Exception.ToString());
+        }
+        catch (Exception ex)
+        {
+            lines = new StringReader(
+                $"[Exception.ToString() failed: {ex.Message}] Original exception type: {ctx.LogEvent.Exception.GetType().FullName}{Environment.NewLine}");
+        }
+
         while (lines.ReadLine() is { } nextLine)
         {
             var style = nextLine.StartsWith(StackFrameLinePrefix) ? _secondaryText : _text;
