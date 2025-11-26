@@ -67,11 +67,7 @@ class CompiledFormattedExpression : CompiledTemplate
                 return; // Null is empty
 
             using var style = _secondaryText.Set(output, ref invisibleCharacterCount);
-
-            if (scalar.Value is IFormattable fmt)
-                output.Write(fmt.ToString(_format, formatProvider));
-            else
-                output.Write(scalar.Value.ToString());
+            scalar.Render(output, null, formatProvider);
         }
         else
         {

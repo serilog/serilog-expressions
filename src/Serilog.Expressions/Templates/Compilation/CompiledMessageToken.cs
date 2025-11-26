@@ -64,26 +64,26 @@ class CompiledMessageToken : CompiledTemplate
             switch (token)
             {
                 case TextToken tt:
-                {
-                    using var _ = _text.Set(output, ref invisibleCharacterCount);
-                    output.Write(tt.Text);
-                    break;
-                }
+                    {
+                        using var _ = _text.Set(output, ref invisibleCharacterCount);
+                        output.Write(tt.Text);
+                        break;
+                    }
                 case PropertyToken pt:
-                {
-                    EvaluateProperty(ctx.LogEvent.Properties, pt, output, ref invisibleCharacterCount);
-                    break;
-                }
+                    {
+                        EvaluateProperty(ctx.LogEvent.Properties, pt, output, ref invisibleCharacterCount);
+                        break;
+                    }
                 default:
-                {
-                    output.Write(token);
-                    break;
-                }
+                    {
+                        output.Write(token);
+                        break;
+                    }
             }
         }
     }
 
-    void EvaluateProperty(IReadOnlyDictionary<string,LogEventPropertyValue> properties, PropertyToken pt, TextWriter output, ref int invisibleCharacterCount)
+    void EvaluateProperty(IReadOnlyDictionary<string, LogEventPropertyValue> properties, PropertyToken pt, TextWriter output, ref int invisibleCharacterCount)
     {
         if (!properties.TryGetValue(pt.PropertyName, out var value))
         {
@@ -136,45 +136,14 @@ class CompiledMessageToken : CompiledTemplate
             return;
         }
 
-        if (value is ValueType)
+        var effectiveStyle = value switch
         {
-            if (value is int or uint or long or ulong or decimal or byte or sbyte or short or ushort)
-            {
-                using (_num.Set(output, ref invisibleCharacterCount))
-                    output.Write(((IFormattable)value).ToString(format, _formatProvider));
-                return;
-            }
+            bool _ => _bool,
+            ValueType _ => _num,
+            _ => _scalar
+        };
 
-            if (value is double d)
-            {
-                using (_num.Set(output, ref invisibleCharacterCount))
-                    output.Write(d.ToString(format, _formatProvider));
-                return;
-            }
-
-            if (value is float f)
-            {
-                using (_num.Set(output, ref invisibleCharacterCount))
-                    output.Write(f.ToString(format, _formatProvider));
-                return;
-            }
-
-            if (value is bool b)
-            {
-                using (_bool.Set(output, ref invisibleCharacterCount))
-                    output.Write(b);
-                return;
-            }
-        }
-
-        if (value is IFormattable formattable)
-        {
-            using (_scalar.Set(output, ref invisibleCharacterCount))
-                output.Write(formattable.ToString(format, _formatProvider));
-            return;
-        }
-
-        using (_scalar.Set(output, ref invisibleCharacterCount))
-            output.Write(value);
+        using (effectiveStyle.Set(output, ref invisibleCharacterCount))
+            scalar.Render(output, format, _formatProvider);
     }
 }
